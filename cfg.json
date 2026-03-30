@@ -29,15 +29,17 @@
         "ICP",
         "MAGIC",
         "REZ",
-        "DOOD"
+        "DOOD", 
+        "DEGO"
     ],
     "quota_asset": "USDT",
     "risk": {
         "leverage": 20,
         "margin_size": "row",
-        "notional_limit": 1000,
+        "notional_limit": 800,
         "margin_over_size_pct": 1,
         "margin_mode": 2,
+        "hedge_mode": false,
         "quarantine": {
             "max_consecutive_fails": 1,
             "quarantine_hours": "inf"
@@ -49,8 +51,8 @@
                 "name": "Rucheiok pattern",
                 "enable": true,
                 "depth": 8,
-                "min_first_row_usdt_notional": 400,
-                "max_first_row_usdt_notional": 950,
+                "min_first_row_usdt_notional": 350,
+                "max_first_row_usdt_notional": 750,
                 "header": {
                     "roc_window": 3,
                     "max_one_roc_pct": 0.5

@@ -37,3 +37,81 @@ Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
 2026-03-30 13:36:54 | DEBUG | core | Полный JSON конфига: {"app": {"name": "Rucheiok Bot", "max_active_positions": 1, "max_place_order_retries": 2}, "credentials": {"api_key": "", "api_secret": ""}, "tg": {"enable": true, "token": "", "chat_id": ""}, "log": {"debug": true, "info": true, "warning": true, "error": true, "max_lines": 1500, "timezone": "Europe/Kyiv"}, "black_list": ["RIVER", "SIREN", "0G", "PTB", "ICP", "MAGIC", "REZ"], "quota_asset": "USDT", "risk": {"leverage": 20, "margin_size": "row", "notional_limit": 1000, "margin_over_size_pct": 1, "margin_mode": 2, "quarantine": {"max_consecutive_fails": 1, "quarantine_hours": "inf"}}, "entry": {"pattern": {"phemex": {"name": "Rucheiok pattern", "enable": true, "depth": 8, "min_first_row_usdt_notional": 400, "max_first_row_usdt_notional": 950, "header": {"roc_window": 3, "max_one_roc_pct": 0.5}, "body": {"roc_sma_window": 5}, "bottom": {"min_spread_between_two_row_pct": 0.2, "min_spread_between_three_row_pct": 0.25}, "header_to_bottom_desired_rate": 6, "max_bid_ask_distance_rate": 0.5, "pattern_ttl_sec": 2}, "binance": {"enable": true, "min_price_spread_pct": 0.15, "update_prices_sec": 1.1, "spread_ttl_sec": 2}, "phemex_funding_filter": {"enable": true, "check_interval_sec": 60, "skip_before_counter_sec": 1800, "funding_threshold_pct": 1.0}}}, "exit": {"scenarious": {"average": {"enable": true, "stabilization_ttl": 0, "target_rate": 0.7, "shift_demotion": 0.2, "min_target_rate": 0.3, "shift_ttl": 60}, "negative": {"enable": true, "stabilization_ttl": 1.5, "negative_spread_pct": 0, "negative_ttl": 60}}, "interference": {"enable": false, "average_vol_pct_to_init_size": 3, "max_vol_pct_to_init_size": 9, "max_retries_per_level": 2}, "position_ttl_close": {"enable": true, "position_ttl": 600, "breakeven_wait_sec": 2, "to_entry_orientation": 0.0}, "extrime_close": {"enable": true, "retry_ttl": 3, "retry_num": "inf", "bid_to_ask_orientation": 0.0, "increase_fraction": 2.5}}}
 2026-03-30 13:37:45 | INFO | core | ⏹ Остановка процессов...
 2026-03-30 13:37:45 | INFO | core | 💾 Финальное сохранение стейта на диск...
+2026-03-30 14:36:02 | INFO | core | ▶️ Запуск торговых процессов...
+2026-03-30 14:36:02 | INFO | core | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>20x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>2s</b>
+Vol Limits: <b>400 - 950 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.2%</b>
+Sprd 3 row: &gt;= <b>0.25%</b>
+H/B rate: <b>6</b> | Max B/A dist: <b>0.5</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.15%</b> | TTL: <b>2s</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>0.7</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-03-30 14:36:02 | DEBUG | core | Полный JSON конфига: {"app": {"name": "Rucheiok Bot", "max_active_positions": 1, "max_place_order_retries": 2}, "credentials": {"api_key": "", "api_secret": ""}, "tg": {"enable": true, "token": "", "chat_id": ""}, "log": {"debug": true, "info": true, "warning": true, "error": true, "max_lines": 1500, "timezone": "Europe/Kyiv"}, "black_list": ["RIVER", "SIREN", "0G", "PTB", "ICP", "MAGIC", "REZ", "DOOD"], "quota_asset": "USDT", "risk": {"leverage": 20, "margin_size": "row", "notional_limit": 1000, "margin_over_size_pct": 1, "margin_mode": 2, "quarantine": {"max_consecutive_fails": 1, "quarantine_hours": "inf"}}, "entry": {"pattern": {"phemex": {"name": "Rucheiok pattern", "enable": true, "depth": 8, "min_first_row_usdt_notional": 400, "max_first_row_usdt_notional": 950, "header": {"roc_window": 3, "max_one_roc_pct": 0.5}, "body": {"roc_sma_window": 5}, "bottom": {"min_spread_between_two_row_pct": 0.2, "min_spread_between_three_row_pct": 0.25}, "header_to_bottom_desired_rate": 6, "max_bid_ask_distance_rate": 0.5, "pattern_ttl_sec": 2}, "binance": {"enable": true, "min_price_spread_pct": 0.15, "update_prices_sec": 1.1, "spread_ttl_sec": 2}, "phemex_funding_filter": {"enable": true, "check_interval_sec": 60, "skip_before_counter_sec": 1800, "funding_threshold_pct": 1.0}}}, "exit": {"scenarious": {"average": {"enable": true, "stabilization_ttl": 0, "target_rate": 0.7, "shift_demotion": 0.2, "min_target_rate": 0.3, "shift_ttl": 60}, "negative": {"enable": true, "stabilization_ttl": 1.5, "negative_spread_pct": 0, "negative_ttl": 60}}, "interference": {"enable": false, "average_vol_pct_to_init_size": 3, "max_vol_pct_to_init_size": 9, "max_retries_per_level": 2}, "position_ttl_close": {"enable": true, "position_ttl": 600, "breakeven_wait_sec": 2, "to_entry_orientation": 0.0}, "extrime_close": {"enable": true, "retry_ttl": 3, "retry_num": "inf", "bid_to_ask_orientation": 0.0, "increase_fraction": 2.5}}}
+2026-03-30 14:43:42 | INFO | core | ⏹ Остановка процессов...
+2026-03-30 14:43:42 | INFO | core | 💾 Финальное сохранение стейта на диск...
+2026-03-30 14:47:22 | INFO | core | ▶️ Запуск торговых процессов...
+2026-03-30 14:47:22 | INFO | core | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>20x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>800 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>2s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.2%</b>
+Sprd 3 row: &gt;= <b>0.25%</b>
+H/B rate: <b>6</b> | Max B/A dist: <b>0.5</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.15%</b> | TTL: <b>2s</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>0.7</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-03-30 14:47:22 | DEBUG | core | Полный JSON конфига: {"app": {"name": "Rucheiok Bot", "max_active_positions": 1, "max_place_order_retries": 2}, "credentials": {"api_key": "", "api_secret": ""}, "tg": {"enable": true, "token": "", "chat_id": ""}, "log": {"debug": true, "info": true, "warning": true, "error": true, "max_lines": 1500, "timezone": "Europe/Kyiv"}, "black_list": ["RIVER", "SIREN", "0G", "PTB", "ICP", "MAGIC", "REZ", "DOOD"], "quota_asset": "USDT", "risk": {"leverage": 20, "margin_size": "row", "notional_limit": 800, "margin_over_size_pct": 1, "margin_mode": 2, "quarantine": {"max_consecutive_fails": 1, "quarantine_hours": "inf"}}, "entry": {"pattern": {"phemex": {"name": "Rucheiok pattern", "enable": true, "depth": 8, "min_first_row_usdt_notional": 350, "max_first_row_usdt_notional": 750, "header": {"roc_window": 3, "max_one_roc_pct": 0.5}, "body": {"roc_sma_window": 5}, "bottom": {"min_spread_between_two_row_pct": 0.2, "min_spread_between_three_row_pct": 0.25}, "header_to_bottom_desired_rate": 6, "max_bid_ask_distance_rate": 0.5, "pattern_ttl_sec": 2}, "binance": {"enable": true, "min_price_spread_pct": 0.15, "update_prices_sec": 1.1, "spread_ttl_sec": 2}, "phemex_funding_filter": {"enable": true, "check_interval_sec": 60, "skip_before_counter_sec": 1800, "funding_threshold_pct": 1.0}}}, "exit": {"scenarious": {"average": {"enable": true, "stabilization_ttl": 0, "target_rate": 0.7, "shift_demotion": 0.2, "min_target_rate": 0.3, "shift_ttl": 60}, "negative": {"enable": true, "stabilization_ttl": 1.5, "negative_spread_pct": 0, "negative_ttl": 60}}, "interference": {"enable": false, "average_vol_pct_to_init_size": 3, "max_vol_pct_to_init_size": 9, "max_retries_per_level": 2}, "position_ttl_close": {"enable": true, "position_ttl": 600, "breakeven_wait_sec": 2, "to_entry_orientation": 0.0}, "extrime_close": {"enable": true, "retry_ttl": 3, "retry_num": "inf", "bid_to_ask_orientation": 0.0, "increase_fraction": 2.5}}}
+2026-03-30 15:18:32 | INFO | core | ⏹ Остановка процессов...
+2026-03-30 15:18:32 | INFO | core | 💾 Финальное сохранение стейта на диск...

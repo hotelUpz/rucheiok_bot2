@@ -265,8 +265,8 @@ class OrderExecutor:
             if qty <= 0:
                 return
 
-            spr3_pct = signal.get("spr3_pct", 0)
-            base_target = price * (1 + (spr3_pct / 100)) if signal["side"] == "LONG" else price * (1 - (spr3_pct / 100))
+            spr2_pct = signal.get("spr2_pct", 0)
+            base_target = price * (1 + (spr2_pct / 100)) if signal["side"] == "LONG" else price * (1 - (spr2_pct / 100))
 
             pos_side = "Long" if signal["side"] == "LONG" else "Short"
             side = "Buy" if signal["side"] == "LONG" else "Sell"
