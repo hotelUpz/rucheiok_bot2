@@ -212,21 +212,19 @@ class TradingBot:
                 size = float(item.get("sizeRq", item.get("size", 0)))
                 if size != 0:
                     symbol = item.get("symbol")
-                    exchange_positions[symbol] = {
-                        "size": abs(size),
-                        "side": "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"
-                    }
+                    pos_side = "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"
+                    pos_key = f"{symbol}_{pos_side}"
+                    exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
 
             old_positions = dict(self.state.active_positions)
             self.state.active_positions.clear()
 
-            for symbol, pos in old_positions.items():
-                if symbol in exchange_positions:
-                    exch_data = exchange_positions[symbol]
+            for pos_key, pos in old_positions.items():
+                if pos_key in exchange_positions:
+                    exch_data = exchange_positions[pos_key]
 
                     if pos.side != exch_data["side"]:
-                        logger.warning(f"⚠️ [RECOVERY] {symbol} конфликт сторон (Кэш: {pos.side}, Биржа: {exch_data['side']}). Позиция сброшена.")
-                        continue
+                        continue # Конфликт сторон (оставляем дроп)
 
                     pos.qty = exch_data["size"]
                     pos.close_order_id = None
@@ -234,15 +232,10 @@ class TradingBot:
                     pos.entry_cancel_requested = False
                     pos.interference_cancel_requested = False
 
-                    try:
-                        await self.private_client.cancel_all_orders(symbol)
-                    except Exception:
-                        pass
-
-                    self.state.active_positions[symbol] = pos
-                    logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {symbol} ({pos.side}). Объем: {pos.qty}, Вход: {pos.entry_price}")
+                    self.state.active_positions[pos_key] = pos
+                    logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {pos_key}. Объем: {pos.qty}, Вход: {pos.entry_price}")
                 else:
-                    logger.info(f"🗑 [RECOVERY] Позиция {symbol} закрыта извне, пока бот спал. Удаляем из кэша.")
+                    logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне, пока бот спал. Удаляем из кэша.")
 
             await self.state.save()
         except Exception as e:
@@ -252,57 +245,190 @@ class TradingBot:
         if not self._is_running:
             return
         symbol = snap.symbol
-        if symbol in self.black_list and symbol not in self.state.active_positions:
+        
+        # Карантин и ЧС работают глобально на весь СИМВОЛ
+        if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions):
             return
         if symbol in self.state.quarantine_until:
             if time.time() > self.state.quarantine_until[symbol]:
                 del self.state.quarantine_until[symbol]
                 self.state.consecutive_fails[symbol] = 0
                 await self.state.save()
-            elif symbol not in self.state.active_positions:
+            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions):
                 return
 
         if symbol in self._processing:
             return
         self._processing.add(symbol)
         try:
-            if symbol in self.state.active_positions:
-                pos = self.state.active_positions[symbol]
+            pos_long_key = f"{symbol}_LONG"
+            pos_short_key = f"{symbol}_SHORT"
+            
+            # 1. Обрабатываем ВЫХОДЫ для обеих возможных позиций (Hedge Mode)
+            for pos_key in (pos_long_key, pos_short_key):
+                if pos_key in self.state.active_positions:
+                    pos = self.state.active_positions[pos_key]
 
-                if pos.current_close_price > 0 and not pos.close_order_id and not pos.in_extrime_mode:
-                    if symbol not in self.state.pending_interference_orders:
-                        last_try = getattr(pos, '_last_restore_ts', 0)
-                        if time.time() - last_try > 3:
-                            setattr(pos, '_last_restore_ts', time.time())
-                            asyncio.create_task(self.executor.restore_tp(symbol, pos))
+                    if pos.current_close_price > 0 and not pos.close_order_id and not pos.in_extrime_mode:
+                        if pos_key not in self.state.pending_interference_orders:
+                            last_try = getattr(pos, '_last_restore_ts', 0)
+                            if time.time() - last_try > 3:
+                                setattr(pos, '_last_restore_ts', time.time())
+                                asyncio.create_task(self.executor.restore_tp(symbol, pos_key, pos))
 
-                if symbol in self.state.pending_entry_orders and pos.qty <= 0:
+                    if pos_key in self.state.pending_entry_orders and pos.qty <= 0:
+                        continue # Позиция еще не налилась
+                        
+                    action = self.exit_engine.analyze(snap, pos)
+                    if action:
+                        await self.executor.handle_exit_action(symbol, pos_key, action)
+            
+            # 2. Подсчет слотов СТРОГО ПО СИМВОЛАМ (1 символ = 1 слот)
+            active_symbols = set(p.symbol for p in self.state.active_positions.values())
+            current_slots = len(active_symbols | self.state.in_flight_orders)
+            
+            if current_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in self.state.in_flight_orders:
+                return
+
+            # 3. Анализ ВХОДА
+            await self.update_prices_cache()
+            signal = self.entry_engine.analyze(
+                snap,
+                self.binance_prices.get(symbol, 0.0),
+                self.phemex_prices.get(symbol, 0.0),
+            )
+            
+            if signal:
+                side_enum = signal["side"]
+                pos_key = f"{symbol}_{side_enum}"
+                
+                # Если именно эта сторона уже торгуется - скипаем
+                if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders:
+                    return 
+                    
+                # Двойная проверка слотов
+                active_symbols = set(p.symbol for p in self.state.active_positions.values())
+                current_slots = len(active_symbols | self.state.in_flight_orders)
+                if current_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in self.state.in_flight_orders:
                     return
-                action = self.exit_engine.analyze(snap, pos)
-                if action:
-                    await self.executor.handle_exit_action(symbol, action)
-            else:
-                if len(self.state.active_positions) + len(self.state.in_flight_orders) >= self.max_active_positions:
-                    return
-                await self.update_prices_cache()
-                signal = self.entry_engine.analyze(
-                    snap,
-                    self.binance_prices.get(symbol, 0.0),
-                    self.phemex_prices.get(symbol, 0.0),
-                )
-                if signal:
-                    if len(self.state.active_positions) + len(self.state.in_flight_orders) >= self.max_active_positions:
-                        return
-                    self.state.in_flight_orders.add(symbol)
-                    try:
-                        signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-                        await self.executor.execute_entry(symbol, signal, snap)
-                    finally:
-                        self.state.in_flight_orders.discard(symbol)
+
+                self.state.in_flight_orders.add(symbol)
+                try:
+                    signal["row_vol_asset"] = snap.asks[0][1] if side_enum == "LONG" else snap.bids[0][1]
+                    await self.executor.execute_entry(symbol, pos_key, signal, snap)
+                finally:
+                    self.state.in_flight_orders.discard(symbol)
         except Exception as e:
             logger.debug(f"Scan error: {e}")
         finally:
             self._processing.discard(symbol)
+
+    # async def _recover_state(self):
+    #     try:
+    #         self.state.load()
+    #         resp = await self.private_client.get_active_positions()
+
+    #         data_block = resp.get("data", {})
+    #         data = data_block.get("positions", []) if isinstance(data_block, dict) else data_block
+    #         if not isinstance(data, list):
+    #             data = []
+
+    #         exchange_positions = {}
+    #         for item in data:
+    #             size = float(item.get("sizeRq", item.get("size", 0)))
+    #             if size != 0:
+    #                 symbol = item.get("symbol")
+    #                 exchange_positions[symbol] = {
+    #                     "size": abs(size),
+    #                     "side": "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"
+    #                 }
+
+    #         old_positions = dict(self.state.active_positions)
+    #         self.state.active_positions.clear()
+
+    #         for symbol, pos in old_positions.items():
+    #             if symbol in exchange_positions:
+    #                 exch_data = exchange_positions[symbol]
+
+    #                 if pos.side != exch_data["side"]:
+    #                     logger.warning(f"⚠️ [RECOVERY] {symbol} конфликт сторон (Кэш: {pos.side}, Биржа: {exch_data['side']}). Позиция сброшена.")
+    #                     continue
+
+    #                 pos.qty = exch_data["size"]
+    #                 pos.close_order_id = None
+    #                 pos.entry_finalized = pos.qty > 0
+    #                 pos.entry_cancel_requested = False
+    #                 pos.interference_cancel_requested = False
+
+    #                 try:
+    #                     await self.private_client.cancel_all_orders(symbol)
+    #                 except Exception:
+    #                     pass
+
+    #                 self.state.active_positions[symbol] = pos
+    #                 logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {symbol} ({pos.side}). Объем: {pos.qty}, Вход: {pos.entry_price}")
+    #             else:
+    #                 logger.info(f"🗑 [RECOVERY] Позиция {symbol} закрыта извне, пока бот спал. Удаляем из кэша.")
+
+    #         await self.state.save()
+    #     except Exception as e:
+    #         logger.error(f"❌ Ошибка Recovery: {e}")
+
+    # async def _process_depth(self, snap: DepthTop):
+    #     if not self._is_running:
+    #         return
+    #     symbol = snap.symbol
+    #     if symbol in self.black_list and symbol not in self.state.active_positions:
+    #         return
+    #     if symbol in self.state.quarantine_until:
+    #         if time.time() > self.state.quarantine_until[symbol]:
+    #             del self.state.quarantine_until[symbol]
+    #             self.state.consecutive_fails[symbol] = 0
+    #             await self.state.save()
+    #         elif symbol not in self.state.active_positions:
+    #             return
+
+    #     if symbol in self._processing:
+    #         return
+    #     self._processing.add(symbol)
+    #     try:
+    #         if symbol in self.state.active_positions:
+    #             pos = self.state.active_positions[symbol]
+
+    #             if pos.current_close_price > 0 and not pos.close_order_id and not pos.in_extrime_mode:
+    #                 if symbol not in self.state.pending_interference_orders:
+    #                     last_try = getattr(pos, '_last_restore_ts', 0)
+    #                     if time.time() - last_try > 3:
+    #                         setattr(pos, '_last_restore_ts', time.time())
+    #                         asyncio.create_task(self.executor.restore_tp(symbol, pos))
+
+    #             if symbol in self.state.pending_entry_orders and pos.qty <= 0:
+    #                 return
+    #             action = self.exit_engine.analyze(snap, pos)
+    #             if action:
+    #                 await self.executor.handle_exit_action(symbol, action)
+    #         else:
+    #             if len(self.state.active_positions) + len(self.state.in_flight_orders) >= self.max_active_positions:
+    #                 return
+    #             await self.update_prices_cache()
+    #             signal = self.entry_engine.analyze(
+    #                 snap,
+    #                 self.binance_prices.get(symbol, 0.0),
+    #                 self.phemex_prices.get(symbol, 0.0),
+    #             )
+    #             if signal:
+    #                 if len(self.state.active_positions) + len(self.state.in_flight_orders) >= self.max_active_positions:
+    #                     return
+    #                 self.state.in_flight_orders.add(symbol)
+    #                 try:
+    #                     signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
+    #                     await self.executor.execute_entry(symbol, signal, snap)
+    #                 finally:
+    #                     self.state.in_flight_orders.discard(symbol)
+    #     except Exception as e:
+    #         logger.debug(f"Scan error: {e}")
+    #     finally:
+    #         self._processing.discard(symbol)
 
     async def _depth_worker(self, symbol: str):
         try:
