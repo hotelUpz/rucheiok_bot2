@@ -128,7 +128,7 @@ class OrderExecutor:
             close_side = "Sell" if pos.side == "LONG" else "Buy"
             pos_side = "Long" if pos.side == "LONG" else "Short"
 
-            if act in ("UPDATE_TARGET", "PLACE_EXTRIME_LIMIT"):
+            if act in ("UPDATE_TARGET", "PLACE_EXTRIME_LIMIT", "PLACE_DYNAMIC_CLOSE"):
                 if act == "UPDATE_TARGET":
                     if "price" in action:
                         target_price = action["price"]
@@ -167,6 +167,8 @@ class OrderExecutor:
                         logger.info(f"🎯 ПЕРВИЧНАЯ ЦЕЛЬ: {log_msg}")
                     elif reason == "SHIFT_DEMOTION":
                         logger.info(f"📉 СДВИГ ЦЕЛИ: {log_msg}")
+                    elif reason == "DYNAMIC_TP_HIT":
+                        logger.info(f"⚡ ДИНАМИЧЕСКОЕ ЗАКРЫТИЕ (TAKER): {log_msg}")
                     elif reason == "TTL_BREAKEVEN":
                         logger.warning(f"⌛ БЕЗУБЫТОК: {log_msg}")
                     else:

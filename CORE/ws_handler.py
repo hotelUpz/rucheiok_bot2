@@ -49,26 +49,7 @@ class PrivateWSHandler:
             logger.debug(f"[{symbol}] Ошибка отмены остатка закрывающей лимитки: {e}")
 
     async def _bootstrap_initial_tp_if_needed(self, symbol: str) -> None:
-        pos = self.tb.state.active_positions.get(symbol)
-        if not pos or pos.qty <= 0:
-            return
-        if pos.close_order_id or pos.current_close_price > 0 or pos.in_extrime_mode:
-            return
-
-        avg_scenario = getattr(self.tb.exit_engine, "average", None)
-        if not avg_scenario or not getattr(avg_scenario, "enable", True):
-            return
-        stab_avg = getattr(avg_scenario, "stab_avg", 0)
-        if stab_avg > 0:
-            return
-
-        try:
-            await self.tb.executor.handle_exit_action(
-                symbol,
-                {"action": "UPDATE_TARGET", "new_rate": pos.current_target_rate, "reason": "INITIAL_TP"},
-            )
-        except Exception as e:
-            logger.error(f"[{symbol}] Ошибка стартовой постановки ТП: {e}")
+        pass # Отключено: AverageScenario теперь ставит динамические цели самостоятельно
 
     async def _finalize_external_close(self, sym: str, close_price: float) -> None:
         self.tb.state.pending_entry_orders.pop(sym, None)
@@ -135,9 +116,9 @@ class PrivateWSHandler:
                 pos.interf_bought_qty += added_qty
                 logger.info(f"🛒 [ИНТЕРФЕРЕНЦИЯ] {symbol}. Долито: {added_qty}. Новый общий объем: {pos.qty}")
 
-        # if status == "PartiallyFilled" and pos and cum_qty > 0:
-        #     asyncio.create_task(self._cancel_interference_remainder_once(symbol, order_id, pos_side, pos))
-        #     return
+        if status == "PartiallyFilled" and pos and cum_qty > 0:
+            asyncio.create_task(self._cancel_interference_remainder_once(symbol, order_id, pos_side, pos))
+            return
 
         if status == "Filled":
             self.tb.state.pending_interference_orders.pop(symbol, None)
@@ -169,13 +150,9 @@ class PrivateWSHandler:
         if not pos or pos.close_order_id != order_id:
             return
 
-        # if status == "PartiallyFilled":
-        #     if cum_qty > 0:
-        #         asyncio.create_task(self._cancel_close_remainder_once(symbol, order_id, pos_side, pos))
-        #     return
         if status == "PartiallyFilled":
-            # ✅ ТЕПЕРЬ МЫ НИЧЕГО НЕ ОТМЕНЯЕМ! Тейк должен висеть до полного налива.
-            logger.info(f"⏳ [{symbol}] Тейк-профит исполняется частично (cumQty: {cum_qty}). Ждем полного налива...")
+            if cum_qty > 0:
+                asyncio.create_task(self._cancel_close_remainder_once(symbol, order_id, pos_side, pos))
             return
 
         if status == "Filled":
