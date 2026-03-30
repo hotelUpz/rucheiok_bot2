@@ -361,7 +361,13 @@ class PrivateWSHandler:
             asyncio.create_task(self.tb.tg.send_message(f"⚠️ Внешнее/ручное закрытие\n#{pos_key}\nPrice: {close_price}"))
 
     async def _handle_entry_order(self, symbol: str, pos_key: str, ord_info: Dict[str, Any], order_id: str, status: str, pos_side: str, cum_qty: float) -> None:
-        if self.tb.state.pending_entry_orders.get(pos_key) != order_id: return
+        saved_id = self.tb.state.pending_entry_orders.get(pos_key)
+        # [ХИРУРГИЯ 2]: Если статус PENDING_HTTP, значит вебсокет обогнал REST. Забираем ID!
+        if saved_id == "PENDING_HTTP":
+            self.tb.state.pending_entry_orders[pos_key] = order_id
+        elif saved_id != order_id:
+            return # Чужой или старый ордер
+            
         pos = self.tb.state.active_positions.get(pos_key)
         semantic = "ОТКРЫТЬ ЛОНГ" if pos and pos.side == "LONG" else "ОТКРЫТЬ ШОРТ"
 
@@ -389,6 +395,48 @@ class PrivateWSHandler:
             else:
                 if not was_requested: logger.warning(f"🗑 [{pos_key}] Входной ордер отменен биржей. Удаляем кэш.")
                 self.tb.state.active_positions.pop(pos_key, None)
+            await self.tb.state.save()
+
+    async def _handle_close_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float, exec_qty: float) -> None:
+        pos = self.tb.state.active_positions.get(pos_key)
+        if not pos: return
+        
+        semantic = "ЗАКРЫТИЕ ЛОНГА" if pos.side == "LONG" else "ЗАКРЫТИЕ ШОРТА"
+
+        # [ХИРУРГИЯ 3]: БЕЗУСЛОВНЫЙ вычет объема. Даже если это запоздалый налив отмененного ордера!
+        if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
+            pos.qty = max(0.0, pos.qty - exec_qty)
+            logger.debug(f"[{pos_key}] Учет исполнения (актуального или запоздалого): -{exec_qty}. Остаток: {pos.qty}")
+
+        # Теперь проверяем, текущий ли это ордер для дальнейших манипуляций (отмена остатка)
+        if pos.close_order_id != order_id:
+            # Если ордер "призрак" закрыл остатки позы в 0 - сбрасываем стейт
+            if pos.qty <= 0:
+                self.tb.state.active_positions.pop(pos_key, None)
+                await self.tb.state.save()
+            return
+
+        # ---- НИЖЕ ЛОГИКА ТОЛЬКО ДЛЯ АКТУАЛЬНОГО ТЕКУЩЕГО ОРДЕРА ----
+        if status == "PartiallyFilled":
+            if cum_qty > 0: asyncio.create_task(self._cancel_close_remainder_once(symbol, pos_key, order_id, pos_side, pos))
+            return
+
+        if status == "Filled" or pos.qty <= 0:
+            self.tb.state.active_positions.pop(pos_key, None)
+            logger.info(f"✅ [{pos_key}] {semantic} ПОЛНОСТЬЮ ЗАВЕРШЕНО.")
+            if self.tb.tg:
+                pnl_str = f"+{price_rp}" if price_rp > 0 else str(price_rp)
+                asyncio.create_task(self.tb.tg.send_message(
+                    f"✅ <b>Тейк-профит исполнен! ({semantic})</b>\nМонета: #{symbol}\n"
+                    f"PnL: {pnl_str}. Цена выхода: {pos.current_close_price}"
+                ))
+            await self.tb.state.save()
+            return
+
+        if status in ("Canceled", "Rejected", "Deactivated"):
+            pos.close_order_id = None
+            pos.close_cancel_requested = False
+            if pos.qty <= 0: self.tb.state.active_positions.pop(pos_key, None)
             await self.tb.state.save()
 
     async def _handle_interference_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, exec_qty: float, cum_qty: float, price_rp: float) -> None:
@@ -425,46 +473,6 @@ class PrivateWSHandler:
                     if price_rp > 0: pos.failed_interference_prices[str(price_rp)] = pos.failed_interference_prices.get(str(price_rp), 0) + 1
                     pos.place_order_fails += 1
                     asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos_key, pos))
-            await self.tb.state.save()
-
-    async def _handle_close_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float, exec_qty: float) -> None:
-        pos = self.tb.state.active_positions.get(pos_key)
-        if not pos: return
-        
-        # [ПАРАНОЙЯ-ФИКС]: Мы удалили жесткий чек `pos.close_order_id != order_id`.
-        # Теперь, если старый (уже отмененный нами) ТП вдруг нальется из-за пинга, 
-        # мы всё равно учтем этот объем и вычтем его из баланса!
-
-        semantic = "ЗАКРЫТИЕ ЛОНГА" if pos.side == "LONG" else "ЗАКРЫТИЕ ШОРТА"
-
-        if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
-            pos.qty = max(0.0, pos.qty - exec_qty)
-            logger.debug(f"[{pos_key}] Учет исполнения (актуального или запоздалого): -{exec_qty}. Остаток: {pos.qty}")
-
-        if status == "PartiallyFilled":
-            if cum_qty > 0: asyncio.create_task(self._cancel_close_remainder_once(symbol, pos_key, order_id, pos_side, pos))
-            return
-
-        if status == "Filled" or pos.qty <= 0:
-            self.tb.state.active_positions.pop(pos_key, None)
-            logger.info(f"✅ [{pos_key}] {semantic} ПОЛНОСТЬЮ ЗАВЕРШЕНО.")
-            if self.tb.tg:
-                pnl_str = f"+{price_rp}" if price_rp > 0 else str(price_rp)
-                asyncio.create_task(self.tb.tg.send_message(
-                    f"✅ <b>Тейк-профит исполнен! ({semantic})</b>\nМонета: #{symbol}\n"
-                    f"PnL: {pnl_str}. Цена выхода: {pos.current_close_price}"
-                ))
-            await self.tb.state.save()
-            return
-
-        if status in ("Canceled", "Rejected", "Deactivated"):
-            # [ПАРАНОЙЯ-ФИКС]: Сбрасываем флаг ТОЛЬКО если это наш ТЕКУЩИЙ ордер. 
-            # Если это пришла отмена старого ордера — флаг нового ордера не трогаем!
-            if pos.close_order_id == order_id:
-                pos.close_order_id = None
-                pos.close_cancel_requested = False
-            
-            if pos.qty <= 0: self.tb.state.active_positions.pop(pos_key, None)
             await self.tb.state.save()
 
     async def handle_message(self, payload: Dict[str, Any]):

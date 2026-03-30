@@ -533,22 +533,31 @@ class OrderExecutor:
             side = "Buy" if signal["side"] == "LONG" else "Sell"
             semantic_action = "ОТКРЫТЬ ЛОНГ" if signal["side"] == "LONG" else "ОТКРЫТЬ ШОРТ"
 
+            # [ХИРУРГИЯ 1]: Создаем позицию и резервируем статус ДО отправки HTTP
+            ask1, bid1 = depth.asks[0][0], depth.bids[0][0]
+            pos = ActivePosition(
+                symbol=symbol, side=signal["side"], entry_price=price, qty=0.0, init_qty=qty,
+                init_ask1=ask1, init_bid1=bid1, base_target_price_100=base_target,
+            )
+            self.tb.exit_engine.initialize_position_state(pos)
+            self.tb.state.active_positions[pos_key] = pos
+            self.tb.state.pending_entry_orders[pos_key] = "PENDING_HTTP" # Метка для супер-быстрых вебсокетов
+
             resp = await self.tb.private_client.place_limit_order(symbol=symbol, side=side, qty=qty, price=price, pos_side=pos_side)
             order_id = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
 
             if order_id:
                 self.tb.state.pending_entry_orders[pos_key] = order_id
-                ask1, bid1 = depth.asks[0][0], depth.bids[0][0]
-                pos = ActivePosition(
-                    symbol=symbol, side=signal["side"], entry_price=price, qty=0.0, init_qty=qty,
-                    init_ask1=ask1, init_bid1=bid1, base_target_price_100=base_target,
-                )
-                self.tb.exit_engine.initialize_position_state(pos)
-                self.tb.state.active_positions[pos_key] = pos
                 await self.tb.state.save()
-
                 logger.info(f"🚀 [{pos_key}] {semantic_action} ОТПРАВЛЕН: по {price} (Плановый объем: {qty})")
                 if self.tb.tg:
                     await self.tb.tg.send_message(f"🟢 <b>Сигнал на вход ({semantic_action})</b>\nМонета: #{symbol}\nЦена: {price}\nОбъем: {qty}")
+            else:
+                # Откат стейта в случае ошибки HTTP (реджект)
+                self.tb.state.active_positions.pop(pos_key, None)
+                self.tb.state.pending_entry_orders.pop(pos_key, None)
+                
         except Exception as e:
+            self.tb.state.active_positions.pop(pos_key, None)
+            self.tb.state.pending_entry_orders.pop(pos_key, None)
             logger.error(f"[{pos_key}] ❌ Критическая ошибка входа: {e}")
