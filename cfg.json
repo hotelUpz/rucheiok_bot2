@@ -1,0 +1,119 @@
+{
+    "app": {
+        "name": "Rucheiok Bot",
+        "max_active_positions": 1,
+        "max_place_order_retries": 2
+    },
+    "credentials": {
+        "api_key": "",
+        "api_secret": ""
+    },
+    "tg": {
+        "enable": true,
+        "token": "",
+        "chat_id": ""
+    },
+    "log": {
+        "debug": true,
+        "info": true,
+        "warning": true,
+        "error": true,
+        "max_lines": 1500,
+        "timezone": "Europe/Kyiv"
+    },
+    "black_list": [
+        "RIVER",
+        "SIREN",
+        "0G",
+        "PTB",
+        "ICP",
+        "MAGIC",
+        "REZ"
+    ],
+    "quota_asset": "USDT",
+    "risk": {
+        "leverage": 20,
+        "margin_size": "row",
+        "notional_limit": 1000,
+        "margin_over_size_pct": 1,
+        "margin_mode": 2,
+        "quarantine": {
+            "max_consecutive_fails": 1,
+            "quarantine_hours": "inf"
+        }
+    },
+    "entry": {
+        "pattern": {
+            "phemex": {
+                "name": "Rucheiok pattern",
+                "enable": true,
+                "depth": 8,
+                "min_first_row_usdt_notional": 400,
+                "max_first_row_usdt_notional": 950,
+                "header": {
+                    "roc_window": 3,
+                    "max_one_roc_pct": 0.5
+                },
+                "body": {
+                    "roc_sma_window": 5
+                },
+                "bottom": {
+                    "min_spread_between_two_row_pct": 0.2,
+                    "min_spread_between_three_row_pct": 0.25
+                },
+                "header_to_bottom_desired_rate": 6,
+                "max_bid_ask_distance_rate": 0.5,
+                "pattern_ttl_sec": 2
+            },
+            "binance": {
+                "enable": true,
+                "min_price_spread_pct": 0.15,
+                "update_prices_sec": 1.1,
+                "spread_ttl_sec": 2
+            },
+            "phemex_funding_filter": {
+                "enable": true,
+                "check_interval_sec": 60,
+                "skip_before_counter_sec": 1800,
+                "funding_threshold_pct": 1.0
+            }
+        }
+    },
+    "exit": {
+        "scenarious": {
+            "average": {
+                "enable": true,
+                "stabilization_ttl": 0,
+                "target_rate": 0.7,
+                "shift_demotion": 0.2,
+                "min_target_rate": 0.3,
+                "shift_ttl": 60
+            },
+            "negative": {
+                "enable": true,
+                "stabilization_ttl": 1.5,
+                "negative_spread_pct": 0,
+                "negative_ttl": 60
+            }
+        },
+        "interference": {
+            "enable": false,
+            "average_vol_pct_to_init_size": 3,
+            "max_vol_pct_to_init_size": 9,
+            "max_retries_per_level": 2
+        },
+        "position_ttl_close": {
+            "enable": true,
+            "position_ttl": 600,
+            "breakeven_wait_sec": 2,
+            "to_entry_orientation": 0.0
+        },
+        "extrime_close": {
+            "enable": true,
+            "retry_ttl": 3,
+            "retry_num": "inf",
+            "bid_to_ask_orientation": 0.0,
+            "increase_fraction": 2.5
+        }
+    }
+}
