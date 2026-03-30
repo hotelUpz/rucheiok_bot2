@@ -135,9 +135,9 @@ class PrivateWSHandler:
                 pos.interf_bought_qty += added_qty
                 logger.info(f"🛒 [ИНТЕРФЕРЕНЦИЯ] {symbol}. Долито: {added_qty}. Новый общий объем: {pos.qty}")
 
-        if status == "PartiallyFilled" and pos and cum_qty > 0:
-            asyncio.create_task(self._cancel_interference_remainder_once(symbol, order_id, pos_side, pos))
-            return
+        # if status == "PartiallyFilled" and pos and cum_qty > 0:
+        #     asyncio.create_task(self._cancel_interference_remainder_once(symbol, order_id, pos_side, pos))
+        #     return
 
         if status == "Filled":
             self.tb.state.pending_interference_orders.pop(symbol, None)

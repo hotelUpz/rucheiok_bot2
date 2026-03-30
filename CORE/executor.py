@@ -53,10 +53,15 @@ class OrderExecutor:
     async def _cancel_current_tp(self, symbol: str, pos: ActivePosition, pos_side: str):
         if pos.close_order_id:
             logger.debug(f"[{symbol}] Запрос отмены старого ТП #{pos.close_order_id[:8]}...")
+            # ✅ КРИТИЧЕСКАЯ ПРАВКА: Предупреждаем ws_handler, что это НАША отмена
+            pos.close_cancel_requested = True 
+            await self.tb.state.save()
             try:
                 await self.tb.private_client.cancel_order(symbol, pos.close_order_id, pos_side)
             except Exception as e:
                 logger.debug(f"[{symbol}] ТП уже исполнен или отменен: {e}")
+                # Если сеть отвалилась до отправки, откатываем флаг
+                pos.close_cancel_requested = False 
             pos.close_order_id = None
 
     async def update_tp_after_interference(self, symbol: str):
