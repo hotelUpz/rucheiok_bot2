@@ -102,13 +102,18 @@ class PrivateWSHandler:
         if status in ("Filled", "Canceled", "Rejected", "Deactivated"):
             self.tb.state.pending_entry_orders.pop(symbol, None)
             if pos:
+                was_requested = pos.entry_cancel_requested
                 pos.entry_cancel_requested = False
                 pos.entry_finalized = cum_qty > 0
 
             if cum_qty > 0 and pos:
-                logger.info(f"✅ [{symbol}] Вход подтвержден. Остаток снят/исполнен. Рабочий объем: {cum_qty}")
+                if status == "Filled":
+                    logger.info(f"✅ [{symbol}] Вход исполнен полностью. Рабочий объем: {cum_qty}")
+                else:
+                    logger.info(f"✅ [{symbol}] Вход подтвержден (частично). Остаток снят. Рабочий объем: {cum_qty}")
             else:
-                logger.warning(f"🗑 [{symbol}] Входной ордер закрыт без позиции. Удаляем кэш.")
+                if not was_requested:
+                    logger.warning(f"🗑 [{symbol}] Входной ордер отменен/отклонен биржей. Удаляем кэш.")
                 self.tb.state.active_positions.pop(symbol, None)
 
             await self.tb.state.save()
@@ -142,12 +147,19 @@ class PrivateWSHandler:
         elif status in ("Canceled", "Rejected", "Deactivated"):
             self.tb.state.pending_interference_orders.pop(symbol, None)
             if pos:
+                was_requested = pos.interference_cancel_requested
                 pos.interference_cancel_requested = False
-                if price_rp > 0:
-                    pos.failed_interference_prices[str(price_rp)] = pos.failed_interference_prices.get(str(price_rp), 0) + 1
                 
-                pos.place_order_fails += 1
-                asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
+                if not was_requested:
+                    # Это реальная ошибка/отказ биржи
+                    if price_rp > 0:
+                        pos.failed_interference_prices[str(price_rp)] = pos.failed_interference_prices.get(str(price_rp), 0) + 1
+                    pos.place_order_fails += 1
+                    asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
+                else:
+                    logger.info(f"🧹 [{symbol}] Остаток ордера скупки помехи успешно отменен.")
+                
+                await self.tb.state.save()
 
     async def _handle_close_order(self, symbol: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float) -> None:
         pos = self.tb.state.active_positions.get(symbol)
@@ -168,13 +180,17 @@ class PrivateWSHandler:
             self._process_pnl(symbol, is_loss, close_price)
             
         elif status in ("Canceled", "Rejected", "Deactivated"):
+            was_requested = pos.close_cancel_requested
             pos.close_cancel_requested = False
-            logger.warning(f"⚠️ [{symbol}] Тейк-профит отменен биржей (Статус: {status})! Сбрасываем ID.")
             pos.close_order_id = None
             
-            # Увеличиваем счетчик аварий API
-            pos.place_order_fails += 1
-            asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
+            if not was_requested:
+                logger.warning(f"⚠️ [{symbol}] Тейк-профит отменен биржей (Статус: {status})! Сбрасываем ID.")
+                # Увеличиваем счетчик аварий API только если не мы сами просили отмену
+                pos.place_order_fails += 1
+                asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
+            else:
+                logger.info(f"🧹 [{symbol}] Остаток закрывающего ордера успешно отменен. Ждем перестановки.")
 
     async def handle_message(self, payload: Dict[str, Any]):
         if "id" in payload or "index_market24h" in payload:
