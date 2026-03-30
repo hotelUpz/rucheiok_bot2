@@ -404,22 +404,14 @@ class PrivateWSHandler:
         
         semantic = "ЗАКРЫТИЕ ЛОНГА" if pos.side == "LONG" else "ЗАКРЫТИЕ ШОРТА"
 
+        # 1. Мгновенно учитываем налив (от любого ордера - старого или нового)
         if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
             pos.qty = max(0.0, pos.qty - exec_qty)
             logger.debug(f"[{pos_key}] Учет исполнения (актуального или запоздалого): -{exec_qty}. Остаток: {pos.qty}")
 
-        if pos.close_order_id != order_id:
-            if pos.qty <= 0:
-                self.tb.state.active_positions.pop(pos_key, None)
-                await self.tb.state.save()
-            return
-
-        if status == "PartiallyFilled":
-            if cum_qty > 0: asyncio.create_task(self._cancel_close_remainder_once(symbol, pos_key, order_id, pos_side, pos))
-            return
-
-        if status == "Filled" or pos.qty <= 0:
-            # [ГАЛОПЕРИДОЛ 3]: Подключаем забытый механизм PnL и Карантина!
+        # 2. ЗОЛОТОЕ ПРАВИЛО: Если объем иссяк — фиксируем финал цикла!
+        # Неважно, какой статус или чей это был ордер. Нет объема - нет позиции.
+        if pos.qty <= 0 or status == "Filled":
             is_loss = False
             if price_rp > 0:
                 if pos.side == "LONG" and price_rp < pos.entry_price: is_loss = True
@@ -434,18 +426,22 @@ class PrivateWSHandler:
                     f"PnL: {pnl_str}. Цена выхода: {pos.current_close_price}"
                 ))
             
-            # Передаем очистку стейта и учет штрафов в специальный метод
             self._process_pnl(symbol, pos_key, is_loss, pos.current_close_price)
             return
 
+        # ---- НИЖЕ ЛОГИКА ТОЛЬКО ДЛЯ АКТУАЛЬНОГО ТЕКУЩЕГО ОРДЕРА ----
+        if pos.close_order_id != order_id:
+            return # Старый ордер, просто учли его объем выше и забыли
+
+        # 3. Отмена остатков при частично наливе
+        if status == "PartiallyFilled":
+            if cum_qty > 0: asyncio.create_task(self._cancel_close_remainder_once(symbol, pos_key, order_id, pos_side, pos))
+            return
+
+        # 4. Очистка завершенных ордеров
         if status in ("Canceled", "Rejected", "Deactivated"):
-            if pos.close_order_id == order_id:
-                pos.close_order_id = None  # Просто забываем этот ордер. Снайпер сам разберется.
-                
-            # ЗОЛОТОЕ ПРАВИЛО: Нет объема -> Нет позиции.
-            if pos.qty <= 0: 
-                self.tb.state.active_positions.pop(pos_key, None)
-                
+            pos.close_order_id = None 
+            pos.close_cancel_requested = False
             await self.tb.state.save()
 
     async def _handle_interference_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, exec_qty: float, cum_qty: float, price_rp: float) -> None:

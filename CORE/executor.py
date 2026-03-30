@@ -471,7 +471,11 @@ class OrderExecutor:
                 interf_qty = round_step(raw_qty, spec.lot_size)
                 order_value_usdt = interf_qty * interf_price
 
-                if interf_qty <= 0 or order_value_usdt < 5.0: return
+                # [ФИНАЛЬНЫЙ ФИКС]: Если экзекьютор порезал объем до неторгуемого лимита - отключаем интерференцию навсегда!
+                if interf_qty <= 0 or order_value_usdt < 5.0: 
+                    pos.interference_disabled = True
+                    await self.tb.state.save()
+                    return
 
                 try:
                     resp = await self.tb.private_client.place_limit_order(
