@@ -349,7 +349,6 @@ class PrivateWSHandler:
         
         pos_side = "Long" if pos.side == "LONG" else "Short"
         
-        # [ФИКС Hedge-Mode]: Изолированно отменяем ТОЛЬКО ордера закрытой стороны!
         to_cancel = [oid for oid in (entry_id, interf_id, pos.close_order_id) if oid]
         for oid in to_cancel:
             try: await self.tb.private_client.cancel_order(sym, oid, pos_side)
@@ -471,17 +470,21 @@ class PrivateWSHandler:
         for ord_info in orders:
             symbol = ord_info.get("symbol")
             if not symbol: continue
-
-            # ГЕНЕРАЦИЯ КЛЮЧА ИЗ ВЕБСОКЕТА
-            pos_side_raw = ord_info.get("posSide", ord_info.get("side", ""))
-            side_ws = "LONG" if pos_side_raw in ("Long", "Buy", "long") else "SHORT"
-            pos_key = f"{symbol}_{side_ws}"
-
-            is_our_order = (pos_key in self.tb.state.active_positions or pos_key in self.tb.state.pending_entry_orders or pos_key in self.tb.state.pending_interference_orders)
-            if not is_our_order: continue
-
             order_id = str(ord_info.get("orderID", ""))
+            
+            # [КРИТИЧЕСКИЙ ФИКС] Ищем pos_key строго по совпадению order_id со стейтом.
+            # Это полностью нивелирует разницу между One-Way и Hedge Mode.
+            pos_key = None
+            for pk in (f"{symbol}_LONG", f"{symbol}_SHORT"):
+                if order_id == self.tb.state.pending_entry_orders.get(pk): pos_key = pk; break
+                if order_id == self.tb.state.pending_interference_orders.get(pk): pos_key = pk; break
+                if pk in self.tb.state.active_positions and self.tb.state.active_positions[pk].close_order_id == order_id:
+                    pos_key = pk; break
+
+            if not pos_key: continue
+
             status = ord_info.get("ordStatus", "")
+            pos_side_raw = ord_info.get("posSide", ord_info.get("side", ""))
             exec_qty = float(ord_info.get("execQty", 0))
             cum_qty = float(ord_info.get("cumQtyRq", ord_info.get("cumQty", exec_qty)))
             price_rp = float(ord_info.get("execPriceRp") or ord_info.get("priceRp") or ord_info.get("price") or 0.0)
@@ -506,6 +509,7 @@ class PrivateWSHandler:
             sym = p.get("symbol")
             if not sym: continue
             
+            # Для позиций side="Buy" всегда означает Лонг, поэтому тут безопасно 
             pos_side_ws = p.get("posSide", p.get("side", ""))
             side_ws = "LONG" if pos_side_ws in ("Long", "Buy", "long") else "SHORT"
             pos_key = f"{sym}_{side_ws}"
@@ -526,7 +530,6 @@ class PrivateWSHandler:
                 pos.qty = real_size
 
     def _process_pnl(self, sym: str, pos_key: str, is_loss: bool, close_price: float):
-        # Карантин остается глобальным для всего СИМВОЛА
         if is_loss:
             self.tb.state.consecutive_fails[sym] = self.tb.state.consecutive_fails.get(sym, 0) + 1
             q_cfg = self.tb.cfg.get("risk", {}).get("quarantine", {})
