@@ -403,34 +403,38 @@ class PrivateWSHandler:
         
         semantic = "ЗАКРЫТИЕ ЛОНГА" if pos.side == "LONG" else "ЗАКРЫТИЕ ШОРТА"
 
-        # [ХИРУРГИЯ 3]: БЕЗУСЛОВНЫЙ вычет объема. Даже если это запоздалый налив отмененного ордера!
         if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
             pos.qty = max(0.0, pos.qty - exec_qty)
             logger.debug(f"[{pos_key}] Учет исполнения (актуального или запоздалого): -{exec_qty}. Остаток: {pos.qty}")
 
-        # Теперь проверяем, текущий ли это ордер для дальнейших манипуляций (отмена остатка)
         if pos.close_order_id != order_id:
-            # Если ордер "призрак" закрыл остатки позы в 0 - сбрасываем стейт
             if pos.qty <= 0:
                 self.tb.state.active_positions.pop(pos_key, None)
                 await self.tb.state.save()
             return
 
-        # ---- НИЖЕ ЛОГИКА ТОЛЬКО ДЛЯ АКТУАЛЬНОГО ТЕКУЩЕГО ОРДЕРА ----
         if status == "PartiallyFilled":
             if cum_qty > 0: asyncio.create_task(self._cancel_close_remainder_once(symbol, pos_key, order_id, pos_side, pos))
             return
 
         if status == "Filled" or pos.qty <= 0:
-            self.tb.state.active_positions.pop(pos_key, None)
+            # [ГАЛОПЕРИДОЛ 3]: Подключаем забытый механизм PnL и Карантина!
+            is_loss = False
+            if price_rp > 0:
+                if pos.side == "LONG" and price_rp < pos.entry_price: is_loss = True
+                if pos.side == "SHORT" and price_rp > pos.entry_price: is_loss = True
+
+            pnl_str = f"+{price_rp}" if not is_loss else str(price_rp)
             logger.info(f"✅ [{pos_key}] {semantic} ПОЛНОСТЬЮ ЗАВЕРШЕНО.")
+            
             if self.tb.tg:
-                pnl_str = f"+{price_rp}" if price_rp > 0 else str(price_rp)
                 asyncio.create_task(self.tb.tg.send_message(
                     f"✅ <b>Тейк-профит исполнен! ({semantic})</b>\nМонета: #{symbol}\n"
                     f"PnL: {pnl_str}. Цена выхода: {pos.current_close_price}"
                 ))
-            await self.tb.state.save()
+            
+            # Передаем очистку стейта и учет штрафов в специальный метод
+            self._process_pnl(symbol, pos_key, is_loss, pos.current_close_price)
             return
 
         if status in ("Canceled", "Rejected", "Deactivated"):

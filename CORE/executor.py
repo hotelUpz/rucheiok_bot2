@@ -533,7 +533,6 @@ class OrderExecutor:
             side = "Buy" if signal["side"] == "LONG" else "Sell"
             semantic_action = "ОТКРЫТЬ ЛОНГ" if signal["side"] == "LONG" else "ОТКРЫТЬ ШОРТ"
 
-            # [ХИРУРГИЯ 1]: Создаем позицию и резервируем статус ДО отправки HTTP
             ask1, bid1 = depth.asks[0][0], depth.bids[0][0]
             pos = ActivePosition(
                 symbol=symbol, side=signal["side"], entry_price=price, qty=0.0, init_qty=qty,
@@ -541,7 +540,7 @@ class OrderExecutor:
             )
             self.tb.exit_engine.initialize_position_state(pos)
             self.tb.state.active_positions[pos_key] = pos
-            self.tb.state.pending_entry_orders[pos_key] = "PENDING_HTTP" # Метка для супер-быстрых вебсокетов
+            self.tb.state.pending_entry_orders[pos_key] = "PENDING_HTTP" 
 
             resp = await self.tb.private_client.place_limit_order(symbol=symbol, side=side, qty=qty, price=price, pos_side=pos_side)
             order_id = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
@@ -553,11 +552,16 @@ class OrderExecutor:
                 if self.tb.tg:
                     await self.tb.tg.send_message(f"🟢 <b>Сигнал на вход ({semantic_action})</b>\nМонета: #{symbol}\nЦена: {price}\nОбъем: {qty}")
             else:
-                # Откат стейта в случае ошибки HTTP (реджект)
                 self.tb.state.active_positions.pop(pos_key, None)
                 self.tb.state.pending_entry_orders.pop(pos_key, None)
                 
         except Exception as e:
-            self.tb.state.active_positions.pop(pos_key, None)
-            self.tb.state.pending_entry_orders.pop(pos_key, None)
-            logger.error(f"[{pos_key}] ❌ Критическая ошибка входа: {e}")
+            # [ГАЛОПЕРИДОЛ 2]: Спасение орфанных позиций при таймаутах сети
+            pos_check = self.tb.state.active_positions.get(pos_key)
+            if pos_check and pos_check.qty > 0:
+                logger.warning(f"[{pos_key}] Ошибка HTTP '{e}', НО вебсокет уже налил {pos_check.qty}! Оставляем позу.")
+                self.tb.state.pending_entry_orders.pop(pos_key, None) 
+            else:
+                self.tb.state.active_positions.pop(pos_key, None)
+                self.tb.state.pending_entry_orders.pop(pos_key, None)
+                logger.error(f"[{pos_key}] ❌ Критическая ошибка входа: {e}")

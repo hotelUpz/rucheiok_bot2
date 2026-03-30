@@ -27,40 +27,38 @@ class Interference:
         target = None
         if pos.side == "LONG":
             for price, vol in depth.asks:
-                # Нас интересуют только аски между входом и нашей целью
                 if price <= pos.entry_price or price >= pos.current_close_price:
                     continue
                     
-                # [ФИКС]: Ищем только те преграды, которые мы реально можем пробить (<= threshold)
-                if vol <= threshold_vol:
-                    # ЗАЩИТА ОТ ДОЛБЕЖКИ: Пропускаем забракованные уровни
-                    if pos.failed_interference_prices.get(str(price), 0) >= self.max_retries_per_level:
-                        continue
-                    target = (price, vol)
-                    break # Нашли ближайшую к спреду мелкую преграду - бьем!
+                # [ГАЛОПЕРИДОЛ 1]: Законы физики стакана. Если преграда большая - мы НЕ МОЖЕМ её перепрыгнуть.
+                # Скупка невозможна, пока эта плита не исчезнет. Прерываем скан!
+                if vol > threshold_vol:
+                    break 
+                    
+                if pos.failed_interference_prices.get(str(price), 0) >= self.max_retries_per_level:
+                    break # Долбежка в один уровень запрещена
+                    
+                target = (price, vol)
+                break
         else:
             for price, vol in depth.bids:
-                # Нас интересуют только биды между входом и нашей целью
                 if price >= pos.entry_price or price <= pos.current_close_price:
                     continue
                     
-                # [ФИКС]: Ищем только те преграды, которые мы реально можем пробить (<= threshold)
-                if vol <= threshold_vol:
-                    # ЗАЩИТА ОТ ДОЛБЕЖКИ
-                    if pos.failed_interference_prices.get(str(price), 0) >= self.max_retries_per_level:
-                        continue
-                    target = (price, vol)
-                    break # Нашли ближайшую к спреду мелкую преграду - бьем!
+                # [ГАЛОПЕРИДОЛ 1]: Законы физики стакана.
+                if vol > threshold_vol:
+                    break
+                    
+                if pos.failed_interference_prices.get(str(price), 0) >= self.max_retries_per_level:
+                    break
+                    
+                target = (price, vol)
+                break
 
         if target:
             price, target_vol = target
-            
-            # Мы заказываем либо наш стандартный кусок, либо добиваем остаток лимита
             buy_qty = min(pos.init_qty * self.avg_vol_pct, allowed_remains)
             
-            # [КРИТИЧЕСКИЙ ФИКС ЗАВИСАНИЯ]: Защита от Silent Loop об min_notional (5 USDT)
-            # Если у нас осталось слишком мало бюджета, биржа отклонит ордер.
-            # Чтобы не уйти в бесконечный цикл спама, просто отключаем интерференцию.
             approx_value_usdt = buy_qty * price
             if approx_value_usdt < 5.0:
                 pos.interference_disabled = True
