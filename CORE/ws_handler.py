@@ -145,36 +145,48 @@ class PrivateWSHandler:
                     asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
             await self.tb.state.save()
 
-    async def _handle_close_order(self, symbol: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float) -> None:
+    async def _handle_close_order(self, symbol: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float, exec_qty: float) -> None:
+        """Обработка WS-событий для закрывающих ордеров (Average, Extrime, TTL)"""
         pos = self.tb.state.active_positions.get(symbol)
         if not pos or pos.close_order_id != order_id:
             return
 
+        # [КРИТИЧЕСКИЙ ФИКС]: Изолируем баланс от задержек WS. Сразу вычитаем исполненный объем.
+        if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
+            pos.qty = max(0.0, pos.qty - exec_qty)
+            logger.debug(f"[{symbol}] Учет исполнения: -{exec_qty}. Остаток позы: {pos.qty}")
+
         if status == "PartiallyFilled":
+            # Ордер частично налился, отменяем остаток, чтобы Average пересчитал стакан
             if cum_qty > 0:
                 asyncio.create_task(self._cancel_close_remainder_once(symbol, order_id, pos_side, pos))
             return
 
-        if status == "Filled":
-            pos.close_cancel_requested = False
-            close_price = price_rp or pos.current_close_price
-            is_loss = (close_price < pos.entry_price) if pos.side == "LONG" else (close_price > pos.entry_price)
-            pnl_str = "🔴 Loss" if is_loss else "🟢 Win"
-            logger.info(f"🎉 [ЦЕЛЬ ИСПОЛНЕНА] {symbol}. PnL: {pnl_str}. Цена выхода: {close_price}")
-            self._process_pnl(symbol, is_loss, close_price)
-            
-        elif status in ("Canceled", "Rejected", "Deactivated"):
-            was_requested = pos.close_cancel_requested
-            pos.close_cancel_requested = False
+        if status == "Filled" or pos.qty <= 0:
+            # Позиция полностью закрыта
+            self.tb.state.active_positions.pop(symbol, None)
+            logger.info(f"✅ [{symbol}] Позиция ПОЛНОСТЬЮ ЗАКРЫТА по цели.")
+            if self.tb.tg:
+                pnl_str = f"+{price_rp}" if price_rp > 0 else str(price_rp)
+                close_price = pos.current_close_price
+                asyncio.create_task(self.tb.tg.send_message(
+                    f"✅ <b>Тейк-профит исполнен!</b>\nМонета: #{symbol}\n"
+                    f"PnL: {pnl_str}. Цена выхода: {close_price}"
+                ))
+            await self.tb.state.save()
+            return
+
+        if status in ("Canceled", "Rejected", "Deactivated"):
+            # Ордер снят (нами или биржей), освобождаем слот для AverageScenario
             pos.close_order_id = None
+            pos.close_cancel_requested = False
             
-            if not was_requested:
-                logger.warning(f"⚠️ [{symbol}] Тейк-профит отменен биржей (Статус: {status})! Сбрасываем ID.")
-                # Увеличиваем счетчик аварий API только если не мы сами просили отмену
-                pos.place_order_fails += 1
-                asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
-            else:
-                logger.info(f"🧹 [{symbol}] Остаток закрывающего ордера успешно отменен. Ждем перестановки.")
+            # Страховка на случай рассинхрона
+            if pos.qty <= 0:
+                self.tb.state.active_positions.pop(symbol, None)
+                
+            await self.tb.state.save()
+            return
 
     async def handle_message(self, payload: Dict[str, Any]):
         if "id" in payload or "index_market24h" in payload:
