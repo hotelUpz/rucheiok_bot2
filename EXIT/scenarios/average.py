@@ -23,51 +23,48 @@ class AverageScenario:
         else:
             virtual_tp = pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate
 
-        # Обязательно обновляем виртуальную цель в стейте, чтобы Интерференция знала диапазон!
         pos.current_close_price = virtual_tp  
 
-        # 1. Первичная постановка цели (Ждем стабилизации)
         if not pos.is_average_stabilized:
             if time_in_pos >= self.stab_avg:
                 pos.is_average_stabilized = True
-                pos.last_shift_ts = now # Таймер сдвигов стартует только сейчас
+                pos.last_shift_ts = now
             else:
                 return None
         
-        # 2. Логика сдвига (Уже стабилизированы)
+        # Логика сдвига 
         if now - pos.last_shift_ts >= self.shift_ttl:
-            new_rate = pos.current_target_rate - self.shift_demotion
             if pos.current_target_rate <= self.min_target_rate:
-                # Если уже на минималке и прошло время -> Экстрим
                 return {"action": "TRIGGER_EXTRIME", "reason": "MIN_TARGET_RATE_TIMEOUT"}
-                
+
+            new_rate = pos.current_target_rate - self.shift_demotion
             pos.current_target_rate = max(new_rate, self.min_target_rate)
             pos.last_shift_ts = now
-            pos.negative_duration_sec = 0.0 # Сброс негативного таймера по ТЗ
+            pos.negative_duration_sec = 0.0 
             
-            # Пересчитываем TP
+            # Пересчитываем цель после сдвига
             if pos.side == "LONG":
-                virtual_tp = pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate
+                pos.current_close_price = pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate
             else:
-                virtual_tp = pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate
-            pos.current_close_price = virtual_tp
+                pos.current_close_price = pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate
 
-        # 3. Динамический поиск объема в стакане
-        # Если ордер уже висит на бирже (ждет налива), не спамим
+            # Если старый ордер всё еще висит в стакане — мы обязаны его отменить для переоценки!
+            if pos.close_order_id:
+                return {"action": "CANCEL_CLOSE", "reason": "SHIFT_DEMOTION_TIMEOUT"}
+
         if pos.close_order_id:
             return None
 
+        # Динамический поиск объема
         best_price = None
         if pos.side == "LONG":
-            # Для лонга ищем объем в бидах
             for price, vol in depth.bids:
-                if price >= virtual_tp:
+                if price >= pos.current_close_price:
                     best_price = price
                     break
         else:
-            # Для шорта ищем объем в асках
             for price, vol in depth.asks:
-                if price <= virtual_tp:
+                if price <= pos.current_close_price:
                     best_price = price
                     break
 

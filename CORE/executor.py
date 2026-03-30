@@ -67,29 +67,15 @@ class OrderExecutor:
     async def update_tp_after_interference(self, symbol: str):
         async with self.get_lock(symbol):
             pos = self.tb.state.active_positions.get(symbol)
-            spec = self.tb.symbol_specs.get(symbol)
-            if not pos or not spec:
+            if not pos:
                 return
 
-            close_side = "Sell" if pos.side == "LONG" else "Buy"
             pos_side = "Long" if pos.side == "LONG" else "Short"
-
+            
+            # СТРОГО ПО ТЗ: Мы ТОЛЬКО отменяем старый ордер.
+            # Новый ордер с обновленным объемом выставит AverageScenario ДИНАМИЧЕСКИ, когда увидит ликвидность!
             await self._cancel_current_tp(symbol, pos, pos_side)
-
-            if pos.current_close_price <= 0 or pos.qty <= 0:
-                return
-            try:
-                resp = await self.tb.private_client.place_limit_order(
-                    symbol=symbol, side=close_side, qty=pos.qty, price=pos.current_close_price, pos_side=pos_side
-                )
-                pos.close_order_id = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-                pos.place_order_fails = 0 # Успех
-                logger.info(f"🔄 [{symbol}] ТП переставлен после помехи. Объем: {pos.qty}, Цена: {pos.current_close_price}")
-                await self.tb.state.save()
-            except Exception as e:
-                logger.error(f"[{symbol}] ❌ Ошибка перестановки ТП: {e}")
-                pos.place_order_fails += 1
-                await self._handle_order_fail(symbol, pos)
+            logger.info(f"🔄 [{symbol}] Отменен старый ТП после интерференции. Передача управления AverageScenario.")
 
     async def restore_tp(self, symbol: str, pos: ActivePosition):
         async with self.get_lock(symbol):
@@ -127,6 +113,12 @@ class OrderExecutor:
             act = action["action"]
             close_side = "Sell" if pos.side == "LONG" else "Buy"
             pos_side = "Long" if pos.side == "LONG" else "Short"
+
+            # ОБРАБОТКА ОТМЕНЫ ЗАВИСШИХ ДИНАМИЧЕСКИХ ОРДЕРОВ
+            if act == "CANCEL_CLOSE":
+                await self._cancel_current_tp(symbol, pos, pos_side)
+                logger.info(f"🧹 [{symbol}] Отмена зависшего динамического ордера: {action.get('reason', '')}")
+                return
 
             if act in ("UPDATE_TARGET", "PLACE_EXTRIME_LIMIT", "PLACE_DYNAMIC_CLOSE"):
                 if act == "UPDATE_TARGET":
@@ -267,8 +259,11 @@ class OrderExecutor:
             if qty <= 0:
                 return
 
-            spr2_pct = signal.get("spr2_pct", 0)
-            base_target = price * (1 + (spr2_pct / 100)) if signal["side"] == "LONG" else price * (1 - (spr2_pct / 100))
+            # СТРОГО ПО ТЗ: берем ask2/bid2 из сигнала
+            base_target = signal.get("base_target_price_100")
+            if not base_target: # Fallback защита
+                spr2_pct = signal.get("spr2_pct", 0)
+                base_target = price * (1 + (spr2_pct / 100)) if signal["side"] == "LONG" else price * (1 - (spr2_pct / 100))
 
             pos_side = "Long" if signal["side"] == "LONG" else "Short"
             side = "Buy" if signal["side"] == "LONG" else "Sell"

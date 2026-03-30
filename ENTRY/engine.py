@@ -1,8 +1,3 @@
-# ============================================================
-# FILE: ENTRY/engine.py
-# ROLE: Оркестратор логики входа (Pattern math, Binance filter, TTLs, Funding)
-# ============================================================
-
 import time
 from typing import Dict, Any, Optional
 from ENTRY.pattern_math import StakanEntryPattern
@@ -16,7 +11,6 @@ class EntryEngine:
         self.binance_cfg = cfg["pattern"]["binance"]
         
         self.pattern_math = StakanEntryPattern(self.phemex_cfg)
-        # Фандинг-фильтр лежит на уровне pattern.*, а не внутри pattern.phemex.*
         self.funding_filter = FundingFilter(cfg.get("pattern", {}).get("phemex_funding_filter", {}), funding_api)
         
         self.target_depth = self.phemex_cfg.get("depth", 8)
@@ -44,6 +38,11 @@ class EntryEngine:
             self._pattern_first_seen.pop(symbol, None)
             self._spread_first_seen.pop(symbol, None)
             return None
+
+        # СТРОГО ПО ТЗ: Извлекаем базу для ТП из второго уровня (ask2/bid2)
+        ask2 = asks_sliced[1][0] if len(asks_sliced) > 1 else asks_sliced[0][0]
+        bid2 = bids_sliced[1][0] if len(bids_sliced) > 1 else bids_sliced[0][0]
+        signal["base_target_price_100"] = ask2 if signal["side"] == "LONG" else bid2
 
         passed_binance = False
         spread_val = 0.0
