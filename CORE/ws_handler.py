@@ -126,23 +126,26 @@ class PrivateWSHandler:
             return
 
         pos = self.tb.state.active_positions.get(symbol)
-        if status in ("Filled", "PartiallyFilled"):
-            if pos and cum_qty > 0:
-                added_qty = cum_qty - pos.interf_bought_qty if pos.interf_bought_qty < cum_qty else exec_qty
-                if added_qty > 0:
-                    pos.qty += added_qty
-                    pos.interf_bought_qty += added_qty
-                    logger.info(f"🛒 [ИНТЕРФЕРЕНЦИЯ] {symbol}. Долито: {added_qty}. Новый общий объем: {pos.qty}")
-                    asyncio.create_task(self.tb.executor.update_tp_after_interference(symbol))
+        
+        # Обновляем объемы, если налило (но ТП пока не трогаем!)
+        if status in ("Filled", "PartiallyFilled") and pos and cum_qty > 0:
+            added_qty = cum_qty - pos.interf_bought_qty if pos.interf_bought_qty < cum_qty else exec_qty
+            if added_qty > 0:
+                pos.qty += added_qty
+                pos.interf_bought_qty += added_qty
+                logger.info(f"🛒 [ИНТЕРФЕРЕНЦИЯ] {symbol}. Долито: {added_qty}. Новый общий объем: {pos.qty}")
 
-            if status == "PartiallyFilled" and pos and cum_qty > 0:
-                asyncio.create_task(self._cancel_interference_remainder_once(symbol, order_id, pos_side, pos))
-                return
+        if status == "PartiallyFilled" and pos and cum_qty > 0:
+            asyncio.create_task(self._cancel_interference_remainder_once(symbol, order_id, pos_side, pos))
+            return
 
+        if status == "Filled":
             self.tb.state.pending_interference_orders.pop(symbol, None)
             if pos:
                 pos.interference_cancel_requested = False
             await self.tb.state.save()
+            # ✅ Обновляем ТП строго ОДИН РАЗ, когда скупка полностью завершена
+            asyncio.create_task(self.tb.executor.update_tp_after_interference(symbol))
 
         elif status in ("Canceled", "Rejected", "Deactivated"):
             self.tb.state.pending_interference_orders.pop(symbol, None)
@@ -150,25 +153,29 @@ class PrivateWSHandler:
                 was_requested = pos.interference_cancel_requested
                 pos.interference_cancel_requested = False
                 
+                # ✅ Если мы сами отменили хвост скупки, значит мы долили часть объема -> обновляем ТП
+                if was_requested and pos.interf_bought_qty > 0:
+                    asyncio.create_task(self.tb.executor.update_tp_after_interference(symbol))
+                
                 if not was_requested:
-                    # Это реальная ошибка/отказ биржи
                     if price_rp > 0:
                         pos.failed_interference_prices[str(price_rp)] = pos.failed_interference_prices.get(str(price_rp), 0) + 1
                     pos.place_order_fails += 1
                     asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos))
-                else:
-                    logger.info(f"🧹 [{symbol}] Остаток ордера скупки помехи успешно отменен.")
-                
-                await self.tb.state.save()
+            await self.tb.state.save()
 
     async def _handle_close_order(self, symbol: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float) -> None:
         pos = self.tb.state.active_positions.get(symbol)
         if not pos or pos.close_order_id != order_id:
             return
 
+        # if status == "PartiallyFilled":
+        #     if cum_qty > 0:
+        #         asyncio.create_task(self._cancel_close_remainder_once(symbol, order_id, pos_side, pos))
+        #     return
         if status == "PartiallyFilled":
-            if cum_qty > 0:
-                asyncio.create_task(self._cancel_close_remainder_once(symbol, order_id, pos_side, pos))
+            # ✅ ТЕПЕРЬ МЫ НИЧЕГО НЕ ОТМЕНЯЕМ! Тейк должен висеть до полного налива.
+            logger.info(f"⏳ [{symbol}] Тейк-профит исполняется частично (cumQty: {cum_qty}). Ждем полного налива...")
             return
 
         if status == "Filled":

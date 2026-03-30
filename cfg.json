@@ -28,7 +28,8 @@
         "PTB",
         "ICP",
         "MAGIC",
-        "REZ"
+        "REZ",
+        "DOOD"
     ],
     "quota_asset": "USDT",
     "risk": {
