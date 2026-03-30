@@ -429,12 +429,17 @@ class PrivateWSHandler:
 
     async def _handle_close_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float, exec_qty: float) -> None:
         pos = self.tb.state.active_positions.get(pos_key)
-        if not pos or pos.close_order_id != order_id: return
+        if not pos: return
+        
+        # [ПАРАНОЙЯ-ФИКС]: Мы удалили жесткий чек `pos.close_order_id != order_id`.
+        # Теперь, если старый (уже отмененный нами) ТП вдруг нальется из-за пинга, 
+        # мы всё равно учтем этот объем и вычтем его из баланса!
+
         semantic = "ЗАКРЫТИЕ ЛОНГА" if pos.side == "LONG" else "ЗАКРЫТИЕ ШОРТА"
 
         if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
             pos.qty = max(0.0, pos.qty - exec_qty)
-            logger.debug(f"[{pos_key}] Учет исполнения: -{exec_qty}. Остаток: {pos.qty}")
+            logger.debug(f"[{pos_key}] Учет исполнения (актуального или запоздалого): -{exec_qty}. Остаток: {pos.qty}")
 
         if status == "PartiallyFilled":
             if cum_qty > 0: asyncio.create_task(self._cancel_close_remainder_once(symbol, pos_key, order_id, pos_side, pos))
@@ -453,8 +458,12 @@ class PrivateWSHandler:
             return
 
         if status in ("Canceled", "Rejected", "Deactivated"):
-            pos.close_order_id = None
-            pos.close_cancel_requested = False
+            # [ПАРАНОЙЯ-ФИКС]: Сбрасываем флаг ТОЛЬКО если это наш ТЕКУЩИЙ ордер. 
+            # Если это пришла отмена старого ордера — флаг нового ордера не трогаем!
+            if pos.close_order_id == order_id:
+                pos.close_order_id = None
+                pos.close_cancel_requested = False
+            
             if pos.qty <= 0: self.tb.state.active_positions.pop(pos_key, None)
             await self.tb.state.save()
 
@@ -472,25 +481,37 @@ class PrivateWSHandler:
             if not symbol: continue
             order_id = str(ord_info.get("orderID", ""))
             
-            # [КРИТИЧЕСКИЙ ФИКС] Ищем pos_key строго по совпадению order_id со стейтом.
-            # Это полностью нивелирует разницу между One-Way и Hedge Mode.
             pos_key = None
+            pos_side_raw = ord_info.get("posSide", ord_info.get("side", ""))
+
+            # 1. ЖЕЛЕЗОБЕТОННЫЙ ПОИСК (Прямое совпадение ID в стейте)
             for pk in (f"{symbol}_LONG", f"{symbol}_SHORT"):
                 if order_id == self.tb.state.pending_entry_orders.get(pk): pos_key = pk; break
                 if order_id == self.tb.state.pending_interference_orders.get(pk): pos_key = pk; break
                 if pk in self.tb.state.active_positions and self.tb.state.active_positions[pk].close_order_id == order_id:
                     pos_key = pk; break
 
+            # 2. ФОЛБЭК ДЛЯ ЗАПОЗДАЛЫХ ОРДЕРОВ (Если Phemex прислал Hedge-направление)
+            if not pos_key and pos_side_raw in ("Long", "Short"):
+                pos_key = f"{symbol}_{pos_side_raw.upper()}"
+                if pos_key not in self.tb.state.active_positions: pos_key = None
+
+            # 3. ФОЛБЭК ДЛЯ ONE-WAY MODE (Направления нет, ищем кто сейчас торгуется)
+            if not pos_key:
+                l_exists = f"{symbol}_LONG" in self.tb.state.active_positions
+                s_exists = f"{symbol}_SHORT" in self.tb.state.active_positions
+                if l_exists and not s_exists: pos_key = f"{symbol}_LONG"
+                elif s_exists and not l_exists: pos_key = f"{symbol}_SHORT"
+
             if not pos_key: continue
 
             status = ord_info.get("ordStatus", "")
-            pos_side_raw = ord_info.get("posSide", ord_info.get("side", ""))
             exec_qty = float(ord_info.get("execQty", 0))
             cum_qty = float(ord_info.get("cumQtyRq", ord_info.get("cumQty", exec_qty)))
             price_rp = float(ord_info.get("execPriceRp") or ord_info.get("priceRp") or ord_info.get("price") or 0.0)
 
             if status not in ("New", "Untriggered", "Triggered"):
-                logger.debug(f"📝 [WS ORD] {pos_key} | ID: {order_id[:8]}... | Status: {status} | execQty: {exec_qty} | cumQty: {cum_qty} | Price: {price_rp}")
+                logger.debug(f"📝 [WS ORD] {pos_key} | ID: {order_id[:8]}... | Status: {status} | execQty: {exec_qty} | cumQty: {cum_qty}")
 
             if status == "Filled": external_fills[pos_key] = price_rp
 
@@ -509,7 +530,6 @@ class PrivateWSHandler:
             sym = p.get("symbol")
             if not sym: continue
             
-            # Для позиций side="Buy" всегда означает Лонг, поэтому тут безопасно 
             pos_side_ws = p.get("posSide", p.get("side", ""))
             side_ws = "LONG" if pos_side_ws in ("Long", "Buy", "long") else "SHORT"
             pos_key = f"{sym}_{side_ws}"
