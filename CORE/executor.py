@@ -32,17 +32,17 @@ class OrderExecutor:
                     logger.error(f"[{symbol}] ⚠️ Лимит ошибок постановки ({max_fails}) исчерпан! Перевод в EXTRIME MODE.")
                     pos.in_extrime_mode = True
                     pos.in_breakeven_mode = False
-                    # Даем Экстриму чистый счетчик
                     pos.place_order_fails = 0 
                     if self.tb.tg:
                         asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>Авария Ордеров</b>\n#{symbol}: Ошибки API. Включен Экстрим."))
                 else:
-                    logger.error(f"[{symbol}] 🗑 Экстрим-ордера отклоняются биржей. Осталась пыль. Удаляем позицию из стейта.")
-                    self.tb.state.active_positions.pop(symbol, None)
+                    # [ФИКС ИНВАРИАНТА]: МЫ В РЫНКЕ! НЕ УДАЛЯЕМ СТЕЙТ! ОРЕМ И ЖДЕМ ОПЕРАТОРА.
+                    logger.error(f"[{symbol}] 🚨 КРИТИЧЕСКИЙ ОТКАЗ! Экстрим-ордера отклоняются биржей. Требуется ручное вмешательство! Позиция ({pos.qty} шт) СОХРАНЕНА.")
                     if self.tb.tg:
-                        asyncio.create_task(self.tb.tg.send_message(f"🗑 <b>Списание пыли</b>\n#{symbol}: Объем слишком мал. Позиция сброшена."))
+                        asyncio.create_task(self.tb.tg.send_message(f"🚨 <b>КРИТИЧЕСКАЯ АВАРИЯ</b>\n#{symbol}: Экстрим-ордера отклоняются биржей! Проверьте баланс/лимиты руками!"))
             else:
-                logger.error(f"[{symbol}] 🗑 Ошибки API до открытия позиции. Сбрасываем стейт.")
+                # Позиция не открылась (входная лимитка реджектнулась до исполнения). Можно удалять.
+                logger.error(f"[{symbol}] 🗑 Ошибки API до открытия позиции (объем 0). Сбрасываем стейт.")
                 self.tb.state.active_positions.pop(symbol, None)
                 
         await self.tb.state.save()
