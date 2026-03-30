@@ -32,19 +32,16 @@ class OrderExecutor:
                     logger.error(f"[{symbol}] ⚠️ Лимит ошибок постановки ({max_fails}) исчерпан! Перевод в EXTRIME MODE.")
                     pos.in_extrime_mode = True
                     pos.in_breakeven_mode = False
-                    # Даем Экстриму чистый счетчик, чтобы он попытался закрыть сделку
+                    # Даем Экстриму чистый счетчик
                     pos.place_order_fails = 0 
                     if self.tb.tg:
                         asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>Авария Ордеров</b>\n#{symbol}: Ошибки API. Включен Экстрим."))
                 else:
-                    # Если бот УЖЕ в экстриме, и ошибки продолжают сыпаться (pos.place_order_fails снова набрал лимит):
-                    # Значит это мертвая пыль, биржа отклоняет из-за малого объема.
                     logger.error(f"[{symbol}] 🗑 Экстрим-ордера отклоняются биржей. Осталась пыль. Удаляем позицию из стейта.")
                     self.tb.state.active_positions.pop(symbol, None)
                     if self.tb.tg:
                         asyncio.create_task(self.tb.tg.send_message(f"🗑 <b>Списание пыли</b>\n#{symbol}: Объем слишком мал. Позиция сброшена."))
             else:
-                # Позиции нет (на этапе открытия), просто забываем.
                 logger.error(f"[{symbol}] 🗑 Ошибки API до открытия позиции. Сбрасываем стейт.")
                 self.tb.state.active_positions.pop(symbol, None)
                 
@@ -53,25 +50,24 @@ class OrderExecutor:
     async def _cancel_current_tp(self, symbol: str, pos: ActivePosition, pos_side: str):
         if pos.close_order_id:
             logger.debug(f"[{symbol}] Запрос отмены старого ТП #{pos.close_order_id[:8]}...")
-            # ✅ КРИТИЧЕСКАЯ ПРАВКА: Предупреждаем ws_handler, что это НАША отмена
             pos.close_cancel_requested = True 
             await self.tb.state.save()
             try:
                 await self.tb.private_client.cancel_order(symbol, pos.close_order_id, pos_side)
             except Exception as e:
                 logger.debug(f"[{symbol}] ТП уже исполнен или отменен: {e}")
-                # Если сеть отвалилась до отправки, откатываем флаг
                 pos.close_cancel_requested = False 
             pos.close_order_id = None
 
     async def update_tp_after_interference(self, symbol: str):
         async with self.get_lock(symbol):
             pos = self.tb.state.active_positions.get(symbol)
-            if not pos:
+            spec = self.tb.symbol_specs.get(symbol)
+            if not pos or not spec:
                 return
 
             pos_side = "Long" if pos.side == "LONG" else "Short"
-            
+
             # СТРОГО ПО ТЗ: Мы ТОЛЬКО отменяем старый ордер.
             # Новый ордер с обновленным объемом выставит AverageScenario ДИНАМИЧЕСКИ, когда увидит ликвидность!
             await self._cancel_current_tp(symbol, pos, pos_side)
@@ -85,6 +81,12 @@ class OrderExecutor:
             if not spec or pos.current_close_price <= 0 or pos.qty <= 0:
                 return
 
+            # [КРИТИЧЕСКИЙ ФИКС]: Защита от саботажа Watchdog-ом
+            # Если Average работает, watchdog НЕ ДОЛЖЕН ставить глухую лимитку. Average сам найдет объем!
+            avg_enabled = self.tb.cfg.get("exit", {}).get("scenarious", {}).get("average", {}).get("enable", True)
+            if avg_enabled and not pos.in_extrime_mode and not pos.in_breakeven_mode:
+                return
+
             close_side = "Sell" if pos.side == "LONG" else "Buy"
             pos_side = "Long" if pos.side == "LONG" else "Short"
 
@@ -95,7 +97,8 @@ class OrderExecutor:
                 order_id = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
                 if order_id:
                     pos.close_order_id = order_id
-                    pos.place_order_fails = 0 # Успех
+                    pos.place_order_fails = 0
+                    pos.close_cancel_requested = False # Сброс флага
                     await self.tb.state.save()
                     logger.warning(f"[{symbol}] 🛡 ТП восстановлен Watchdog-ом на {pos.current_close_price}!")
             except Exception as e:
@@ -114,7 +117,7 @@ class OrderExecutor:
             close_side = "Sell" if pos.side == "LONG" else "Buy"
             pos_side = "Long" if pos.side == "LONG" else "Short"
 
-            # ОБРАБОТКА ОТМЕНЫ ЗАВИСШИХ ДИНАМИЧЕСКИХ ОРДЕРОВ
+            # ОБРАБОТКА ОТМЕНЫ ЗАВИСШИХ ДИНАМИЧЕСКИХ ОРДЕРОВ ИЗ AVERAGE
             if act == "CANCEL_CLOSE":
                 await self._cancel_current_tp(symbol, pos, pos_side)
                 logger.info(f"🧹 [{symbol}] Отмена зависшего динамического ордера: {action.get('reason', '')}")
@@ -146,7 +149,11 @@ class OrderExecutor:
                         symbol=symbol, side=close_side, qty=pos.qty, price=target_price, pos_side=pos_side
                     )
                     pos.close_order_id = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-                    pos.place_order_fails = 0 # Сброс при успехе
+                    pos.place_order_fails = 0
+                    
+                    # [КРИТИЧЕСКИЙ ФИКС]: Принудительно сбрасываем флаг ожидания отмены.
+                    # Иначе поздний WS-ответ от старого ордера заблокирует отмену будущих partial fills!
+                    pos.close_cancel_requested = False
 
                     reason = action.get("reason", "")
                     log_msg = (
@@ -259,7 +266,7 @@ class OrderExecutor:
             if qty <= 0:
                 return
 
-            # СТРОГО ПО ТЗ: берем ask2/bid2 из сигнала
+            # СТРОГО ПО ТЗ: берем базу (ask2/bid2) переданную из ENTRY/engine
             base_target = signal.get("base_target_price_100")
             if not base_target: # Fallback защита
                 spr2_pct = signal.get("spr2_pct", 0)
