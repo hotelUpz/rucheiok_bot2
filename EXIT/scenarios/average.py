@@ -17,7 +17,8 @@ class AverageScenario:
 
         time_in_pos = now - pos.opened_at
 
-        # Виртуальный расчет тейк профита
+        # 1. ВЫЧИСЛЕНИЕ ВИРТУАЛЬНОЙ ЦЕЛИ
+        # Математически эквивалентно логике "От обратного" (целевой спред * target_rate).
         if pos.side == "LONG":
             virtual_tp = pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate
         else:
@@ -25,6 +26,7 @@ class AverageScenario:
 
         pos.current_close_price = virtual_tp  
 
+        # Ждем стабилизации после входа
         if not pos.is_average_stabilized:
             if time_in_pos >= self.stab_avg:
                 pos.is_average_stabilized = True
@@ -32,7 +34,7 @@ class AverageScenario:
             else:
                 return None
         
-        # Логика сдвига 
+        # 2. ЛОГИКА СДВИГА (Shift) И КОМПРОМИССОВ
         if now - pos.last_shift_ts >= self.shift_ttl:
             if pos.current_target_rate <= self.min_target_rate:
                 return {"action": "TRIGGER_EXTRIME", "reason": "MIN_TARGET_RATE_TIMEOUT"}
@@ -42,33 +44,36 @@ class AverageScenario:
             pos.last_shift_ts = now
             pos.negative_duration_sec = 0.0 
             
-            # Пересчитываем цель после сдвига
+            # Пересчитываем цель после понижения планки
             if pos.side == "LONG":
                 pos.current_close_price = pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate
             else:
                 pos.current_close_price = pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate
 
-            # Если старый ордер всё еще висит в стакане — мы обязаны его отменить для переоценки!
+            # Если старый кусок лимитки всё еще висит в стакане — мы обязаны его отменить,
+            # чтобы расчистить путь для новой итерации хантинга.
             if pos.close_order_id:
                 return {"action": "CANCEL_CLOSE", "reason": "SHIFT_DEMOTION_TIMEOUT"}
 
+        # Если ордер в стакане, молча ждем его судьбы от ws_handler (Полный налив или Отмена остатка)
         if pos.close_order_id:
             return None
 
-        # Динамический поиск объема
-        best_price = None
+        # 3. АКТИВНЫЙ ХАНТИНГ (Парсинг стакана)
+        hit = False
         if pos.side == "LONG":
-            for price, vol in depth.bids:
-                if price >= pos.current_close_price:
-                    best_price = price
-                    break
+            # Для лонга: ищем БИДЫ, которые больше или равны нашей виртуальной цели
+            if depth.bids and depth.bids[0][0] >= pos.current_close_price:
+                hit = True
         else:
-            for price, vol in depth.asks:
-                if price <= pos.current_close_price:
-                    best_price = price
-                    break
+            # Для шорта: ищем АСКИ, которые меньше или равны нашей виртуальной цели
+            if depth.asks and depth.asks[0][0] <= pos.current_close_price:
+                hit = True
 
-        if best_price is not None:
-            return {"action": "PLACE_DYNAMIC_CLOSE", "price": best_price, "reason": "DYNAMIC_TP_HIT"}
+        if hit:
+            # ФОКУС: Кидаем заявку ровно в НАШУ virtual_tp, а не в цену бида/аска!
+            # Биржа сработает как Price Improvement (исполнит нас об лучшую цену).
+            # А если ликвидность сбежит, мы встанем ровно на нашей границе, ничего не теряя.
+            return {"action": "PLACE_DYNAMIC_CLOSE", "price": pos.current_close_price, "reason": "DYNAMIC_TP_HIT"}
 
         return None
