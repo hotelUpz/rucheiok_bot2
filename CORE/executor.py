@@ -546,7 +546,10 @@ class OrderExecutor:
             order_id = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
 
             if order_id:
-                self.tb.state.pending_entry_orders[pos_key] = order_id
+                # [СКАЛЬПЕЛЬ 1]: Защита от Зомби. Вписываем ID только если вебсокет еще не завершил цикл!
+                if self.tb.state.pending_entry_orders.get(pos_key) == "PENDING_HTTP":
+                    self.tb.state.pending_entry_orders[pos_key] = order_id
+                    
                 await self.tb.state.save()
                 logger.info(f"🚀 [{pos_key}] {semantic_action} ОТПРАВЛЕН: по {price} (Плановый объем: {qty})")
                 if self.tb.tg:

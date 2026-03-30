@@ -349,7 +349,8 @@ class PrivateWSHandler:
         
         pos_side = "Long" if pos.side == "LONG" else "Short"
         
-        to_cancel = [oid for oid in (entry_id, interf_id, pos.close_order_id) if oid]
+        # [СКАЛЬПЕЛЬ 3]: Игнорируем PENDING_HTTP, так как это не настоящий ID ордера
+        to_cancel = [oid for oid in (entry_id, interf_id, pos.close_order_id) if oid and oid != "PENDING_HTTP"]
         for oid in to_cancel:
             try: await self.tb.private_client.cancel_order(sym, oid, pos_side)
             except Exception: pass
@@ -384,17 +385,17 @@ class PrivateWSHandler:
 
         if status in ("Filled", "Canceled", "Rejected", "Deactivated"):
             self.tb.state.pending_entry_orders.pop(pos_key, None)
+            
             if pos:
-                was_requested = pos.entry_cancel_requested
-                pos.entry_cancel_requested = False
                 pos.entry_finalized = cum_qty > 0
 
             if cum_qty > 0 and pos:
                 if status == "Filled": logger.info(f"✅ [{pos_key}] Вход исполнен полностью. Объем: {cum_qty}")
-                else: logger.info(f"✅ [{pos_key}] Вход подтвержден (частично). Остаток снят. Объем: {cum_qty}")
+                else: logger.info(f"✅ [{pos_key}] Вход подтвержден (частично). Ордер снят. Объем: {cum_qty}")
             else:
-                if not was_requested: logger.warning(f"🗑 [{pos_key}] Входной ордер отменен биржей. Удаляем кэш.")
+                logger.warning(f"🗑 [{pos_key}] Входной ордер снят без налива. Удаляем кэш.")
                 self.tb.state.active_positions.pop(pos_key, None)
+                
             await self.tb.state.save()
 
     async def _handle_close_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float, exec_qty: float) -> None:
@@ -438,9 +439,13 @@ class PrivateWSHandler:
             return
 
         if status in ("Canceled", "Rejected", "Deactivated"):
-            pos.close_order_id = None
-            pos.close_cancel_requested = False
-            if pos.qty <= 0: self.tb.state.active_positions.pop(pos_key, None)
+            if pos.close_order_id == order_id:
+                pos.close_order_id = None  # Просто забываем этот ордер. Снайпер сам разберется.
+                
+            # ЗОЛОТОЕ ПРАВИЛО: Нет объема -> Нет позиции.
+            if pos.qty <= 0: 
+                self.tb.state.active_positions.pop(pos_key, None)
+                
             await self.tb.state.save()
 
     async def _handle_interference_order(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, exec_qty: float, cum_qty: float, price_rp: float) -> None:
@@ -466,17 +471,17 @@ class PrivateWSHandler:
 
         elif status in ("Canceled", "Rejected", "Deactivated"):
             self.tb.state.pending_interference_orders.pop(pos_key, None)
-            if pos:
-                was_requested = pos.interference_cancel_requested
-                pos.interference_cancel_requested = False
+            
+            # Если отменили остаток, но что-то успели купить - обновляем цель
+            if pos and pos.interf_bought_qty > 0:
+                asyncio.create_task(self.tb.executor.update_tp_after_interference(symbol, pos_key))
+            
+            # Штрафуем только за явные реджекты биржи (чтобы не долбиться в стену)
+            if status == "Rejected" and pos:
+                if price_rp > 0: pos.failed_interference_prices[str(price_rp)] = pos.failed_interference_prices.get(str(price_rp), 0) + 1
+                pos.place_order_fails += 1
+                asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos_key, pos))
                 
-                if was_requested and pos.interf_bought_qty > 0:
-                    asyncio.create_task(self.tb.executor.update_tp_after_interference(symbol, pos_key))
-                
-                if not was_requested:
-                    if price_rp > 0: pos.failed_interference_prices[str(price_rp)] = pos.failed_interference_prices.get(str(price_rp), 0) + 1
-                    pos.place_order_fails += 1
-                    asyncio.create_task(self.tb.executor._handle_order_fail(symbol, pos_key, pos))
             await self.tb.state.save()
 
     async def handle_message(self, payload: Dict[str, Any]):

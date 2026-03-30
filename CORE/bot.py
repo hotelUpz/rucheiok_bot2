@@ -225,6 +225,13 @@ class TradingBot:
 
                     if pos.side != exch_data["side"]:
                         continue # Конфликт сторон (оставляем дроп)
+                        
+                    # [СКАЛЬПЕЛЬ 2]: Сносим старые зависшие лимитки с биржи! 
+                    # Бот проснулся с амнезией (close_order_id = None), значит доска должна быть чистой.
+                    try:
+                        await self.private_client.cancel_all_orders(pos.symbol)
+                    except Exception:
+                        pass
 
                     pos.qty = exch_data["size"]
                     pos.close_order_id = None
@@ -236,6 +243,24 @@ class TradingBot:
                     logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {pos_key}. Объем: {pos.qty}, Вход: {pos.entry_price}")
                 else:
                     logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне, пока бот спал. Удаляем из кэша.")
+
+            # for pos_key, pos in old_positions.items():
+            #     if pos_key in exchange_positions:
+            #         exch_data = exchange_positions[pos_key]
+
+            #         if pos.side != exch_data["side"]:
+            #             continue # Конфликт сторон (оставляем дроп)
+
+            #         pos.qty = exch_data["size"]
+            #         pos.close_order_id = None
+            #         pos.entry_finalized = pos.qty > 0
+            #         pos.entry_cancel_requested = False
+            #         pos.interference_cancel_requested = False
+
+            #         self.state.active_positions[pos_key] = pos
+            #         logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {pos_key}. Объем: {pos.qty}, Вход: {pos.entry_price}")
+            #     else:
+            #         logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне, пока бот спал. Удаляем из кэша.")
 
             await self.state.save()
         except Exception as e:
