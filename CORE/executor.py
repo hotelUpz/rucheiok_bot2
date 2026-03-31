@@ -30,7 +30,7 @@ class OrderExecutor:
     async def _handle_order_fail(self, symbol: str, pos_key: str, pos: ActivePosition) -> None:
         """Централизованный диспетчер аварий API."""
         max_fails: int = self.tb.cfg.get("app", {}).get("max_place_order_retries", 5)
-        semantic: str = "ЛОНГ" if pos.side == "LONG" else "ШОРТ"
+        # semantic: str = "ЛОНГ" if pos.side == "LONG" else "ШОРТ"
         
         if pos.place_order_fails >= max_fails:
             if pos.qty > 0:
