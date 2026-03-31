@@ -2,11 +2,9 @@
 # FILE: ENTRY/pattern_math.py
 # ROLE: Оптимизированная математика паттернов стакана (HFT)
 # ============================================================
+
 from __future__ import annotations
-
-from typing import List, Tuple, Optional, TypedDict, Literal, Any
-
-PriceLevel = Tuple[float, float]
+from typing import Optional, TypedDict, Literal, Any, List
 
 class EntrySignal(TypedDict, total=False):
     side: Literal["LONG", "SHORT"]
@@ -28,7 +26,6 @@ class StakanEntryPattern:
         self.min_vol: Optional[float] = self.cfg.get("min_first_row_usdt_notional")
         self.max_vol: Optional[float] = self.cfg.get("max_first_row_usdt_notional")
         
-        # Выносим статику из вложенных структур
         btm = self.cfg.get("bottom", {})
         self.min_spr2: float = btm.get("min_spread_between_two_row_pct", 0.0)
         self.min_spr3: float = btm.get("min_spread_between_three_row_pct", 0.0)
@@ -43,13 +40,13 @@ class StakanEntryPattern:
         self.desired_rate: float = self.cfg.get("header_to_bottom_desired_rate", 0.0)
         self.max_dist_rate: float = self.cfg.get("max_bid_ask_distance_rate", 0.0)
 
-    def analyze(self, bids: List[PriceLevel], asks: List[PriceLevel]) -> Optional[EntrySignal]:
+    def analyze(self, bids: list[tuple[float, float]], asks: list[tuple[float, float]]) -> Optional[EntrySignal]:
         if not self.enabled or len(bids) < self.depth or len(asks) < self.depth:
             return None
 
         return self._check_pattern(asks, bids, "LONG") or self._check_pattern(bids, asks, "SHORT")
 
-    def _check_pattern(self, side: List[PriceLevel], opp_side: List[PriceLevel], direction: Literal["LONG", "SHORT"]) -> Optional[EntrySignal]:
+    def _check_pattern(self, side: list[tuple[float, float]], opp_side: list[tuple[float, float]], direction: Literal["LONG", "SHORT"]) -> Optional[EntrySignal]:
         p1, p2, p3 = side[0][0], side[1][0], side[2][0]
         opp_p1 = opp_side[0][0]
         

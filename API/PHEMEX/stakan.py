@@ -18,7 +18,7 @@ from c_log import UnifiedLogger
 
 logger = UnifiedLogger("api")
 
-PriceLevel = Tuple[float, float]  # (price, qty)
+# PriceLevel = Tuple[float, float]  # (price, qty)
 
 # @dataclass(frozen=True)
 # class DepthTop:

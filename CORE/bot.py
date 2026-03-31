@@ -347,7 +347,7 @@ class TradingBot:
         await self._recover_state()
 
         self._funding_task = asyncio.create_task(self.entry_engine.funding_filter.run())
-        self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.handle_message))
+        self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)

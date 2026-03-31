@@ -9,7 +9,7 @@ from typing import Dict, Any, Optional, TYPE_CHECKING
 
 from ENTRY.pattern_math import StakanEntryPattern, EntrySignal
 from ENTRY.funding_filter import FundingFilter
-from API.PHEMEX.stakan import DepthTop, PriceLevel
+from API.PHEMEX.stakan import DepthTop
 
 if TYPE_CHECKING:
     from API.PHEMEX.funding import PhemexFunding
@@ -43,33 +43,31 @@ class EntryEngine:
             return None
             
         now: float = time.time()
-
-        # 2. Только теперь делаем сортировку и срез (самая дорогая операция)
-        # Сортируем только ключи (float), это быстрее, чем сортировать кортежи
+        
+        # 1. Извлекаем ключи (цены) и сортируем их
+        # bids - по убыванию (лучшая цена сверху), asks - по возрастанию
         top_bid_keys = sorted(depth.bids.keys(), reverse=True)[:self.target_depth]
         top_ask_keys = sorted(depth.asks.keys())[:self.target_depth]
         
-        # Проверяем, хватает ли глубины для анализа
         if len(top_bid_keys) < self.target_depth or len(top_ask_keys) < self.target_depth:
             return None
-        
-        bids_sliced: list[PriceLevel] = depth.bids[:self.target_depth]
-        asks_sliced: list[PriceLevel] = depth.asks[:self.target_depth]
+
+        # 2. Формируем список кортежей (price, qty) для математики.
+        bids_sliced: list[tuple[float, float]] = [(p, depth.bids[p]) for p in top_bid_keys]
+        asks_sliced: list[tuple[float, float]] = [(p, depth.asks[p]) for p in top_ask_keys]
         
         signal: Optional[EntrySignal] = self.pattern_math.analyze(bids_sliced, asks_sliced)
         
         if not signal:
-            # Очищаем только если сигнал полностью пропал
             keys_to_pop = [f"{symbol}_LONG", f"{symbol}_SHORT"]
             for k in keys_to_pop:
                 self._pattern_first_seen.pop(k, None)
                 self._spread_first_seen.pop(k, None)
             return None
             
-        # Формируем изолированный ключ для Hedge-режима
         pos_key: str = f"{symbol}_{signal['side']}"
 
-        # Извлекаем базу для ТП из второго уровня (ask2/bid2)
+        # Извлекаем базу для ТП из второго уровня
         ask2: float = asks_sliced[1][0] if len(asks_sliced) > 1 else asks_sliced[0][0]
         bid2: float = bids_sliced[1][0] if len(bids_sliced) > 1 else bids_sliced[0][0]
         signal["base_target_price_100"] = ask2 if signal["side"] == "LONG" else bid2
@@ -89,19 +87,16 @@ class EntryEngine:
             self._spread_first_seen.pop(pos_key, None)
             return None
 
-        # Проверка удержания паттерна во времени (TTL)
         if self.pattern_ttl > 0:
             first_seen_p = self._pattern_first_seen.setdefault(pos_key, now)
             if now - first_seen_p < self.pattern_ttl: 
                 return None
 
-        # Проверка удержания спреда Binance во времени (TTL)
         if self.binance_enabled and self.spread_ttl > 0:
             first_seen_s = self._spread_first_seen.setdefault(pos_key, now)
             if now - first_seen_s < self.spread_ttl: 
                 return None
 
-        # Сигнал прошел все фильтры и удержания. Сбрасываем таймеры.
         self._pattern_first_seen.pop(pos_key, None)
         self._spread_first_seen.pop(pos_key, None)
         
