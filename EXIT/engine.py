@@ -1,6 +1,6 @@
 import asyncio
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, TYPE_CHECKING
 
 from CORE.models import ActivePosition
 from API.PHEMEX.stakan import DepthTop
@@ -12,13 +12,16 @@ from EXIT.position_ttl_close import PositionTTLClose
 from EXIT.extrime_close import ExtrimeClose
 from EXIT.interference import Interference
 
+if TYPE_CHECKING:
+    from CORE.bot import TradingBot
+
 logger = UnifiedLogger("exit")
 
 
 class ExitEngine:
     def __init__(self, exit_cfg: Dict[str, Any], tb):
         self.cfg = exit_cfg
-        self.tb = tb
+        self.tb: "TradingBot" = tb
         scenarios_cfg = self.cfg.get("scenarious", {})
 
         self.average = AverageScenario(scenarios_cfg.get("average", {}))

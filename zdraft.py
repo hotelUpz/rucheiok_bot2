@@ -759,3 +759,61 @@
 #             return {"action": "PLACE_DYNAMIC_CLOSE", "price": pos.current_close_price, "reason": "DYNAMIC_TP_HIT"}
 
 #         return None
+
+
+
+    # async def stop(self):
+    #     """
+    #     СТРОГО ПО ТЗ 1.13: STOP должен останавливать новые входы, 
+    #     не рушить state, корректно завершать фоновые задачи.
+    #     """
+    #     from c_log import UnifiedLogger
+    #     logger = UnifiedLogger("core")
+        
+    #     logger.info("🛑 Получена команда STOP. Начинаем graceful shutdown...")
+    #     self._is_running = False  # Блокирует новые входы
+        
+    #     # Останавливаем публичные сокеты (стаканы)
+    #     if hasattr(self, 'phemex_public_ws') and self.phemex_public_ws:
+    #         await self.phemex_public_ws.stop()
+            
+    #     # Останавливаем приватные сокеты (ордера/позиции)
+    #     if hasattr(self, 'phemex_private_ws') and self.phemex_private_ws:
+    #         await self.phemex_private_ws.stop()
+
+    #     # Сохраняем стейт на диск.
+    #     # ВАЖНО: Мы НЕ очищаем self.state.active_positions! 
+    #     # При следующем старте Recovery восстановит контроль над позициями.
+    #     await self.state.save()
+    #     logger.info("✅ Graceful shutdown завершен. Стейт сохранен.")
+
+
+
+    # async def save(self):
+    #     """Потокобезопасная отправка данных на диск"""
+    #     async with self._lock: # <-- ДОБАВИТЬ ЭТО
+    #         state_dict = {
+    #             "positions": {sym: pos.to_dict() for sym, pos in self.active_positions.items() if sym not in self.black_list},
+    #             "fails": dict(self.consecutive_fails),
+    #             "quarantine": dict(self.quarantine_until)
+    #         }
+    #         await asyncio.to_thread(self._sync_save, state_dict)
+
+    # def load(self):
+    #     """Синхронная загрузка стейта при старте"""
+    #     if not os.path.exists(self.filepath): return
+    #     try:
+    #         with open(self.filepath, "r", encoding="utf-8") as f:
+    #             data = json.load(f)
+            
+    #         self.consecutive_fails = data.get("fails", {})
+    #         self.quarantine_until = data.get("quarantine", {})
+            
+    #         saved_positions = data.get("positions", {})
+    #         self.active_positions.clear()
+    #         for sym, pos_data in saved_positions.items():
+    #             if sym in self.black_list:
+    #                 continue
+    #             self.active_positions[sym] = ActivePosition.from_dict(pos_data)
+    #     except Exception as e:
+    #         logger.error(f"Ошибка чтения стейта: {e}")

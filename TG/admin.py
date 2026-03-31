@@ -10,6 +10,7 @@ from pathlib import Path
 import json
 from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.context import FSMContext
@@ -41,6 +42,18 @@ class AdminTgBot:
             resize_keyboard=True
         )
         self._register_handlers()
+
+    async def reset_session(self):
+        """Безопасное пересоздание сессии при сетевых сбоях"""
+        try:
+            if self.bot.session and not self.bot.session.closed:
+                await self.bot.session.close()
+        except Exception as e:
+            logger.error(f"Ошибка при закрытии сессии TG: {e}")
+        
+        # Создаем новую сессию
+        self.bot.session = AiohttpSession()
+        logger.warning("🔄 Сессия Telegram API перезапущена")
 
     def _register_handlers(self):
         @self.dp.message(Command("start"), StateFilter("*"))
