@@ -17,6 +17,8 @@ from aiogram.fsm.state import State, StatesGroup
 from c_log import UnifiedLogger
 from utils import get_config_summary
 
+TEMP_CFG_PATH = CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.json"
+
 logger = UnifiedLogger("tg")
 
 class BotStates(StatesGroup):
