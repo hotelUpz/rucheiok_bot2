@@ -35,7 +35,10 @@
     ],
     "quota_asset": "USDT",
     "risk": {
-        "leverage": 20,
+        "leverage": {
+            "used_by_cache": false,
+            "val": 20
+        },
         "margin_size": "row",
         "notional_limit": 800,
         "margin_over_size_pct": 1,
