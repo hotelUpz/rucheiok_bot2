@@ -24,6 +24,7 @@ from EXIT.engine import ExitEngine
 from CORE.models import BotState
 from CORE.executor import OrderExecutor
 from CORE.ws_handler import PrivateWSHandler
+from CORE.bot_utils import BlackListManager, PriceCacheManager
 from c_log import UnifiedLogger
 from TG.tg_sender import TelegramSender
 from utils import get_config_summary
@@ -36,18 +37,12 @@ class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
         self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
+        quota_asset = self.cfg.get("quota_asset", "USDT")
 
-        self.quota_asset = self.cfg.get("quota_asset", "USDT").upper()
-        self.black_list = []
-        for sym in self.cfg.get("black_list", []):
-            sym = sym.upper()
-            full_sym = sym if sym.endswith(self.quota_asset) else sym + self.quota_asset
-            self.black_list.append(full_sym)
-            if "OG" in full_sym:
-                self.black_list.append(full_sym.replace("OG", "0G"))
-            if "0G" in full_sym:
-                self.black_list.append(full_sym.replace("0G", "OG"))
-
+        # Инициализация сервисов (Черный список и Кэш цен)
+        self.bl_manager = BlackListManager(CFG_PATH, quota_asset)
+        self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
+        
         self.state = BotState(black_list=self.black_list)
         self.state.load()
 
@@ -60,6 +55,10 @@ class TradingBot:
         self.phemex_ticker_api = PhemexTickerAPI()
         self.phemex_funding_api = PhemexFunding()
         self.session = aiohttp.ClientSession()
+        
+        # Настройка Менеджера цен
+        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
+        self.price_manager = PriceCacheManager(self.binance_ticker_api, self.phemex_ticker_api, upd_sec)
 
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
         api_secret = os.getenv("API_SECRET") or self.cfg["credentials"].get("api_secret", "")
@@ -77,9 +76,6 @@ class TradingBot:
         self.exit_engine = ExitEngine(cfg["exit"], self)
         self.symbol_specs: Dict[str, SymbolInfo] = {}
 
-        self.binance_prices: Dict[str, float] = {}
-        self.phemex_prices: Dict[str, float] = {}
-        self.prices_cache_time = 0.0
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
         self._latest_depth: Dict[str, DepthTop] = {}
@@ -87,6 +83,7 @@ class TradingBot:
         self._funding_task: asyncio.Task | None = None
         self._private_ws_task: asyncio.Task | None = None
         self._stream_task: asyncio.Task | None = None
+        self._price_updater_task: asyncio.Task | None = None
 
     async def aclose(self):
         await self.stop()
@@ -103,15 +100,11 @@ class TradingBot:
             await self.session.close()
 
     async def _await_task(self, task: asyncio.Task | None):
-        if not task:
-            return
+        if not task: return
         task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
-        except Exception as e:
-            logger.debug(f"Task shutdown note: {e}")
+        try: await task
+        except asyncio.CancelledError: pass
+        except Exception as e: logger.debug(f"Task shutdown note: {e}")
 
     def reload_config(self) -> tuple[bool, str]:
         try:
@@ -120,26 +113,14 @@ class TradingBot:
 
             self.cfg = new_cfg
             self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
-
-            self.quota_asset = self.cfg.get("quota_asset", "USDT").upper()
-            new_bl = []
-            for sym in self.cfg.get("black_list", []):
-                sym = sym.upper()
-                full_sym = sym if sym.endswith(self.quota_asset) else sym + self.quota_asset
-                new_bl.append(full_sym)
-                if "OG" in full_sym:
-                    new_bl.append(full_sym.replace("OG", "0G"))
-                if "0G" in full_sym:
-                    new_bl.append(full_sym.replace("0G", "OG"))
-
-            self.black_list.clear()
-            self.black_list.extend(new_bl)
+            
+            # Делегируем обновление ЧС утилите
+            self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
             if hasattr(self.state, 'black_list'):
                 self.state.black_list = self.black_list
 
             old_ff = getattr(self.entry_engine, 'funding_filter', None) if hasattr(self, 'entry_engine') else None
-            if old_ff:
-                old_ff.stop()
+            if old_ff: old_ff.stop()
 
             self.entry_engine = EntryEngine(self.cfg["entry"], self.phemex_funding_api)
             self.exit_engine = ExitEngine(self.cfg["exit"], self)
@@ -153,65 +134,21 @@ class TradingBot:
             return False, f"Ошибка загрузки в память: {e}"
 
     def set_blacklist(self, symbols: list) -> tuple[bool, str]:
-        new_bl = []
-        clean_symbols_for_cfg = []
-        for sym in symbols:
-            sym = sym.upper().strip()
-            if not sym:
-                continue
-            clean_symbols_for_cfg.append(sym)
-            full_sym = sym if sym.endswith(self.quota_asset) else sym + self.quota_asset
-            if full_sym not in new_bl:
-                new_bl.append(full_sym)
-            if "OG" in full_sym:
-                new_bl.append(full_sym.replace("OG", "0G"))
-            if "0G" in full_sym:
-                new_bl.append(full_sym.replace("0G", "OG"))
-
-        self.black_list.clear()
-        self.black_list.extend(new_bl)
-
-        if hasattr(self.state, 'black_list'):
-            self.state.black_list = self.black_list
-
-        try:
-            with open(CFG_PATH, "r", encoding="utf-8") as f:
-                c = json.load(f)
-            c["black_list"] = clean_symbols_for_cfg
-            with open(CFG_PATH, "w", encoding="utf-8") as f:
-                json.dump(c, f, indent=4)
-        except Exception as e:
-            return False, f"❌ Ошибка записи: {e}"
-        return True, "✅ Список успешно обновлен."    
-
-    async def update_prices_cache(self):
-        """Теперь этот метод просто делает запрос. Всю логику таймингов перенесли в loop."""
-        try:
-            b_prices, p_prices = await asyncio.gather(
-                self.binance_ticker_api.get_all_prices(), 
-                self.phemex_ticker_api.get_all_prices()
-            )
-            self.binance_prices = b_prices
-            self.phemex_prices = p_prices
-        except Exception as e:
-            logger.debug(f"Ошибка фонового обновления цен тикеров: {e}")
-
-    async def _price_updater_loop(self):
-        """Фоновая задача, которая обновляет тикеры, НЕ БЛОКИРУЯ стаканы"""
-        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3)
-        while self._is_running:
-            await self.update_prices_cache()
-            await asyncio.sleep(upd_sec)
+        # Вся черновая работа с ЧС передана менеджеру
+        success, msg = self.bl_manager.update_and_save(symbols)
+        if success:
+            self.black_list = self.bl_manager.symbols
+            if hasattr(self.state, 'black_list'):
+                self.state.black_list = self.black_list
+        return success, msg
     
     async def _recover_state(self):
         try:
             self.state.load()
             resp = await self.private_client.get_active_positions()
-
             data_block = resp.get("data", {})
             data = data_block.get("positions", []) if isinstance(data_block, dict) else data_block
-            if not isinstance(data, list):
-                data = []
+            if not isinstance(data, list): data = []
 
             exchange_positions = {}
             for item in data:
@@ -228,16 +165,10 @@ class TradingBot:
             for pos_key, pos in old_positions.items():
                 if pos_key in exchange_positions:
                     exch_data = exchange_positions[pos_key]
-
-                    if pos.side != exch_data["side"]:
-                        continue # Конфликт сторон (оставляем дроп)
+                    if pos.side != exch_data["side"]: continue
                         
-                    # [СКАЛЬПЕЛЬ 2]: Сносим старые зависшие лимитки с биржи! 
-                    # Бот проснулся с амнезией (close_order_id = None), значит доска должна быть чистой.
-                    try:
-                        await self.private_client.cancel_all_orders(pos.symbol)
-                    except Exception:
-                        pass
+                    try: await self.private_client.cancel_all_orders(pos.symbol)
+                    except Exception: pass
 
                     pos.qty = exch_data["size"]
                     pos.close_order_id = None
@@ -248,31 +179,31 @@ class TradingBot:
                     self.state.active_positions[pos_key] = pos
                     logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {pos_key}. Объем: {pos.qty}, Вход: {pos.entry_price}")
                 else:
-                    logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне, пока бот спал. Удаляем из кэша.")
+                    logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне. Удаляем из кэша.")
 
             await self.state.save()
         except Exception as e:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
-    async def _depth_worker(self, symbol: str):
-        try:
-            while self._is_running:
-                snap = self._latest_depth.pop(symbol, None)
-                if snap is None:
-                    break
-                await self._process_depth(snap)
-        finally:
-            self._depth_workers.pop(symbol, None)
-            if self._is_running and symbol in self._latest_depth:
-                self._depth_workers[symbol] = asyncio.create_task(self._depth_worker(symbol))
+    # ==========================================
+    # ИСПРАВЛЕННЫЕ И БЕЗОПАСНЫЕ ВОРКЕРЫ СТАКАНА
+    # ==========================================
+    async def _depth_worker_loop(self, symbol: str):
+        """Безопасный цикл обработки стакана без рекурсии в finally."""
+        while self._is_running:
+            snap = self._latest_depth.pop(symbol, None)
+            if snap is None:
+                break # Нет свежих данных - гасим воркер, он освобождает память
+            await self._process_depth(snap)
 
     async def _on_depth_received(self, snap: DepthTop):
-        if not self._is_running:
-            return
+        if not self._is_running: return
         self._latest_depth[snap.symbol] = snap
+        
         worker = self._depth_workers.get(snap.symbol)
+        # Если воркера нет или он завершил цикл обработки (done) - запускаем новый
         if worker is None or worker.done():
-            self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker(snap.symbol))
+            self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker_loop(snap.symbol))
 
     async def _process_depth(self, snap: DepthTop):
         if not self._is_running: return
@@ -291,49 +222,37 @@ class TradingBot:
         try:
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             
-            # 1. Обработка Выхода
+            # 1. Выход
             for pos_key in (pos_long_key, pos_short_key):
                 if pos_key in self.state.active_positions:
                     pos = self.state.active_positions[pos_key]
                     if pos_key in self.state.pending_entry_orders and pos.qty <= 0: continue
-                        
                     action = self.exit_engine.analyze(snap, pos)
                     if action: await self.executor.handle_exit_action(symbol, pos_key, action)
             
-            # 2. Логика слотов и Hedge Mode (ИСПРАВЛЕНО)
+            # 2. Логика слотов и Hedge Mode
             hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-            
             has_long = pos_long_key in self.state.active_positions or pos_long_key in self.state.in_flight_orders
             has_short = pos_short_key in self.state.active_positions or pos_short_key in self.state.in_flight_orders
 
-            # Если Hedge Mode отключен, и уже есть любая позиция/ордер по монете - скипаем
-            if not hedge_mode and (has_long or has_short):
-                return
+            if not hedge_mode and (has_long or has_short): return
 
-            # Считаем занятые слоты по уникальным монетам (Символам)
             active_symbols = set(p.symbol for p in self.state.active_positions.values())
             in_flight_symbols = set(k.split("_")[0] for k in self.state.in_flight_orders)
             used_slots = len(active_symbols | in_flight_symbols)
 
-            # Если слоты забиты, и этой монеты еще нет в работе - скипаем
             if used_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in in_flight_symbols:
                 return
 
-            # 3. Анализ Входа (УБРАН БЛОКИРУЮЩИЙ ВЫЗОВ HTTP!)
-            # Берем цены мгновенно из словаря, который обновляется в фоне
-            b_price = self.binance_prices.get(symbol, 0.0)
-            p_price = self.phemex_prices.get(symbol, 0.0)
-
+            # 3. Вход: Мгновенное чтение из кэша утилиты
+            b_price, p_price = self.price_manager.get_prices(symbol)
             signal = self.entry_engine.analyze(snap, b_price, p_price)
             
             if signal:
                 pos_key = f"{symbol}_{signal['side']}"
-                
-                # Повторная проверка, чтобы не открыть второй лонг/шорт туда же
                 if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders or pos_key in self.state.in_flight_orders: 
                     return 
 
-                # Фиксируем ин-флайт по КЛЮЧУ ПОЗИЦИИ, а не по символу!
                 self.state.in_flight_orders.add(pos_key)
                 try:
                     signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
@@ -347,8 +266,7 @@ class TradingBot:
             self._processing.discard(symbol)
 
     async def start(self):
-        if getattr(self, '_is_running', False):
-            return
+        if getattr(self, '_is_running', False): return
         self._is_running = True
         logger.info("▶️ Запуск торговых процессов...")
 
@@ -358,43 +276,34 @@ class TradingBot:
         if self.tg:
             asyncio.create_task(self.tg.send_message("🟢 <b>ТОРГОВЛЯ НАЧАТА</b>"))
 
-        symbols_info = await self.phemex_sym_api.get_all(quote=self.quota_asset, only_active=True)
+        symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
 
         await self._recover_state()
 
-        # [ЖИРНАЯ ПРАВКА]: Прогреваем кэш цен ДО запуска стаканов!
-        # Гарантирует, что первый тик не столкнется с нулевыми ценами.
+        # Прогрев и старт менеджера цен
         logger.info("🔄 Прогрев кэша цен (Binance/Phemex)...")
-        await self.update_prices_cache()
-        
-        # Только теперь запускаем фоновое обновление
-        self._price_updater_task = asyncio.create_task(self._price_updater_loop())
+        await self.price_manager.warmup()
+        self._price_updater_task = asyncio.create_task(self.price_manager.loop())
         
         self._funding_task = asyncio.create_task(self.entry_engine.funding_filter.run())
         self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
-        # Запуск стримов
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
         self._stream_task = asyncio.create_task(self._stream.run(self._on_depth_received))
 
     async def stop(self):
-        if not getattr(self, '_is_running', False):
-            return
+        if not getattr(self, '_is_running', False): return
         self._is_running = False
         logger.info("⏹ Остановка процессов...")
 
+        self.price_manager.stop()
         self.entry_engine.funding_filter.stop()
-        if self._stream:
-            self._stream.stop()
-
+        if self._stream: self._stream.stop()
         await self.private_ws.aclose()
         
-        # Останавливаем новую таску цен
-        if hasattr(self, '_price_updater_task'):
-            await self._await_task(self._price_updater_task)
-            
+        await self._await_task(self._price_updater_task)
         await self._await_task(self._funding_task)
         await self._await_task(self._private_ws_task)
         await self._await_task(self._stream_task)
