@@ -272,7 +272,20 @@ class PrivateWSHandler:
                 pos.qty = real_size
 
     def _process_pnl(self, sym: str, pos_key: str, is_loss: bool, close_price: float) -> None:
-        """Обработка результатов торгового цикла. Карантин символа при серии убытков."""
+        """Обработка результатов торгового цикла. Зачистка хвостов и Карантин."""
+        
+        # [СКАЛЬПЕЛЬ]: Уничтожаем все физические ордера-хвосты (Помехи/Входы), если позиция закрылась
+        pos = self.tb.state.active_positions.get(pos_key)
+        if pos:
+            pos_side = "Long" if pos.side == "LONG" else "Short"
+            interf_id = self.tb.state.pending_interference_orders.get(pos_key)
+            if interf_id and interf_id != "PENDING_HTTP":
+                asyncio.create_task(self.tb.private_client.cancel_order(sym, interf_id, pos_side))
+                
+            entry_id = self.tb.state.pending_entry_orders.get(pos_key)
+            if entry_id and entry_id != "PENDING_HTTP":
+                asyncio.create_task(self.tb.private_client.cancel_order(sym, entry_id, pos_side))
+
         if is_loss:
             self.tb.state.consecutive_fails[sym] = self.tb.state.consecutive_fails.get(sym, 0) + 1
             q_cfg: dict = self.tb.cfg.get("risk", {}).get("quarantine", {})
@@ -294,7 +307,7 @@ class PrivateWSHandler:
         else:
             self.tb.state.consecutive_fails[sym] = 0
 
-        # Очистка следов цикла
+        # Очистка следов цикла из стейта
         self.tb.state.pending_entry_orders.pop(pos_key, None)
         self.tb.state.pending_interference_orders.pop(pos_key, None)
         self.tb.state.active_positions.pop(pos_key, None)
