@@ -182,7 +182,26 @@ class TradingBot:
                 json.dump(c, f, indent=4)
         except Exception as e:
             return False, f"❌ Ошибка записи: {e}"
-        return True, "✅ Список успешно обновлен."
+        return True, "✅ Список успешно обновлен."    
+
+    async def update_prices_cache(self):
+        """Теперь этот метод просто делает запрос. Всю логику таймингов перенесли в loop."""
+        try:
+            b_prices, p_prices = await asyncio.gather(
+                self.binance_ticker_api.get_all_prices(), 
+                self.phemex_ticker_api.get_all_prices()
+            )
+            self.binance_prices = b_prices
+            self.phemex_prices = p_prices
+        except Exception as e:
+            logger.debug(f"Ошибка фонового обновления цен тикеров: {e}")
+
+    async def _price_updater_loop(self):
+        """Фоновая задача, которая обновляет тикеры, НЕ БЛОКИРУЯ стаканы"""
+        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3)
+        while self._is_running:
+            await self.update_prices_cache()
+            await asyncio.sleep(upd_sec)
     
     async def _recover_state(self):
         try:
@@ -254,25 +273,6 @@ class TradingBot:
         worker = self._depth_workers.get(snap.symbol)
         if worker is None or worker.done():
             self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker(snap.symbol))
-
-    async def update_prices_cache(self):
-        """Теперь этот метод просто делает запрос. Всю логику таймингов перенесли в loop."""
-        try:
-            b_prices, p_prices = await asyncio.gather(
-                self.binance_ticker_api.get_all_prices(), 
-                self.phemex_ticker_api.get_all_prices()
-            )
-            self.binance_prices = b_prices
-            self.phemex_prices = p_prices
-        except Exception as e:
-            logger.debug(f"Ошибка фонового обновления цен тикеров: {e}")
-
-    async def _price_updater_loop(self):
-        """Фоновая задача, которая обновляет тикеры, НЕ БЛОКИРУЯ стаканы"""
-        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3)
-        while self._is_running:
-            await self.update_prices_cache()
-            await asyncio.sleep(upd_sec)
 
     async def _process_depth(self, snap: DepthTop):
         if not self._is_running: return
@@ -363,12 +363,18 @@ class TradingBot:
 
         await self._recover_state()
 
-        # ЗАПУСКАЕМ ФОНОВУЮ ЗАДАЧУ ОБНОВЛЕНИЯ ЦЕН
+        # [ЖИРНАЯ ПРАВКА]: Прогреваем кэш цен ДО запуска стаканов!
+        # Гарантирует, что первый тик не столкнется с нулевыми ценами.
+        logger.info("🔄 Прогрев кэша цен (Binance/Phemex)...")
+        await self.update_prices_cache()
+        
+        # Только теперь запускаем фоновое обновление
         self._price_updater_task = asyncio.create_task(self._price_updater_loop())
         
         self._funding_task = asyncio.create_task(self.entry_engine.funding_filter.run())
         self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
+        # Запуск стримов
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
         self._stream_task = asyncio.create_task(self._stream.run(self._on_depth_received))
