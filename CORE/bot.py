@@ -88,6 +88,20 @@ class TradingBot:
         self._private_ws_task: asyncio.Task | None = None
         self._stream_task: asyncio.Task | None = None
 
+    async def aclose(self):
+        await self.stop()
+        logger.info("💾 Финальное сохранение стейта на диск...")
+        await self.state.save()
+
+        await self.phemex_sym_api.aclose()
+        await self.binance_ticker_api.aclose()
+        await self.phemex_ticker_api.aclose()
+        await self.phemex_funding_api.aclose()
+        if self.tg:
+            await self.tg.aclose()
+        if self.session and not self.session.closed:
+            await self.session.close()
+
     async def _await_task(self, task: asyncio.Task | None):
         if not task:
             return
@@ -169,34 +183,7 @@ class TradingBot:
         except Exception as e:
             return False, f"❌ Ошибка записи: {e}"
         return True, "✅ Список успешно обновлен."
-
-    async def aclose(self):
-        await self.stop()
-        logger.info("💾 Финальное сохранение стейта на диск...")
-        await self.state.save()
-
-        await self.phemex_sym_api.aclose()
-        await self.binance_ticker_api.aclose()
-        await self.phemex_ticker_api.aclose()
-        await self.phemex_funding_api.aclose()
-        if self.tg:
-            await self.tg.aclose()
-        if self.session and not self.session.closed:
-            await self.session.close()
-
-    async def update_prices_cache(self):
-        now = time.time()
-        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3)
-        if now - self.prices_cache_time < upd_sec:
-            return
-        self.prices_cache_time = now
-        try:
-            self.binance_prices, self.phemex_prices = await asyncio.gather(
-                self.binance_ticker_api.get_all_prices(), self.phemex_ticker_api.get_all_prices()
-            )
-        except Exception:
-            self.prices_cache_time = 0.0
-
+    
     async def _recover_state(self):
         try:
             self.state.load()
@@ -248,66 +235,6 @@ class TradingBot:
         except Exception as e:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
-    async def _process_depth(self, snap: DepthTop):
-        if not self._is_running: return
-        symbol = snap.symbol
-        
-        if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
-        if symbol in self.state.quarantine_until:
-            if time.time() > self.state.quarantine_until[symbol]:
-                del self.state.quarantine_until[symbol]
-                self.state.consecutive_fails[symbol] = 0
-                await self.state.save()
-            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
-
-        if symbol in self._processing: return
-        self._processing.add(symbol)
-        try:
-            pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
-            
-            # 1. Обработка Выхода (Hedge Mode учитывает обе стороны)
-            for pos_key in (pos_long_key, pos_short_key):
-                if pos_key in self.state.active_positions:
-                    pos = self.state.active_positions[pos_key]
-                    if pos_key in self.state.pending_entry_orders and pos.qty <= 0: continue
-                        
-                    action = self.exit_engine.analyze(snap, pos)
-                    if action: await self.executor.handle_exit_action(symbol, pos_key, action)
-            
-            # 2. Строгая проверка слотов и Hedge Mode перед входом
-            active_symbols = set(p.symbol for p in self.state.active_positions.values())
-            current_slots = len(active_symbols | self.state.in_flight_orders)
-            
-            hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-
-            # Если Hedge Mode отключен - запрещаем вторую сторону на том же символе
-            if not hedge_mode and (symbol in active_symbols or symbol in self.state.in_flight_orders):
-                return
-
-            if current_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in self.state.in_flight_orders:
-                return
-
-            # 3. Анализ Входа
-            await self.update_prices_cache()
-            signal = self.entry_engine.analyze(
-                snap, self.binance_prices.get(symbol, 0.0), self.phemex_prices.get(symbol, 0.0)
-            )
-            
-            if signal:
-                pos_key = f"{symbol}_{signal['side']}"
-                if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: return 
-
-                self.state.in_flight_orders.add(symbol)
-                try:
-                    signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-                    await self.executor.execute_entry(symbol, pos_key, signal, snap)
-                finally:
-                    self.state.in_flight_orders.discard(symbol)
-        except Exception as e:
-            logger.debug(f"Scan error: {e}")
-        finally:
-            self._processing.discard(symbol)
-
     async def _depth_worker(self, symbol: str):
         try:
             while self._is_running:
@@ -328,6 +255,97 @@ class TradingBot:
         if worker is None or worker.done():
             self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker(snap.symbol))
 
+    async def update_prices_cache(self):
+        """Теперь этот метод просто делает запрос. Всю логику таймингов перенесли в loop."""
+        try:
+            b_prices, p_prices = await asyncio.gather(
+                self.binance_ticker_api.get_all_prices(), 
+                self.phemex_ticker_api.get_all_prices()
+            )
+            self.binance_prices = b_prices
+            self.phemex_prices = p_prices
+        except Exception as e:
+            logger.debug(f"Ошибка фонового обновления цен тикеров: {e}")
+
+    async def _price_updater_loop(self):
+        """Фоновая задача, которая обновляет тикеры, НЕ БЛОКИРУЯ стаканы"""
+        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3)
+        while self._is_running:
+            await self.update_prices_cache()
+            await asyncio.sleep(upd_sec)
+
+    async def _process_depth(self, snap: DepthTop):
+        if not self._is_running: return
+        symbol = snap.symbol
+        
+        if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
+        if symbol in self.state.quarantine_until:
+            if time.time() > self.state.quarantine_until[symbol]:
+                del self.state.quarantine_until[symbol]
+                self.state.consecutive_fails[symbol] = 0
+                await self.state.save()
+            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
+
+        if symbol in self._processing: return
+        self._processing.add(symbol)
+        try:
+            pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
+            
+            # 1. Обработка Выхода
+            for pos_key in (pos_long_key, pos_short_key):
+                if pos_key in self.state.active_positions:
+                    pos = self.state.active_positions[pos_key]
+                    if pos_key in self.state.pending_entry_orders and pos.qty <= 0: continue
+                        
+                    action = self.exit_engine.analyze(snap, pos)
+                    if action: await self.executor.handle_exit_action(symbol, pos_key, action)
+            
+            # 2. Логика слотов и Hedge Mode (ИСПРАВЛЕНО)
+            hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
+            
+            has_long = pos_long_key in self.state.active_positions or pos_long_key in self.state.in_flight_orders
+            has_short = pos_short_key in self.state.active_positions or pos_short_key in self.state.in_flight_orders
+
+            # Если Hedge Mode отключен, и уже есть любая позиция/ордер по монете - скипаем
+            if not hedge_mode and (has_long or has_short):
+                return
+
+            # Считаем занятые слоты по уникальным монетам (Символам)
+            active_symbols = set(p.symbol for p in self.state.active_positions.values())
+            in_flight_symbols = set(k.split("_")[0] for k in self.state.in_flight_orders)
+            used_slots = len(active_symbols | in_flight_symbols)
+
+            # Если слоты забиты, и этой монеты еще нет в работе - скипаем
+            if used_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in in_flight_symbols:
+                return
+
+            # 3. Анализ Входа (УБРАН БЛОКИРУЮЩИЙ ВЫЗОВ HTTP!)
+            # Берем цены мгновенно из словаря, который обновляется в фоне
+            b_price = self.binance_prices.get(symbol, 0.0)
+            p_price = self.phemex_prices.get(symbol, 0.0)
+
+            signal = self.entry_engine.analyze(snap, b_price, p_price)
+            
+            if signal:
+                pos_key = f"{symbol}_{signal['side']}"
+                
+                # Повторная проверка, чтобы не открыть второй лонг/шорт туда же
+                if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders or pos_key in self.state.in_flight_orders: 
+                    return 
+
+                # Фиксируем ин-флайт по КЛЮЧУ ПОЗИЦИИ, а не по символу!
+                self.state.in_flight_orders.add(pos_key)
+                try:
+                    signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
+                    await self.executor.execute_entry(symbol, pos_key, signal, snap)
+                finally:
+                    self.state.in_flight_orders.discard(pos_key)
+                    
+        except Exception as e:
+            logger.debug(f"Scan error: {e}")
+        finally:
+            self._processing.discard(symbol)
+
     async def start(self):
         if getattr(self, '_is_running', False):
             return
@@ -336,16 +354,18 @@ class TradingBot:
 
         summary = get_config_summary(self.cfg)
         logger.info(f"⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ\n{summary}")
-        logger.debug(f"Полный JSON конфига: {json.dumps(self.cfg, ensure_ascii=False)}")
 
         if self.tg:
-            asyncio.create_task(self.tg.send_message("🟢 <b>ТОРГОВЛЯ НАЧАТА</b>\n\nНажмите «📊 Статус» чтобы посмотреть текущие настройки."))
+            asyncio.create_task(self.tg.send_message("🟢 <b>ТОРГОВЛЯ НАЧАТА</b>"))
 
         symbols_info = await self.phemex_sym_api.get_all(quote=self.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
 
         await self._recover_state()
 
+        # ЗАПУСКАЕМ ФОНОВУЮ ЗАДАЧУ ОБНОВЛЕНИЯ ЦЕН
+        self._price_updater_task = asyncio.create_task(self._price_updater_loop())
+        
         self._funding_task = asyncio.create_task(self.entry_engine.funding_filter.run())
         self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
@@ -364,15 +384,18 @@ class TradingBot:
             self._stream.stop()
 
         await self.private_ws.aclose()
+        
+        # Останавливаем новую таску цен
+        if hasattr(self, '_price_updater_task'):
+            await self._await_task(self._price_updater_task)
+            
         await self._await_task(self._funding_task)
         await self._await_task(self._private_ws_task)
         await self._await_task(self._stream_task)
-        self._funding_task = None
-        self._private_ws_task = None
-        self._stream_task = None
-
+        
         for task in list(self._depth_workers.values()):
             await self._await_task(task)
+            
         self._depth_workers.clear()
         self._latest_depth.clear()
         self._processing.clear()
