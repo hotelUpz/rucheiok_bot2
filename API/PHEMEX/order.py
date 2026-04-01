@@ -61,6 +61,15 @@ class PhemexPrivateClient:
         logger.error(f"API Request Failed ({method} {path}): {last_err}")
         raise RuntimeError(f"Private API request failed: {last_err}")
     
+    async def set_margin_mode(self, symbol: str, margin_mode: int, pos_mode: int = 2) -> Dict[str, Any]:
+        """
+        Переключение режима маржи:
+        marginMode: 1 = Isolated, 2 = Cross
+        targetPosMode: 1 = One-way, 2 = Hedged
+        """
+        query_no_q = f"marginMode={margin_mode}&symbol={symbol}&targetPosMode={pos_mode}"
+        return await self._request("PUT", "/g-positions/switch-pos-mode-sync", query_no_q=query_no_q)
+
     async def set_leverage(self, symbol: str, pos_side: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
         lev_str = float_to_str(leverage)
         query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}" if mode == "hedged" else f"leverageRr={lev_str}&symbol={symbol}"
@@ -78,12 +87,10 @@ class PhemexPrivateClient:
         return await self._request("DELETE", "/g-orders/cancel", query_no_q=query_no_q)
 
     async def cancel_all_orders(self, symbol: str) -> Dict[str, Any]:
-        # ПРЕДОХРАНИТЕЛЬ: Жестко блокируем отмену, если символ не передан
         if not symbol or not isinstance(symbol, str) or len(symbol) < 3:
             logger.error("🛑 КРИТИЧЕСКАЯ БЛОКИРОВКА: Попытка отменить все ордера без указания конкретной монеты!")
             return {}
         return await self._request("DELETE", "/g-orders/all", query_no_q=f"symbol={symbol}")
 
     async def get_active_positions(self) -> Dict[str, Any]:
-        # ИСПРАВЛЕННЫЙ ЭНДПОИНТ (404 Error Fix)
         return await self._request("GET", "/g-accounts/accountPositions", query_no_q="currency=USDT")

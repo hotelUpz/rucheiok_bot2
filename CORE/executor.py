@@ -30,7 +30,6 @@ class OrderExecutor:
     async def _handle_order_fail(self, symbol: str, pos_key: str, pos: ActivePosition) -> None:
         """Централизованный диспетчер аварий API."""
         max_fails: int = self.tb.cfg.get("app", {}).get("max_place_order_retries", 5)
-        # semantic: str = "ЛОНГ" if pos.side == "LONG" else "ШОРТ"
         
         if pos.place_order_fails >= max_fails:
             if pos.qty > 0:
@@ -167,16 +166,6 @@ class OrderExecutor:
             return
 
         try:
-            if symbol not in self.tb.state.leverage_configured:
-                leverage_cfg = self.tb.cfg.get("risk", {}).get("leverage")
-                if leverage_cfg is not None:
-                    leverage_val = spec.max_leverage if str(leverage_cfg).lower() == "max" else float(leverage_cfg)
-                    try: 
-                        await self.tb.private_client.set_leverage(symbol, "Merged", leverage_val, mode="hedged")
-                    except Exception: 
-                        pass
-                self.tb.state.leverage_configured.add(symbol)
-
             price: float = round_step(signal['price'], spec.tick_size)
             if price <= 0: 
                 return
@@ -221,7 +210,6 @@ class OrderExecutor:
                 self.tb.state.pending_entry_orders.pop(pos_key, None)
                 
         except Exception as e:
-            # Спасение орфанных позиций при таймаутах сети, если налив уже прошел по WS
             pos_check: ActivePosition | None = self.tb.state.active_positions.get(pos_key)
             if pos_check and pos_check.qty > 0:
                 self.tb.state.pending_entry_orders.pop(pos_key, None) 

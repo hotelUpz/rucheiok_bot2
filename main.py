@@ -14,6 +14,7 @@ from c_log import UnifiedLogger
 
 BASE_DIR = Path(__file__).resolve().parent
 CFG_PATH = BASE_DIR / "cfg.json"
+CACHE_PATH = BASE_DIR / "leverage_cache.json"
 
 load_dotenv(BASE_DIR / ".env")
 logger = UnifiedLogger("main")
@@ -24,8 +25,10 @@ def load_cfg(path: str | Path = CFG_PATH) -> dict:
     return cfg
 
 async def polling_supervisor(tg_admin: AdminTgBot):
+    """Следит за тем, чтобы Telegram бот всегда был онлайн"""
     logger.info("🤖 Запуск супервизора Telegram...")
-    retry_pause = 5.0
+    
+    retry_pause = 5.0  # Пауза перед рестартом при ошибке
     
     while True:
         try:
@@ -36,9 +39,11 @@ async def polling_supervisor(tg_admin: AdminTgBot):
                 handle_as_tasks=True
             )
             logger.error("⚠️ Поллинг завершился штатно (неожиданно)")
+        
         except asyncio.CancelledError:
             logger.info("Stopping TG supervisor...")
             break
+            
         except Exception as e:
             logger.error(f"💥 Критическая ошибка TG Polling: {e}")
             logger.info(f"Перезапуск через {retry_pause} сек...")
@@ -50,37 +55,41 @@ async def _main():
     cfg = load_cfg()
     tg_enabled = cfg.get("tg", {}).get("enable", False)
     
-    # 1. Инициализация объекта бота (загружает стейт, включая кэш плечей)
     bot = TradingBot(cfg)
-    
-    # 2. Извлечение настроек для пред-установки
-    api_key = os.getenv("API_KEY") or cfg["credentials"].get("api_key", "")
-    api_secret = os.getenv("API_SECRET") or cfg["credentials"].get("api_secret", "")
-    
-    risk_cfg = cfg.get("risk", {})
-    leverage_cfg = risk_cfg.get("leverage", {})
-    
-    # Парсинг новой структуры leverage
-    leverage_val = leverage_cfg.get("val") if isinstance(leverage_cfg, dict) else leverage_cfg
-    use_cache = leverage_cfg.get("used_by_cache", False) if isinstance(leverage_cfg, dict) else False
-    margin_mode = risk_cfg.get("margin_mode", 2)
-    
-    # 3. Вызов глобального сеттера
-    logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
-    setter = GlobalLeverageSetter(
-        api_key=api_key,
-        api_secret=api_secret,
-        leverage_val=leverage_val,
-        margin_mode=margin_mode,
-        black_list=bot.black_list,
-        use_cache=use_cache,
-        cache=bot.state.leverage_configured,
-        delay_sec=0.3
-    )
-    await setter.apply()
-
     tasks = []
+
     try:
+        # Извлекаем параметры для глобальной настройки плечей
+        api_key = os.getenv("API_KEY") or cfg.get("credentials", {}).get("api_key", "")
+        api_secret = os.getenv("API_SECRET") or cfg.get("credentials", {}).get("api_secret", "")
+        
+        risk_cfg = cfg.get("risk", {})
+        leverage_cfg = risk_cfg.get("leverage", {})
+        margin_mode = risk_cfg.get("margin_mode", 2)
+        
+        # Парсим новую структуру (словарь или число)
+        if isinstance(leverage_cfg, dict):
+            leverage_val = leverage_cfg.get("val")
+            use_cache = leverage_cfg.get("used_by_cache", False)
+        else:
+            leverage_val = leverage_cfg
+            use_cache = False
+            
+        # 1. Запуск глобальной конфигурации
+        logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
+        setter = GlobalLeverageSetter(
+            api_key=api_key,
+            api_secret=api_secret,
+            leverage_val=leverage_val,
+            margin_mode=margin_mode,
+            black_list=bot.black_list,
+            use_cache=use_cache,
+            cache_path=CACHE_PATH,
+            delay_sec=0.3
+        )
+        await setter.apply()
+
+        # 2. Инициализация TG и Торговли
         if tg_enabled:
             token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
             chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
@@ -94,7 +103,6 @@ async def _main():
             tasks.append(tg_task)
         else:
             logger.warning("TG отключен. Автостарт торговли...")
-            # 4. Запуск торговли только ПОСЛЕ настройки
             await bot.start()
 
         if tasks:
