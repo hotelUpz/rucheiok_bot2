@@ -4,6 +4,7 @@
 # ============================================================
 
 import asyncio
+import time
 from typing import Dict, Any, TYPE_CHECKING
 from c_log import UnifiedLogger
 from CORE.models import ActivePosition
@@ -85,30 +86,52 @@ class OrderExecutor:
 
             # 3. Физический удар по стакану (Снайпер или Экстрим)
             if act in ("PLACE_EXTRIME_LIMIT", "PLACE_DYNAMIC_CLOSE"):
-                target_price = round_step(action["price"], spec.tick_size)
+                target_price: float = round_step(action["price"], spec.tick_size)
                 if target_price <= 0: 
                     return
 
-                # Защита от спама идентичным ордером
-                if pos.close_order_id and pos.current_close_price > 0 and abs(pos.current_close_price - target_price) < max(spec.tick_size, 1e-12):
-                    return
+                # Если ордер уже висит
+                if pos.close_order_id:
+                    # Если цена та же самая - игнорируем (защита от спама)
+                    if pos.current_close_price > 0 and abs(pos.current_close_price - target_price) < max(spec.tick_size, 1e-12):
+                        return
+                    # Если цена ИЗМЕНИЛАСЬ - СНОСИМ СТАРЫЙ ОРДЕР ПЕРЕД ПОСТАНОВКОЙ НОВОГО!
+                    else:
+                        try:
+                            await self.tb.private_client.cancel_order(symbol, pos.close_order_id, pos_side)
+                        except Exception:
+                            pass
+                        pos.close_order_id = None
 
                 pos.current_close_price = target_price
+                
+                # ⏱ ВЗВОД ТАЙМЕРА ОХОТЫ
+                # Устанавливаем флаг "Охоты" (заморозки пересмотра цели) ДО сетевого запроса, 
+                # чтобы WS-поток не обогнал REST-ответ.
+                hunting_timeout: float = float(self.tb.cfg.get("exit", {}).get("hunting_timeout_sec", 1.0))
+                pos.hunting_active_until = time.time() + hunting_timeout
 
                 try:
-                    resp = await self.tb.private_client.place_limit_order(
+                    resp: Dict[str, Any] = await self.tb.private_client.place_limit_order(
                         symbol=symbol, side=close_side, qty=pos.qty, price=target_price, pos_side=pos_side
                     )
                     order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
+                    
                     if order_id:
                         pos.close_order_id = order_id
                         pos.place_order_fails = 0
                         pos.close_cancel_requested = False
                         
                         reason: str = action.get("reason", "")
-                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price}")
+                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {hunting_timeout}с")
                         await self.tb.state.save()
+                    else:
+                        # Тихий отказ (не вернулся ID) - снимаем блок
+                        pos.hunting_active_until = 0.0
+                        
                 except Exception as e:
+                    # При сетевом сбое снимаем блокировку охоты, чтобы логика пошла на новый круг
+                    pos.hunting_active_until = 0.0
                     logger.error(f"[{pos_key}] ❌ Ошибка выстрела ТП: {e}")
                     pos.place_order_fails += 1
                     await self._handle_order_fail(symbol, pos_key, pos)

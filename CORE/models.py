@@ -47,6 +47,8 @@ class ActivePosition:
     
     entry_cancel_requested: bool = False
     interference_cancel_requested: bool = False
+    # НОВОЕ ПОЛЕ: Timestamp, до которого позиция находится в фазе "Охоты"
+    hunting_active_until: float = 0.0
     close_cancel_requested: bool = False
     entry_finalized: bool = False
     

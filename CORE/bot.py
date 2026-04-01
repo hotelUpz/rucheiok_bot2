@@ -21,7 +21,7 @@ from API.PHEMEX.funding import PhemexFunding
 
 from ENTRY.engine import EntryEngine
 from EXIT.engine import ExitEngine
-from CORE.models import BotState
+from CORE.models import BotState, ActivePosition
 from CORE.executor import OrderExecutor
 from CORE.ws_handler import PrivateWSHandler
 from CORE.bot_utils import BlackListManager, PriceCacheManager
@@ -222,13 +222,23 @@ class TradingBot:
         try:
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             
-            # 1. Выход
+            # 1. Обработка Выхода
             for pos_key in (pos_long_key, pos_short_key):
                 if pos_key in self.state.active_positions:
-                    pos = self.state.active_positions[pos_key]
-                    if pos_key in self.state.pending_entry_orders and pos.qty <= 0: continue
-                    action = self.exit_engine.analyze(snap, pos)
-                    if action: await self.executor.handle_exit_action(symbol, pos_key, action)
+                    pos: 'ActivePosition' = self.state.active_positions[pos_key]
+                    
+                    if pos_key in self.state.pending_entry_orders and pos.qty <= 0: 
+                        continue
+                        
+                    # 🛑 БЛОКИРОВКА АНАЛИЗА ПРИ АКТИВНОЙ ОХОТЕ
+                    # Если мы ударили по стакану, даем ордеру минимальное время (напр. 1 сек).
+                    # Таймеры деградации цели замораживаются. Ждем развязки (Full Fill или Partial Fill).
+                    if pos.hunting_active_until > time.time():
+                        continue
+                        
+                    action: Dict[str, Any] | None = self.exit_engine.analyze(snap, pos)
+                    if action: 
+                        await self.executor.handle_exit_action(symbol, pos_key, action)
             
             # 2. Логика слотов и Hedge Mode
             hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
