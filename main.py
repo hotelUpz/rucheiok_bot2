@@ -8,6 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from CORE.bot import TradingBot
+from CORE.leverage_setter import GlobalLeverageSetter
 from TG.admin import AdminTgBot
 from c_log import UnifiedLogger
 
@@ -23,33 +24,25 @@ def load_cfg(path: str | Path = CFG_PATH) -> dict:
     return cfg
 
 async def polling_supervisor(tg_admin: AdminTgBot):
-    """Следит за тем, чтобы Telegram бот всегда был онлайн"""
     logger.info("🤖 Запуск супервизора Telegram...")
-    
-    retry_pause = 5.0  # Пауза перед рестартом при ошибке
+    retry_pause = 5.0
     
     while True:
         try:
-            # skip_updates=True полезен, чтобы бот не захлебнулся 
-            # старыми командами после долгого оффлайна
             await tg_admin.dp.start_polling(
                 tg_admin.bot, 
                 allowed_updates=["message"],
                 skip_updates=True,
-                handle_as_tasks=True # Важно для параллельной обработки
+                handle_as_tasks=True
             )
             logger.error("⚠️ Поллинг завершился штатно (неожиданно)")
-        
         except asyncio.CancelledError:
-            # Сюда попадаем при выключении программы (Ctrl+C)
             logger.info("Stopping TG supervisor...")
             break
-            
         except Exception as e:
             logger.error(f"💥 Критическая ошибка TG Polling: {e}")
             logger.info(f"Перезапуск через {retry_pause} сек...")
         
-        # В любой непонятной ситуации — сбрасываем сессию и ждем
         await tg_admin.reset_session()
         await asyncio.sleep(retry_pause)
 
@@ -57,9 +50,36 @@ async def _main():
     cfg = load_cfg()
     tg_enabled = cfg.get("tg", {}).get("enable", False)
     
+    # 1. Инициализация объекта бота (загружает стейт, включая кэш плечей)
     bot = TradingBot(cfg)
-    tasks = []
+    
+    # 2. Извлечение настроек для пред-установки
+    api_key = os.getenv("API_KEY") or cfg["credentials"].get("api_key", "")
+    api_secret = os.getenv("API_SECRET") or cfg["credentials"].get("api_secret", "")
+    
+    risk_cfg = cfg.get("risk", {})
+    leverage_cfg = risk_cfg.get("leverage", {})
+    
+    # Парсинг новой структуры leverage
+    leverage_val = leverage_cfg.get("val") if isinstance(leverage_cfg, dict) else leverage_cfg
+    use_cache = leverage_cfg.get("used_by_cache", False) if isinstance(leverage_cfg, dict) else False
+    margin_mode = risk_cfg.get("margin_mode", 2)
+    
+    # 3. Вызов глобального сеттера
+    logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
+    setter = GlobalLeverageSetter(
+        api_key=api_key,
+        api_secret=api_secret,
+        leverage_val=leverage_val,
+        margin_mode=margin_mode,
+        black_list=bot.black_list,
+        use_cache=use_cache,
+        cache=bot.state.leverage_configured,
+        delay_sec=0.3
+    )
+    await setter.apply()
 
+    tasks = []
     try:
         if tg_enabled:
             token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
@@ -70,33 +90,25 @@ async def _main():
                 sys.exit(1)
             
             tg_admin = AdminTgBot(token, chat_id, bot)
-            
-            # Создаем задачу для ТГ, которая будет крутиться в фоне
             tg_task = asyncio.create_task(polling_supervisor(tg_admin))
             tasks.append(tg_task)
         else:
-            # Если ТГ нет, просто запускаем торговлю сразу
             logger.warning("TG отключен. Автостарт торговли...")
+            # 4. Запуск торговли только ПОСЛЕ настройки
             await bot.start()
 
-        # Держим main живым, пока работают задачи
-        # Если добавите другие фоновые задачи (например, веб-сервер), 
-        # добавьте их в tasks.
         if tasks:
             await asyncio.gather(*tasks)
         else:
-            # Бесконечный цикл для режима без ТГ
             while True: await asyncio.sleep(3600)
                 
     except (asyncio.CancelledError, KeyboardInterrupt):
         logger.warning("\n🛑 Получен сигнал прерывания. Остановка...")
     finally:
         logger.info("🧹 Очистка ресурсов...")
-        # Останавливаем торговые процессы
         await bot.stop()
         await bot.aclose()
         
-        # Отменяем все фоновые задачи (включая супервизор ТГ)
         for t in tasks:
             t.cancel()
         
@@ -105,6 +117,8 @@ async def _main():
 
 if __name__ == "__main__":
     try:
+        if sys.platform == 'win32':
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(_main())
     except KeyboardInterrupt:
         pass
