@@ -148,10 +148,14 @@ class BotState:
     async def save(self):
         """Потокобезопасная отправка данных на диск"""
         async with self._lock:
+            # 🛑 ЖИРНАЯ ПРАВКА: Берем list(), чтобы зафиксировать состояние 
+            # и избежать RuntimeError, если WS удалит ключ во время сохранения
+            current_positions = list(self.active_positions.items())
+            
             state_dict = {
                 "positions": {
                     pos_key: pos.to_dict() 
-                    for pos_key, pos in self.active_positions.items() 
+                    for pos_key, pos in current_positions 
                     if pos.symbol not in self.black_list
                 },
                 "fails": dict(self.consecutive_fails),

@@ -52,34 +52,66 @@ class AverageScenario:
             if pos.close_order_id:
                 return {"action": "CANCEL_CLOSE", "reason": "SHIFT_DEMOTION_TIMEOUT"}
 
-        if pos.close_order_id:
-            return None
+        # if pos.close_order_id:
+        #     return None
+
+        # # 3. АКТИВНЫЙ ХАНТИНГ (Поиск уровня с максимальным объемом)
+        # target_price = None
+        # max_vol = -1.0
+
+        # if pos.side == "LONG":
+        #     # Для лонга: ищем БИД с максимальным объемом среди тех, что >= pos.current_close_price
+        #     for price, vol in depth.bids:
+        #         if price >= pos.current_close_price:
+        #             if vol > max_vol:
+        #                 max_vol = vol
+        #                 target_price = price
+        #         else:
+        #             break # Биды отсортированы по убыванию цены, дальше смотреть нет смысла (цены хуже)
+        # else:
+        #     # Для шорта: ищем АСК с максимальным объемом среди тех, что <= pos.current_close_price
+        #     for price, vol in depth.asks:
+        #         if price <= pos.current_close_price:
+        #             if vol > max_vol:
+        #                 max_vol = vol
+        #                 target_price = price
+        #         else:
+        #             break # Аски отсортированы по возрастанию цены, дальше смотреть нет смысла (цены хуже)
+
+        # if target_price is not None:
+        #     # Бьем прямо в самый плотный уровень
+        #     return {"action": "PLACE_DYNAMIC_CLOSE", "price": target_price, "reason": "DYNAMIC_TP_HIT"}
+
+        # return None
 
         # 3. АКТИВНЫЙ ХАНТИНГ (Поиск уровня с максимальным объемом)
-        target_price = None
+        ideal_target_price = None
         max_vol = -1.0
 
         if pos.side == "LONG":
-            # Для лонга: ищем БИД с максимальным объемом среди тех, что >= pos.current_close_price
             for price, vol in depth.bids:
                 if price >= pos.current_close_price:
                     if vol > max_vol:
                         max_vol = vol
-                        target_price = price
+                        ideal_target_price = price
                 else:
-                    break # Биды отсортированы по убыванию цены, дальше смотреть нет смысла (цены хуже)
+                    break
         else:
-            # Для шорта: ищем АСК с максимальным объемом среди тех, что <= pos.current_close_price
             for price, vol in depth.asks:
                 if price <= pos.current_close_price:
                     if vol > max_vol:
                         max_vol = vol
-                        target_price = price
+                        ideal_target_price = price
                 else:
-                    break # Аски отсортированы по возрастанию цены, дальше смотреть нет смысла (цены хуже)
+                    break
 
-        if target_price is not None:
-            # Бьем прямо в самый плотный уровень
-            return {"action": "PLACE_DYNAMIC_CLOSE", "price": target_price, "reason": "DYNAMIC_TP_HIT"}
+        if ideal_target_price is not None:
+            # Если ордер уже стоит на ЭТОЙ ЖЕ цене - не суетимся, ждем (возвращаем None)
+            if pos.close_order_id and abs(pos.current_close_price - ideal_target_price) < 1e-8:
+                return None
+                
+            # Если ордера нет ИЛИ стенка объема уехала на другую цену - бьем туда!
+            # (Executor сам отменит старый ордер перед постановкой этого)
+            return {"action": "PLACE_DYNAMIC_CLOSE", "price": ideal_target_price, "reason": "DYNAMIC_TP_HIT"}
 
         return None
