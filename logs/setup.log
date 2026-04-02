@@ -6,3 +6,13 @@
 2026-04-02 23:58:24 | ERROR | setup | [SOLUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
 2026-04-02 23:58:25 | ERROR | setup | [UNIUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
 2026-04-02 23:58:25 | ERROR | setup | [DOTUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-03 00:03:44 | INFO | setup | 🔄 Загрузка спецификаций Phemex...
+2026-04-03 00:03:44 | ERROR | setup | [BTCUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:44 | ERROR | setup | [ETHUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:45 | ERROR | setup | [XRPUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:45 | ERROR | setup | [ADAUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:46 | ERROR | setup | [SOLUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:46 | ERROR | setup | [UNIUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:47 | ERROR | setup | [DOTUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:47 | ERROR | setup | [LINKUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-03 00:03:48 | ERROR | setup | [ATOMUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.

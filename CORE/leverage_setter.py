@@ -40,8 +40,8 @@ class GlobalLeverageSetter:
 
         try:
             if self.margin_mode == 2:
-                # Включаем CROSS маржу (для Кросса плечо задавать не нужно, Phemex сделает сам)
-                await client.set_cross_margin(sym)
+                # Включаем CROSS маржу (для Phemex это leverage=0)
+                await client.set_leverage(sym, 0, mode=self.api_pos_mode)
                 logger.debug(f"[{sym}] Успешно: CROSS Margin")
                 return target_lev
             else:
@@ -90,7 +90,7 @@ class GlobalLeverageSetter:
             
             for spec in symbols_info:
                 sym = spec.symbol
-                if self.leverage_val is None or sym in self.black_list or sym in current_cache:
+                if self.leverage_val is None or sym in self.black_list or (self.use_cache and sym in current_cache):
                     skipped_count += 1
                     continue
                 

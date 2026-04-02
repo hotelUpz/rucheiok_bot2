@@ -5,3 +5,12 @@
 2026-04-02 23:58:24 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
 2026-04-02 23:58:25 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
 2026-04-02 23:58:25 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-03 00:03:44 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:44 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:45 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:45 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:46 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:46 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:47 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:47 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 00:03:48 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
