@@ -45,18 +45,14 @@ class EntryEngine:
             
         now: float = time.time()
         
-        # 1. Извлекаем ключи (цены) и сортируем их
-        # bids - по убыванию (лучшая цена сверху), asks - по возрастанию
-        top_bid_keys = sorted(depth.bids.keys(), reverse=True)[:self.target_depth]
-        top_ask_keys = sorted(depth.asks.keys())[:self.target_depth]
+        # 1. Извлекаем нужную глубину из уже отсортированных стримом списков
+        bids_sliced = depth.bids[:self.target_depth]
+        asks_sliced = depth.asks[:self.target_depth]
         
-        if len(top_bid_keys) < self.target_depth or len(top_ask_keys) < self.target_depth:
+        if len(bids_sliced) < self.target_depth or len(asks_sliced) < self.target_depth:
             return None
 
-        # 2. Формируем список кортежей (price, qty) для математики.
-        bids_sliced: list[tuple[float, float]] = [(p, depth.bids[p]) for p in top_bid_keys]
-        asks_sliced: list[tuple[float, float]] = [(p, depth.asks[p]) for p in top_ask_keys]
-        
+        # 2. Передаем в математику
         signal: Optional[EntrySignal] = self.pattern_math.analyze(bids_sliced, asks_sliced)
         
         if not signal:

@@ -62,16 +62,15 @@ class Interference:
             return {"action": "BUY_OUT_INTERFERENCE", "price": price, "qty": buy_qty}
 
         return None
-
+    
     def _find_target(self, depth: DepthTop, pos: ActivePosition, max_chunk_vol: float) -> tuple[float, float] | None:
         """
         Сканирует стакан и ищет первую доступную преграду ("котях").
         Если преграда слишком большая (vol > max_chunk_vol) - поиск прерывается (Законы физики).
         """
         if pos.side == "LONG":
-            # Ищем сопротивление (Аски) от лучших (дешевых) к худшим. Сортируем ключи словаря.
-            sorted_asks = sorted(depth.asks.items(), key=lambda x: x[0])
-            for price, vol in sorted_asks:
+            # Ищем сопротивление (Аски) от лучших (дешевых) к худшим. Они уже отсортированы стримом!
+            for price, vol in depth.asks:
                 if price <= pos.entry_price or price >= pos.current_close_price:
                     continue
                     
@@ -83,9 +82,8 @@ class Interference:
                     
                 return (price, vol)
         else:
-            # Ищем поддержку (Биды) от лучших (дорогих) к худшим. Сортируем реверсивно.
-            sorted_bids = sorted(depth.bids.items(), key=lambda x: x[0], reverse=True)
-            for price, vol in sorted_bids:
+            # Ищем поддержку (Биды) от лучших (дорогих) к худшим. Они уже отсортированы стримом!
+            for price, vol in depth.bids:
                 if price >= pos.entry_price or price <= pos.current_close_price:
                     continue
                     

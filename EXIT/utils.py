@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
 def get_top_bid_ask(depth: DepthTop) -> tuple[float, float]:
-    """Безопасное извлечение лучших цен (bid1, ask1) из словарей стакана."""
-    ask1 = min(depth.asks.keys()) if depth.asks else 0.0
-    bid1 = max(depth.bids.keys()) if depth.bids else 0.0
+    """Быстрое извлечение лучших цен (bid1, ask1) из списков стакана."""
+    ask1 = depth.asks[0][0] if depth.asks else 0.0
+    bid1 = depth.bids[0][0] if depth.bids else 0.0
     return bid1, ask1
 
 def check_is_negative(pos: ActivePosition, depth: DepthTop, negative_spread_pct: float) -> bool:
