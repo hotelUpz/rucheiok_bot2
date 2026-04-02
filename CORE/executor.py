@@ -124,7 +124,7 @@ class OrderExecutor:
                         pos.close_cancel_requested = False
                         
                         reason: str = action.get("reason", "")
-                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {self.hunting_timeout}с")
+                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {self.hunting_timeout_sec}с")
                         await self.tb.state.save()
                     else:
                         # Тихий отказ (не вернулся ID) - снимаем блок

@@ -8,3 +8,31 @@
 2026-04-02 14:55:17 | ERROR | setup | [DOTUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
 2026-04-02 14:55:18 | ERROR | setup | [LINKUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
 2026-04-02 14:55:18 | ERROR | setup | [ATOMUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 17:06:47 | INFO | setup | 🔄 Загрузка спецификаций Phemex...
+2026-04-02 17:06:47 | ERROR | setup | [BTCUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:48 | ERROR | setup | [ETHUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:48 | ERROR | setup | [XRPUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:49 | ERROR | setup | [ADAUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:49 | ERROR | setup | [SOLUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:50 | ERROR | setup | [UNIUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:50 | ERROR | setup | [DOTUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:51 | ERROR | setup | [LINKUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:52 | ERROR | setup | [ATOMUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:06:52 | ERROR | setup | [LTCUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 17:37:54 | INFO | setup | 🔄 Загрузка спецификаций Phemex...
+2026-04-02 17:37:54 | ERROR | setup | [BTCUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:55 | ERROR | setup | [ETHUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:55 | ERROR | setup | [XRPUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:56 | ERROR | setup | [ADAUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:56 | ERROR | setup | [SOLUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:57 | ERROR | setup | [UNIUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:57 | ERROR | setup | [DOTUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:58 | ERROR | setup | [LINKUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:58 | ERROR | setup | [ATOMUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:37:59 | ERROR | setup | [LTCUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:38:00 | ERROR | setup | [DOGEUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:38:00 | ERROR | setup | [TWTUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:38:01 | ERROR | setup | [BNBUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:38:01 | ERROR | setup | [MANAUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:38:02 | ERROR | setup | [APEUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.
+2026-04-02 17:38:02 | ERROR | setup | [LUNCUSDT] Ошибка настройки: private api request failed: phemex error [10500]: api signature verification failed.

@@ -90,6 +90,7 @@ async def _main():
         await setter.apply()
 
         print("lev set succ")
+        return
 
         # 2. Инициализация TG и Торговли
         if tg_enabled:

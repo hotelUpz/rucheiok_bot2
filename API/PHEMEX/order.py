@@ -65,19 +65,24 @@ class PhemexPrivateClient:
         """
         Переключение режима маржи:
         targetMarginMode: 1 = Isolated, 2 = Cross
+        Для этого эндпоинта Phemex ожидает параметры в ТЕЛЕ запроса (JSON body), а не в Query!
         """
-        if int(margin_mode) == 2:
-            # Для Кросс-маржи плечи передавать нельзя - сервер их выкинет -> 401 Miss Signature
-            query_no_q = f"symbol={symbol}&targetMarginMode={margin_mode}"
-        else:
-            # Для Изолированной маржи плечи обязательны (алфавитный порядок ключей сохранен)
+        body = {
+            "symbol": symbol,
+            "targetMarginMode": int(margin_mode)
+        }
+        
+        if int(margin_mode) == 1:
             lev_str = float_to_str(leverage)
             if mode == "hedged":
-                query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}&targetMarginMode={margin_mode}"
+                body["longLeverageRr"] = lev_str
+                body["shortLeverageRr"] = lev_str
             else:
-                query_no_q = f"buyLeverageRr={lev_str}&sellLeverageRr={lev_str}&symbol={symbol}&targetMarginMode={margin_mode}"
+                body["buyLeverageRr"] = lev_str
+                body["sellLeverageRr"] = lev_str
                 
-        return await self._request("PUT", "/g-positions/switch-isolated", query_no_q=query_no_q)
+        # Передаем параметры через body=body, а query_no_q оставляем пустым
+        return await self._request("PUT", "/g-positions/switch-isolated", body=body)
 
     async def set_leverage(self, symbol: str, pos_side: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
         lev_str = float_to_str(leverage)
