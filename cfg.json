@@ -37,7 +37,7 @@
     "risk": {
         "leverage": {
             "used_by_cache": false,
-            "val": 20,
+            "val": 21,
             "delay_sec": 0.3,
             "margin_mode": 2
         },

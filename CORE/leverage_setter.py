@@ -1,10 +1,5 @@
-# ============================================================
-# FILE: CORE/leverage_setter.py
-# ROLE: Глобальная пред-установка плеча и маржи (с JSON кешем)
-# ============================================================
 from __future__ import annotations
 
-import json
 import asyncio
 import aiohttp
 from typing import List, Dict, Optional, Any, TYPE_CHECKING
@@ -12,6 +7,7 @@ from pathlib import Path
 
 from API.PHEMEX.symbol import PhemexSymbols, SymbolInfo
 from API.PHEMEX.order import PhemexPrivateClient
+from utils import load_json, save_json_safe
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
@@ -37,76 +33,53 @@ class GlobalLeverageSetter:
         self.margin_mode = margin_mode
         self.black_list = set(black_list)
         self.use_cache = use_cache
-        self.cache_path = Path(cache_path)
+        self.cache_path = str(cache_path)
         self.delay_sec = delay_sec
-        
-        # Хардкодим биржевой режим аккаунта, так как бот использует posSide
-        self.api_pos_mode = "hedged"
 
     def _load_cache(self) -> Dict[str, Any]:
-        """Считываем словарь кэша плечей. Если use_cache=False, возвращаем пустой словарь для пересборки."""
-        if not self.use_cache or not self.cache_path.exists():
+        if not self.use_cache: 
             return {}
-        try:
-            with open(self.cache_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Ошибка чтения {self.cache_path.name}: {e}")
-            return {}
+        return load_json(self.cache_path, default={})
 
     def _save_cache(self, data: Dict[str, Any]) -> None:
-        """Сохраняем финальный словарь на диск ВСЕГДА (создаем/обновляем слепок)."""
-        try:
-            with open(self.cache_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            logger.error(f"Ошибка записи {self.cache_path.name}: {e}")
+        # Пишем ВСЕГДА, чтобы создать кэш, даже если use_cache = False
+        save_json_safe(self.cache_path, data)
 
     async def _apply_setup_with_fallback(self, client: PhemexPrivateClient, sym: str, target_lev: float, max_lev: float) -> float | None:
-        safe_target_lev = target_lev
-        
-        # Предварительная защита: если мы изначально знаем, что просим больше лимита
-        if target_lev > max_lev:
-            logger.warning(f"[{sym}] Запрошено {target_lev}x, но лимит {max_lev}x. Сразу применяем фолбэк...")
-            safe_target_lev = max(1, int(max_lev))  # Принудительно целое число
-
         try:
             if self.margin_mode == 2:
-                # Включаем CROSS маржу
-                await client.set_margin_mode(sym, 2, safe_target_lev, mode=self.api_pos_mode)
-                logger.debug(f"[{sym}] Успешно: Lev={safe_target_lev}x (CROSS Margin)")
+                # Для CROSS маржи: только эндпоинт switch-isolated. Плечо не ставим. 
+                # Иначе биржа перекинет позицию в ISOLATED.
+                await client.set_margin_mode(sym, margin_mode=2, leverage=0, mode="hedged")
+                logger.debug(f"[{sym}] Успешно: CROSS Margin")
+                return target_lev
             else:
-                # Включаем ISOLATED маржу (Phemex сам включает Isolated при смене плеча)
-                await client.set_leverage(sym, "Merged", safe_target_lev, mode=self.api_pos_mode)
-                logger.debug(f"[{sym}] Успешно: Lev={safe_target_lev}x (ISOLATED Margin)")
-            return safe_target_lev
+                # Для ISOLATED: просто ставим плечо. Биржа сама включит Isolated.
+                await client.set_leverage(sym, "Merged", target_lev, mode="hedged")
+                logger.debug(f"[{sym}] Успешно: ISOLATED Margin, Lev={target_lev}x")
+                return target_lev
 
         except Exception as e:
             err_msg = str(e).lower()
+            
             if "has no change" in err_msg or "same" in err_msg:
-                return safe_target_lev
+                return target_lev
             
-            # Если мы уже на фолбэке, и он упал - выходим
-            if safe_target_lev == max(1, int(max_lev)):
-                logger.error(f"[{sym}] Ошибка настройки (лимит исчерпан): {err_msg[:100]}")
-                return None
+            is_out_of_range = (
+                "leverage" in err_msg and ("exceed" in err_msg or "range" in err_msg or "max" in err_msg or "20003" in err_msg)
+            ) or "11088" in err_msg or target_lev > max_lev
 
-            # Пробуем фолбэк, если ошибка связана с плечом
-            is_out_of_range = "leverage" in err_msg and ("exceed" in err_msg or "range" in err_msg or "max" in err_msg or "20003" in err_msg)
-            
-            if is_out_of_range or "11088" in err_msg:
-                fallback_lev = max(1, int(max_lev))
-                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено. Фолбэк на {fallback_lev}x...")
+            # В Кросс-марже плечо не используется, фолбэк применим только для Isolated
+            if is_out_of_range and self.margin_mode != 2:
+                fallback_lev = max(1.0, float(int(max_lev)))
+                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено (лимит). Фолбэк на {fallback_lev}x...")
                 try:
-                    if self.margin_mode == 2:
-                        await client.set_margin_mode(sym, 2, fallback_lev, mode=self.api_pos_mode)
-                    else:
-                        await client.set_leverage(sym, "Merged", fallback_lev, mode=self.api_pos_mode)
+                    await client.set_leverage(sym, "Merged", fallback_lev, mode="hedged")
                     return fallback_lev
                 except Exception as fb_e:
                     if "has no change" in str(fb_e).lower() or "same" in str(fb_e).lower():
                         return fallback_lev
-                    logger.error(f"[{sym}] Критическая ошибка Fallback: {fb_e}")
+                    logger.error(f"[{sym}] Ошибка Fallback: {fb_e}")
                     return None
             
             logger.error(f"[{sym}] Ошибка настройки: {err_msg[:100]}")
@@ -125,7 +98,6 @@ class GlobalLeverageSetter:
             await sym_api.aclose()
 
         if not symbols_info:
-            logger.warning("⚠️ Список символов пуст.")
             return
 
         current_cache = self._load_cache()
@@ -133,21 +105,12 @@ class GlobalLeverageSetter:
 
         async with aiohttp.ClientSession() as session:
             client = PhemexPrivateClient(self.api_key, self.api_secret, session, retries=1)
-            success_count = 0
-            skipped_count = 0
+            success_count, skipped_count = 0, 0
             
             for spec in symbols_info:
                 sym = spec.symbol
 
-                if self.leverage_val is None:
-                    skipped_count += 1
-                    continue
-
-                if sym in self.black_list:
-                    skipped_count += 1
-                    continue
-
-                if self.use_cache and sym in current_cache:
+                if self.leverage_val is None or sym in self.black_list or (self.use_cache and sym in current_cache):
                     skipped_count += 1
                     continue
 

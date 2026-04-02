@@ -1,6 +1,7 @@
 import os
 import json
-import asyncio
+# import asyncio
+from typing import Any
 from decimal import Decimal, ROUND_HALF_DOWN
 
 def round_step(value: float, step: float) -> float:
@@ -95,3 +96,36 @@ def get_config_summary(cfg: dict) -> str:
     lines.append(f"└ Incr Frac: <b>+{ext.get('increase_fraction')}%</b> | Orient: <b>{ext.get('bid_to_ask_orientation')}</b>")
 
     return "\n".join(lines)
+
+def load_json(filepath: str, default: Any = None) -> Any:
+    """Безопасное чтение JSON файла."""
+    if not os.path.exists(filepath):
+        return default if default is not None else {}
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        from c_log import UnifiedLogger
+        UnifiedLogger("utils").error(f"Ошибка чтения {filepath}: {e}")
+        return default if default is not None else {}
+
+def save_json_safe(filepath: str, data: Any) -> None:
+    """Безопасное, атомарное сохранение JSON файла (защита от повреждений при перезагрузке)."""
+    tmp_file = f"{filepath}.{os.getpid()}.tmp"
+    for attempt in range(3):
+        try:
+            with open(tmp_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4)
+            os.replace(tmp_file, filepath)
+            return
+        except Exception as e:
+            if attempt == 2:
+                from c_log import UnifiedLogger
+                UnifiedLogger("utils").error(f"Ошибка сохранения {filepath}: {e}")
+            else:
+                import time
+                time.sleep(0.05 * (attempt + 1))
+        finally:
+            if os.path.exists(tmp_file):
+                try: os.remove(tmp_file)
+                except: pass
