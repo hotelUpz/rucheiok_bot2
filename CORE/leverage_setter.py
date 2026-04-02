@@ -67,11 +67,9 @@ class GlobalLeverageSetter:
         При превышении лимита монеты — ставит максимально возможное.
         """
         try:
-            # 1. Пробуем основной удар (вслепую)
-            await client.set_margin_mode(sym, margin_mode=self.margin_mode, leverage=target_lev, mode="hedged")
-            await asyncio.sleep(0.1)
+            # Просто устанавливаем плечо. Phemex автоматически включит Isolated режим.
             await client.set_leverage(sym, "Merged", target_lev, mode="hedged")
-            logger.debug(f"[{sym}] Успешно: MarginMode={self.margin_mode}, Lev={target_lev}x")
+            logger.debug(f"[{sym}] Успешно: Lev={target_lev}x (Isolated)")
             return target_lev
 
         except Exception as e:
@@ -87,10 +85,8 @@ class GlobalLeverageSetter:
             ) or "11088" in err_msg or target_lev > max_lev
 
             if is_out_of_range:
-                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено (лимит монеты). Фолбэк на {max_lev}x...")
+                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено (лимит). Фолбэк на {max_lev}x...")
                 try:
-                    await client.set_margin_mode(sym, margin_mode=self.margin_mode, leverage=max_lev, mode="hedged")
-                    await asyncio.sleep(0.1)
                     await client.set_leverage(sym, "Merged", max_lev, mode="hedged")
                     return max_lev
                 except Exception as fb_e:
