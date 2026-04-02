@@ -11,6 +11,7 @@ from CORE.bot import TradingBot
 from CORE.leverage_setter import GlobalLeverageSetter
 from TG.admin import AdminTgBot
 from c_log import UnifiedLogger
+from utils import load_json
 
 BASE_DIR = Path(__file__).resolve().parent
 CFG_PATH = BASE_DIR / "cfg.json"
@@ -19,10 +20,6 @@ CACHE_PATH = BASE_DIR / "leverage_cache.json"
 load_dotenv(BASE_DIR / ".env")
 logger = UnifiedLogger("main")
 
-def load_cfg(path: str | Path = CFG_PATH) -> dict:
-    with open(path, "r", encoding="utf-8") as f:
-        cfg = json.load(f)
-    return cfg
 
 async def polling_supervisor(tg_admin: AdminTgBot):
     """Следит за тем, чтобы Telegram бот всегда был онлайн"""
@@ -52,7 +49,7 @@ async def polling_supervisor(tg_admin: AdminTgBot):
         await asyncio.sleep(retry_pause)
 
 async def _main():
-    cfg = load_cfg()
+    cfg = load_json(filepath=CFG_PATH, default={})
     tg_enabled = cfg.get("tg", {}).get("enable", False)
     
     bot = TradingBot(cfg)
@@ -68,6 +65,7 @@ async def _main():
         
         # Парсим новую структуру (словарь или число)
         if isinstance(leverage_cfg, dict):
+            set_previous = leverage_cfg.get("set_previous")
             leverage_val = leverage_cfg.get("val")
             use_cache = leverage_cfg.get("used_by_cache", False)
             margin_mode = leverage_cfg.get("margin_mode", 2)
@@ -75,7 +73,7 @@ async def _main():
         else:
             raise TypeError(f"Expected dict for leverage_cfg, got {type(leverage_cfg).__name__}")
         
-        if leverage_val:
+        if set_previous:
             # 1. Запуск глобальной конфигурации
             logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
             setter = GlobalLeverageSetter(
@@ -89,12 +87,10 @@ async def _main():
                 delay_sec=delay_sec
             )
             await setter.apply()
-
             print("lev set succ")
-            # return
         
         else:
-            logger.info("⚙️ Скип установки (Leverage & Margin), так как leverage_val == None")
+            logger.info("⚙️ Скип установки (Leverage & Margin), так как set_previous == false")
 
         # 2. Инициализация TG и Торговли
         if tg_enabled:

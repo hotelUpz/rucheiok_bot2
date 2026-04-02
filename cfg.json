@@ -89,7 +89,7 @@
         }
     },
     "exit": {
-        "hunting_timeout_sec": 0.75,
+        "hunting_timeout_sec": 0.5,
         "scenarious": {
             "average": {
                 "enable": true,
