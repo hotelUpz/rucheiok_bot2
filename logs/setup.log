@@ -1,22 +1,10 @@
-2026-04-02 13:51:50 | ERROR | setup | ❌ Отсутствуют API ключи для установки параметров.
-2026-04-02 13:54:17 | INFO | setup | 🔄 Загрузка спецификаций с Phemex для настройки плеча/маржи...
-2026-04-02 13:54:17 | ERROR | setup | [BTCUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:18 | ERROR | setup | [ETHUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:18 | ERROR | setup | [XRPUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:19 | ERROR | setup | [ADAUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:19 | ERROR | setup | [SOLUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:20 | ERROR | setup | [UNIUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:20 | ERROR | setup | [DOTUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:21 | ERROR | setup | [LINKUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:21 | ERROR | setup | [ATOMUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:22 | ERROR | setup | [LTCUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:22 | ERROR | setup | [DOGEUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:23 | ERROR | setup | [TWTUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:23 | ERROR | setup | [BNBUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:24 | ERROR | setup | [MANAUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:24 | ERROR | setup | [APEUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:25 | ERROR | setup | [LUNCUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:26 | ERROR | setup | [FLOWUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:26 | ERROR | setup | [NEOUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:27 | ERROR | setup | [ACHUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
-2026-04-02 13:54:27 | ERROR | setup | [BANDUSDT] Ошибка настройки: Private API request failed: Phemex Error [10500]: invalid targetPosMode
+2026-04-02 14:55:14 | INFO | setup | 🔄 Загрузка спецификаций с Phemex для настройки плеча/маржи...
+2026-04-02 14:55:14 | ERROR | setup | [BTCUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:15 | ERROR | setup | [ETHUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:15 | ERROR | setup | [XRPUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:16 | ERROR | setup | [ADAUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:16 | ERROR | setup | [SOLUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:17 | ERROR | setup | [UNIUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:17 | ERROR | setup | [DOTUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:18 | ERROR | setup | [LINKUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 14:55:18 | ERROR | setup | [ATOMUSDT] Ошибка настройки: Private API request failed: HTTP 401: {"code": "401","msg": "401 Miss Signature."}

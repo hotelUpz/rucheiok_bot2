@@ -61,14 +61,15 @@ class PhemexPrivateClient:
         logger.error(f"API Request Failed ({method} {path}): {last_err}")
         raise RuntimeError(f"Private API request failed: {last_err}")
     
-    async def set_margin_mode(self, symbol: str, margin_mode: int, pos_mode: int = 2) -> Dict[str, Any]:
+    async def set_margin_mode(self, symbol: str, margin_mode: int, leverage: float) -> Dict[str, Any]:
         """
         Переключение режима маржи:
-        marginMode: 1 = Isolated, 2 = Cross
-        targetPosMode: 1 = One-way, 2 = Hedged
+        targetMarginMode: 1 = Isolated, 2 = Cross
+        (Phemex требует передавать buy/sell leverage при смене режима)
         """
-        query_no_q = f"marginMode={margin_mode}&symbol={symbol}&targetPosMode={pos_mode}"
-        return await self._request("PUT", "/g-positions/switch-pos-mode-sync", query_no_q=query_no_q)
+        lev_str = float_to_str(leverage)
+        query_no_q = f"buyLeverageRr={lev_str}&sellLeverageRr={lev_str}&symbol={symbol}&targetMarginMode={margin_mode}"
+        return await self._request("PUT", "/g-positions/switch-isolated", query_no_q=query_no_q)
 
     async def set_leverage(self, symbol: str, pos_side: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
         lev_str = float_to_str(leverage)
