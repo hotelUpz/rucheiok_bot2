@@ -1,5 +1,9 @@
-from CORE.models import ActivePosition
-from API.PHEMEX.stakan import DepthTop
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from CORE.models import ActivePosition
+    from API.PHEMEX.stakan import DepthTop
 
 class ExtrimeClose:
     def __init__(self, cfg: dict):

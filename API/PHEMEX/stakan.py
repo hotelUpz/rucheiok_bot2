@@ -11,7 +11,7 @@ import json
 import random
 import time
 from dataclasses import dataclass
-from typing import Awaitable, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Awaitable, Callable, Dict, Iterable, List, Optional
 
 import aiohttp
 from c_log import UnifiedLogger

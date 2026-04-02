@@ -65,15 +65,15 @@ async def _main():
         
         risk_cfg = cfg.get("risk", {})
         leverage_cfg = risk_cfg.get("leverage", {})
-        margin_mode = risk_cfg.get("margin_mode", 2)
         
         # Парсим новую структуру (словарь или число)
         if isinstance(leverage_cfg, dict):
             leverage_val = leverage_cfg.get("val")
             use_cache = leverage_cfg.get("used_by_cache", False)
+            margin_mode = leverage_cfg.get("margin_mode", 2)
+            delay_sec = leverage_cfg.get("delay_sec", 0.3)
         else:
-            leverage_val = leverage_cfg
-            use_cache = False
+            raise TypeError(f"Expected dict for leverage_cfg, got {type(leverage_cfg).__name__}")
             
         # 1. Запуск глобальной конфигурации
         logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
@@ -85,30 +85,30 @@ async def _main():
             black_list=bot.black_list,
             use_cache=use_cache,
             cache_path=CACHE_PATH,
-            delay_sec=0.3
+            delay_sec=delay_sec
         )
         await setter.apply()
 
-        # 2. Инициализация TG и Торговли
-        if tg_enabled:
-            token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
-            chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
+        # # 2. Инициализация TG и Торговли
+        # if tg_enabled:
+        #     token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
+        #     chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
             
-            if not token or not chat_id:
-                logger.error("Telegram включен, но token/chat_id не заданы.")
-                sys.exit(1)
+        #     if not token or not chat_id:
+        #         logger.error("Telegram включен, но token/chat_id не заданы.")
+        #         sys.exit(1)
             
-            tg_admin = AdminTgBot(token, chat_id, bot)
-            tg_task = asyncio.create_task(polling_supervisor(tg_admin))
-            tasks.append(tg_task)
-        else:
-            logger.warning("TG отключен. Автостарт торговли...")
-            await bot.start()
+        #     tg_admin = AdminTgBot(token, chat_id, bot)
+        #     tg_task = asyncio.create_task(polling_supervisor(tg_admin))
+        #     tasks.append(tg_task)
+        # else:
+        #     logger.warning("TG отключен. Автостарт торговли...")
+        #     await bot.start()
 
-        if tasks:
-            await asyncio.gather(*tasks)
-        else:
-            while True: await asyncio.sleep(3600)
+        # if tasks:
+        #     await asyncio.gather(*tasks)
+        # else:
+        #     while True: await asyncio.sleep(3600)
                 
     except (asyncio.CancelledError, KeyboardInterrupt):
         logger.warning("\n🛑 Получен сигнал прерывания. Остановка...")

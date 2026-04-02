@@ -2,17 +2,20 @@
 # FILE: CORE/leverage_setter.py
 # ROLE: Глобальная пред-установка плеча и маржи (с JSON кешем)
 # ============================================================
+from __future__ import annotations
 
-import os
 import json
 import asyncio
 import aiohttp
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, TYPE_CHECKING
 from pathlib import Path
 
 from API.PHEMEX.symbol import PhemexSymbols, SymbolInfo
 from API.PHEMEX.order import PhemexPrivateClient
 from c_log import UnifiedLogger
+
+if TYPE_CHECKING:
+    from API.PHEMEX.symbol import SymbolInfo
 
 logger = UnifiedLogger("setup")
 
@@ -100,6 +103,7 @@ class GlobalLeverageSetter:
                 try:
                     # 1. Всегда ставим Margin Mode и Pos Mode (Hedged = 2)
                     await client.set_margin_mode(sym, margin_mode=self.margin_mode, pos_mode=2)
+                    await asyncio.sleep(0.1)
                     
                     # 2. Ставим плечо, если задано (не null)
                     actual_leverage = None

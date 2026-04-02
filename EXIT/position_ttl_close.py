@@ -1,4 +1,8 @@
-from CORE.models import ActivePosition
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from CORE.models import ActivePosition
 
 class PositionTTLClose:
     def __init__(self, cfg: dict):

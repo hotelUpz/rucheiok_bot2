@@ -1,19 +1,20 @@
+from __future__ import annotations
+
 import asyncio
 import time
 from typing import Dict, Any, Optional, TYPE_CHECKING
-
-from CORE.models import ActivePosition
-from API.PHEMEX.stakan import DepthTop
-from c_log import UnifiedLogger
 
 from EXIT.scenarios.average import AverageScenario
 from EXIT.scenarios.negative import NegativeScenario
 from EXIT.position_ttl_close import PositionTTLClose
 from EXIT.extrime_close import ExtrimeClose
 from EXIT.interference import Interference
+from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
     from CORE.bot import TradingBot
+    from CORE.models import ActivePosition
+    from API.PHEMEX.stakan import DepthTop
 
 logger = UnifiedLogger("exit")
 

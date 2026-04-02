@@ -2,15 +2,16 @@
 # FILE: CORE/ws_handler.py
 # ROLE: Мгновенная событийная обработка WebSocket (Изолированная логика)
 # ============================================================
+from __future__ import annotations
 
 import asyncio
 import time
 from typing import Dict, Any, TYPE_CHECKING
 from c_log import UnifiedLogger
-from CORE.models import ActivePosition
 
 if TYPE_CHECKING:
     from CORE.bot import TradingBot
+    from CORE.models import ActivePosition
 
 logger = UnifiedLogger("core")
 

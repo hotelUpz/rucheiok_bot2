@@ -2,17 +2,18 @@
 # FILE: CORE/bot.py
 # ROLE: Главный оркестратор торговых процессов
 # ============================================================
+from __future__ import annotations
 
 import asyncio
 import time
-from typing import Dict, Any, Set
+from typing import Dict, Any, Set, TYPE_CHECKING
 import os
 import json
 import aiohttp
 from pathlib import Path
 
-from API.PHEMEX.symbol import PhemexSymbols, SymbolInfo
-from API.PHEMEX.stakan import PhemexStakanStream, DepthTop
+from API.PHEMEX.symbol import PhemexSymbols
+from API.PHEMEX.stakan import PhemexStakanStream
 from API.PHEMEX.order import PhemexPrivateClient
 from API.PHEMEX.ws_private import PhemexPrivateWS
 from API.BINANCE.ticker import BinanceTickerAPI
@@ -21,13 +22,19 @@ from API.PHEMEX.funding import PhemexFunding
 
 from ENTRY.engine import EntryEngine
 from EXIT.engine import ExitEngine
-from CORE.models import BotState, ActivePosition
+from CORE.models import BotState
 from CORE.executor import OrderExecutor
 from CORE.ws_handler import PrivateWSHandler
 from CORE.bot_utils import BlackListManager, PriceCacheManager
 from c_log import UnifiedLogger
 from TG.tg_sender import TelegramSender
 from utils import get_config_summary
+
+if TYPE_CHECKING:
+    from CORE.models import ActivePosition
+    from API.PHEMEX.symbol import SymbolInfo
+    from API.PHEMEX.stakan import DepthTop
+
 
 logger = UnifiedLogger("core")
 BASE_DIR = Path(__file__).resolve().parent.parent

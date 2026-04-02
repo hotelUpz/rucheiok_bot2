@@ -37,12 +37,13 @@
     "risk": {
         "leverage": {
             "used_by_cache": false,
-            "val": 20
+            "val": 20,
+            "delay_sec": 0.3,
+            "margin_mode": 2
         },
         "margin_size": "row",
         "notional_limit": 800,
         "margin_over_size_pct": 1,
-        "margin_mode": 2,
         "hedge_mode": false,
         "quarantine": {
             "max_consecutive_fails": 1,

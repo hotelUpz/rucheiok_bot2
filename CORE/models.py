@@ -2,6 +2,7 @@
 # FILE: CORE/models.py
 # ROLE: Data structures for trading state
 # ============================================================
+from __future__ import annotations
 
 import time
 import os
@@ -9,8 +10,6 @@ import json
 import asyncio
 from typing import Dict, Set, List
 from dataclasses import dataclass, field
-
-from CORE.models import ActivePosition
 from c_log import UnifiedLogger
 
 logger = UnifiedLogger("core")

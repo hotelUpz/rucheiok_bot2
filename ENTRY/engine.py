@@ -9,10 +9,11 @@ from typing import Dict, Any, Optional, TYPE_CHECKING
 
 from ENTRY.pattern_math import StakanEntryPattern, EntrySignal
 from ENTRY.funding_filter import FundingFilter
-from API.PHEMEX.stakan import DepthTop
 
 if TYPE_CHECKING:
     from API.PHEMEX.funding import PhemexFunding
+    from ENTRY.pattern_math import EntrySignal
+    from API.PHEMEX.stakan import DepthTop
 
 
 class EntryEngine:

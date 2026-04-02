@@ -2,17 +2,18 @@
 # FILE: CORE/executor.py
 # ROLE: Отправка ордеров на биржу и защита от гонок потоков (Locks)
 # ============================================================
+from __future__ import annotations
 
 import asyncio
 import time
 from typing import Dict, Any, TYPE_CHECKING
 from c_log import UnifiedLogger
 from CORE.models import ActivePosition
-from API.PHEMEX.stakan import DepthTop
 from utils import round_step
 
 if TYPE_CHECKING:
     from CORE.bot import TradingBot
+    from API.PHEMEX.stakan import DepthTop
 
 logger = UnifiedLogger("core")
 
