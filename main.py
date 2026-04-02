@@ -89,26 +89,28 @@ async def _main():
         )
         await setter.apply()
 
-        # # 2. Инициализация TG и Торговли
-        # if tg_enabled:
-        #     token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
-        #     chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
-            
-        #     if not token or not chat_id:
-        #         logger.error("Telegram включен, но token/chat_id не заданы.")
-        #         sys.exit(1)
-            
-        #     tg_admin = AdminTgBot(token, chat_id, bot)
-        #     tg_task = asyncio.create_task(polling_supervisor(tg_admin))
-        #     tasks.append(tg_task)
-        # else:
-        #     logger.warning("TG отключен. Автостарт торговли...")
-        #     await bot.start()
+        print("lev set succ")
 
-        # if tasks:
-        #     await asyncio.gather(*tasks)
-        # else:
-        #     while True: await asyncio.sleep(3600)
+        # 2. Инициализация TG и Торговли
+        if tg_enabled:
+            token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
+            chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
+            
+            if not token or not chat_id:
+                logger.error("Telegram включен, но token/chat_id не заданы.")
+                sys.exit(1)
+            
+            tg_admin = AdminTgBot(token, chat_id, bot)
+            tg_task = asyncio.create_task(polling_supervisor(tg_admin))
+            tasks.append(tg_task)
+        else:
+            logger.warning("TG отключен. Автостарт торговли...")
+            await bot.start()
+
+        if tasks:
+            await asyncio.gather(*tasks)
+        else:
+            while True: await asyncio.sleep(3600)
                 
     except (asyncio.CancelledError, KeyboardInterrupt):
         logger.warning("\n🛑 Получен сигнал прерывания. Остановка...")
