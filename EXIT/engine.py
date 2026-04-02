@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from CORE.models import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("exit")
+logger = UnifiedLogger("bot")
 
 
 class ExitEngine:

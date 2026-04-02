@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from utils import load_json, save_json_safe
 from c_log import UnifiedLogger
 
-logger = UnifiedLogger("core")
+logger = UnifiedLogger("bot")
 
 
 @dataclass

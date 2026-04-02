@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from CORE.bot import TradingBot
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("core")
+logger = UnifiedLogger("bot")
 
 class OrderExecutor:
     """Асинхронный отправитель торговых приказов на биржу. Оперирует локами для защиты от гонок потоков."""

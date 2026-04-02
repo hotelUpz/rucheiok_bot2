@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
 
-logger = UnifiedLogger("core")
+logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 

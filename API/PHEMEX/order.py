@@ -28,8 +28,7 @@ class PhemexPrivateClient:
         url = f"{self.BASE_URL}{path}{query_for_url}"
         body_str = json.dumps(body, separators=(',', ':')) if body else ""
         
-        is_safe_to_retry = method.upper() in ("GET", "DELETE", "PUT")
-        attempts = self.retries if is_safe_to_retry else 1
+        attempts = self.retries if method.upper() in ("GET", "DELETE", "PUT") else 1
         last_err = None
 
         for attempt in range(1, attempts + 1):
@@ -42,14 +41,11 @@ class PhemexPrivateClient:
                     "x-phemex-request-expiry": str(expiry),
                     "x-phemex-request-signature": signature
                 }
-                
                 async with self.session.request(method, url, headers=headers, data=body_str if body else None, timeout=timeout_sec) as resp:
                     text = await resp.text()
                     if resp.status not in (200, 201, 202, 204):
                         raise RuntimeError(f"HTTP {resp.status}: {text}")
-                    try: data = json.loads(text)
-                    except json.JSONDecodeError: raise RuntimeError(f"Invalid JSON: {text}")
-                        
+                    data = json.loads(text)
                     code = int(data.get("code", 0))
                     if code != 0:
                         raise RuntimeError(f"Phemex Error [{code}]: {data.get('msg', '')}")
@@ -57,36 +53,21 @@ class PhemexPrivateClient:
             except Exception as e:
                 last_err = e
                 if attempt < attempts: await asyncio.sleep(0.5 * attempt)
-                else: break
+        
         logger.error(f"API Request Failed ({method} {path}): {last_err}")
         raise RuntimeError(f"Private API request failed: {last_err}")
-    
-    async def set_margin_mode(self, symbol: str, margin_mode: int, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
-        """
-        Переключение режима маржи:
-        targetMarginMode: 1 = Isolated, 2 = Cross
-        Для этого эндпоинта Phemex ожидает параметры в ТЕЛЕ запроса (JSON body), а не в Query!
-        """
-        body = {
-            "symbol": symbol,
-            "targetMarginMode": int(margin_mode)
-        }
-        
-        if int(margin_mode) == 1:
-            lev_str = float_to_str(leverage)
-            if mode == "hedged":
-                body["longLeverageRr"] = lev_str
-                body["shortLeverageRr"] = lev_str
-            else:
-                body["buyLeverageRr"] = lev_str
-                body["sellLeverageRr"] = lev_str
-                
-        # Передаем параметры через body=body, а query_no_q оставляем пустым
-        return await self._request("PUT", "/g-positions/switch-isolated", body=body)
 
-    async def set_leverage(self, symbol: str, pos_side: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
-        lev_str = float_to_str(leverage)
-        query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}" if mode == "hedged" else f"leverageRr={lev_str}&symbol={symbol}"
+    async def set_leverage(self, symbol: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
+        """Универсальная установка: leverage=0 -> CROSS, leverage>0 -> ISOLATED"""
+        # КРИТИЧНО: Для кросс-маржи Phemex требует строго целое число 0
+        lev_val = int(leverage) if leverage == 0 else leverage
+        lev_str = str(lev_val)
+        
+        if mode == "hedged":
+            query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}"
+        else:
+            query_no_q = f"leverageRr={lev_str}&symbol={symbol}"
+            
         return await self._request("PUT", "/g-positions/leverage", query_no_q=query_no_q)
 
     async def place_limit_order(self, symbol: str, side: str, qty: float, price: float, pos_side: str) -> Dict[str, Any]:
@@ -99,12 +80,3 @@ class PhemexPrivateClient:
     async def cancel_order(self, symbol: str, order_id: str, pos_side: str) -> Dict[str, Any]:
         query_no_q = f"orderID={order_id}&posSide={pos_side}&symbol={symbol}"
         return await self._request("DELETE", "/g-orders/cancel", query_no_q=query_no_q)
-
-    async def cancel_all_orders(self, symbol: str) -> Dict[str, Any]:
-        if not symbol or not isinstance(symbol, str) or len(symbol) < 3:
-            logger.error("🛑 КРИТИЧЕСКАЯ БЛОКИРОВКА: Попытка отменить все ордера без указания конкретной монеты!")
-            return {}
-        return await self._request("DELETE", "/g-orders/all", query_no_q=f"symbol={symbol}")
-
-    async def get_active_positions(self) -> Dict[str, Any]:
-        return await self._request("GET", "/g-accounts/accountPositions", query_no_q="currency=USDT")

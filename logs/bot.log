@@ -1,0 +1,538 @@
+2026-04-02 23:29:33 | INFO | bot | ⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...
+2026-04-02 23:29:33 | INFO | bot | 🔄 Загрузка спецификаций Phemex...
+2026-04-02 23:29:34 | DEBUG | bot | [BTCUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:34 | DEBUG | bot | [ETHUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:35 | DEBUG | bot | [XRPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:35 | DEBUG | bot | [ADAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:36 | DEBUG | bot | [SOLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:37 | DEBUG | bot | [UNIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:37 | DEBUG | bot | [DOTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:38 | DEBUG | bot | [LINKUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:38 | DEBUG | bot | [ATOMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:39 | ERROR | bot | [LTCUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:39 | ERROR | bot | [DOGEUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:40 | ERROR | bot | [TWTUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:40 | ERROR | bot | [BNBUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:41 | ERROR | bot | [MANAUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:41 | ERROR | bot | [APEUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:42 | ERROR | bot | [LUNCUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:42 | ERROR | bot | [FLOWUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:43 | ERROR | bot | [NEOUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:43 | ERROR | bot | [ACHUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:44 | ERROR | bot | [BANDUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:44 | ERROR | bot | [VETUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:45 | ERROR | bot | [API3USDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:45 | ERROR | bot | [SUSHIUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:46 | ERROR | bot | [ENJUSDT] Ошибка настройки: private api request failed: phemex error [20004]: te_err_inconsistent_pos_mode
+2026-04-02 23:29:46 | DEBUG | bot | [XTZUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:47 | DEBUG | bot | [CHZUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:29:47 | DEBUG | bot | [JASMYUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:48 | DEBUG | bot | [THETAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:48 | DEBUG | bot | [TRXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:49 | DEBUG | bot | [ONEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:49 | DEBUG | bot | [RUNEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:50 | DEBUG | bot | [AXSUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:50 | DEBUG | bot | [ETCUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:51 | DEBUG | bot | [RSRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:51 | DEBUG | bot | [FILUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:52 | DEBUG | bot | [AVAXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:52 | DEBUG | bot | [GMTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:53 | DEBUG | bot | [ZRXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:29:53 | DEBUG | bot | [MTLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:54 | DEBUG | bot | [LUNA2USDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:54 | DEBUG | bot | [CRVUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:55 | DEBUG | bot | [APTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:55 | DEBUG | bot | [MASKUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:56 | DEBUG | bot | [CELOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:56 | DEBUG | bot | [ZECUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:57 | DEBUG | bot | [EGLDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:57 | DEBUG | bot | [GALAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:29:58 | DEBUG | bot | [ALICEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:29:58 | ERROR | bot | [U1000SHIBUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000shibusdt
+2026-04-02 23:29:59 | DEBUG | bot | [STORJUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:29:59 | DEBUG | bot | [GRTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:00 | DEBUG | bot | [ARUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:00 | DEBUG | bot | [IMXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:01 | DEBUG | bot | [QTUMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:02 | DEBUG | bot | [OGNUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:02 | DEBUG | bot | [QNTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:03 | DEBUG | bot | [RVNUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:03 | DEBUG | bot | [LDOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:04 | DEBUG | bot | [ZILUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:04 | DEBUG | bot | [ALGOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:05 | DEBUG | bot | [GMXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:05 | DEBUG | bot | [C98USDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:06 | DEBUG | bot | [CHRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:06 | DEBUG | bot | [BCHUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:07 | DEBUG | bot | [KAVAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:07 | DEBUG | bot | [FLUXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:08 | DEBUG | bot | [SNXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:08 | DEBUG | bot | [BATUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:09 | DEBUG | bot | [NEARUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:09 | DEBUG | bot | [YFIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:10 | DEBUG | bot | [ROSEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:10 | DEBUG | bot | [ENSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:11 | DEBUG | bot | [SPELLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:11 | DEBUG | bot | [SANDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:12 | DEBUG | bot | [PAXGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:12 | DEBUG | bot | [XLMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:13 | DEBUG | bot | [SKLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:13 | DEBUG | bot | [DYDXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:14 | DEBUG | bot | [INJUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:14 | DEBUG | bot | [ARPAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:15 | DEBUG | bot | [AAVEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:15 | DEBUG | bot | [AGLDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:16 | DEBUG | bot | [DASHUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:16 | DEBUG | bot | [ONTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:17 | DEBUG | bot | [SFPUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:17 | DEBUG | bot | [OPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:18 | DEBUG | bot | [1INCHUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:18 | DEBUG | bot | [STGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:19 | DEBUG | bot | [COTIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:19 | DEBUG | bot | [LPTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:20 | DEBUG | bot | [KNCUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:20 | DEBUG | bot | [HFTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:21 | DEBUG | bot | [KSMUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:21 | DEBUG | bot | [IOTXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:22 | DEBUG | bot | [COMPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:22 | DEBUG | bot | [MINAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:23 | DEBUG | bot | [ANKRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:23 | DEBUG | bot | [ZENUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:24 | DEBUG | bot | [WOOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:25 | DEBUG | bot | [YGGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:25 | DEBUG | bot | [PEOPLEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:26 | DEBUG | bot | [IOSTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:26 | DEBUG | bot | [TUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:27 | DEBUG | bot | [FETUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:27 | DEBUG | bot | [HIGHUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:28 | DEBUG | bot | [BLURUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:28 | DEBUG | bot | [ASTRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:29 | DEBUG | bot | [CFXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:29 | DEBUG | bot | [STXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:30 | DEBUG | bot | [SSVUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:30 | DEBUG | bot | [HBARUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:31 | DEBUG | bot | [CKBUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:31 | DEBUG | bot | [RLCUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:32 | DEBUG | bot | [TRUUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:32 | DEBUG | bot | [LQTYUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:33 | DEBUG | bot | [ARBUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:33 | DEBUG | bot | [IDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:34 | DEBUG | bot | [TLMUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:34 | DEBUG | bot | [ICXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:35 | DEBUG | bot | [BELUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:35 | DEBUG | bot | [RPLUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:36 | DEBUG | bot | [SUIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:36 | ERROR | bot | [U1000PEPEUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000pepeusdt
+2026-04-02 23:30:37 | DEBUG | bot | [EDUUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:37 | ERROR | bot | [U1000FLOKIUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000flokiusdt
+2026-04-02 23:30:38 | DEBUG | bot | [ORDIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:38 | ERROR | bot | [U1000XECUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000xecusdt
+2026-04-02 23:30:39 | DEBUG | bot | [MAVUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:40 | DEBUG | bot | [XVGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:40 | DEBUG | bot | [WLDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:41 | DEBUG | bot | [PENDLEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:41 | DEBUG | bot | [AUCTIONUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:42 | DEBUG | bot | [ARKMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:42 | DEBUG | bot | [SEIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:43 | DEBUG | bot | [CYBERUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:43 | DEBUG | bot | [TRBUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:44 | DEBUG | bot | [XVSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:44 | DEBUG | bot | [DUSKUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:45 | DEBUG | bot | [NMRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:45 | DEBUG | bot | [ARKUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:46 | DEBUG | bot | [BIGTIMEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:46 | DEBUG | bot | [BNTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:47 | DEBUG | bot | [WAXPUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:47 | DEBUG | bot | [POLYXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:30:48 | DEBUG | bot | [GASUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:48 | DEBUG | bot | [TIAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:49 | DEBUG | bot | [MEMEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:49 | DEBUG | bot | [CAKEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:50 | DEBUG | bot | [STEEMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:50 | DEBUG | bot | [ILVUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:51 | DEBUG | bot | [KASUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:51 | DEBUG | bot | [BEAMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:52 | ERROR | bot | [U1000BONKUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000bonkusdt
+2026-04-02 23:30:52 | DEBUG | bot | [PYTHUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:53 | DEBUG | bot | [SUPERUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:53 | DEBUG | bot | [USTCUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:54 | DEBUG | bot | [ONGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:54 | DEBUG | bot | [JTOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:55 | ERROR | bot | [U1000SATSUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000satsusdt
+2026-04-02 23:30:55 | ERROR | bot | [U1000RATSUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000ratsusdt
+2026-04-02 23:30:56 | DEBUG | bot | [ACEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:57 | DEBUG | bot | [MOVRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:57 | DEBUG | bot | [NFPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:58 | DEBUG | bot | [POWRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:58 | DEBUG | bot | [XAIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:59 | DEBUG | bot | [WIFUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:30:59 | DEBUG | bot | [MANTAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:00 | DEBUG | bot | [ONDOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:00 | DEBUG | bot | [UMAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:01 | DEBUG | bot | [LSKUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:01 | DEBUG | bot | [ALTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:02 | DEBUG | bot | [JUPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:02 | DEBUG | bot | [ZETAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:03 | DEBUG | bot | [RONUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:03 | DEBUG | bot | [DYMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:04 | DEBUG | bot | [MAVIAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:04 | DEBUG | bot | [PROMUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:05 | DEBUG | bot | [PIXELUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:05 | DEBUG | bot | [STRKUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:06 | DEBUG | bot | [GLMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:06 | DEBUG | bot | [PORTALUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:07 | DEBUG | bot | [TONUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:07 | DEBUG | bot | [AXLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:08 | DEBUG | bot | [METISUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:08 | DEBUG | bot | [AEVOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:09 | DEBUG | bot | [VANRYUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:09 | DEBUG | bot | [BOMEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:10 | DEBUG | bot | [ETHFIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:10 | DEBUG | bot | [POPCATUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:11 | DEBUG | bot | [WUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:12 | DEBUG | bot | [ENAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:12 | DEBUG | bot | [DEGENUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:13 | DEBUG | bot | [TNSRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:13 | DEBUG | bot | [SAGAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:14 | DEBUG | bot | [TAOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:14 | DEBUG | bot | [MERLUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:15 | DEBUG | bot | [MEWUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:15 | DEBUG | bot | [BRETTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:16 | DEBUG | bot | [BBUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:16 | DEBUG | bot | [PTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:17 | DEBUG | bot | [NOTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:17 | DEBUG | bot | [TURBOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:18 | DEBUG | bot | [IOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:18 | DEBUG | bot | [ZKUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:19 | DEBUG | bot | [LISTAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:19 | DEBUG | bot | [ZROUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:20 | DEBUG | bot | [BANANAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:20 | DEBUG | bot | [RENDERUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:21 | DEBUG | bot | [RAREUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:21 | DEBUG | bot | [SYNUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:22 | DEBUG | bot | [SUNUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:22 | DEBUG | bot | [MBOXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:23 | ERROR | bot | [U1000000BABYDOGEUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000000babydogeusdt
+2026-04-02 23:31:23 | DEBUG | bot | [NEIROUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:24 | DEBUG | bot | [POLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:24 | DEBUG | bot | [FIDAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:25 | DEBUG | bot | [CATIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:25 | DEBUG | bot | [HMSTRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:26 | DEBUG | bot | [DIAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:26 | DEBUG | bot | [EIGENUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:27 | ERROR | bot | [U1000CATUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000catusdt
+2026-04-02 23:31:27 | DEBUG | bot | [DEEPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:28 | DEBUG | bot | [SCRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:28 | DEBUG | bot | [MOODENGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:29 | DEBUG | bot | [GOATUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:29 | DEBUG | bot | [SANTOSUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:30 | DEBUG | bot | [SAFEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:30 | DEBUG | bot | [GRASSUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:31 | DEBUG | bot | [CETUSUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:31 | DEBUG | bot | [COWUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:32 | ERROR | bot | [U1000000MOGUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000000mogusdt
+2026-04-02 23:31:32 | DEBUG | bot | [DRIFTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:33 | DEBUG | bot | [PNUTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:33 | DEBUG | bot | [ACTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:34 | DEBUG | bot | [HIPPOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:34 | DEBUG | bot | [AKTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:35 | DEBUG | bot | [BANUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:35 | DEBUG | bot | [SCRTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:36 | ERROR | bot | [U1000CHEEMSUSDT] Ошибка настройки: private api request failed: phemex error [10500]: failed to find symbol u1000cheemsusdt
+2026-04-02 23:31:36 | DEBUG | bot | [CHILLGUYUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:37 | DEBUG | bot | [MORPHOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:37 | DEBUG | bot | [THEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:38 | DEBUG | bot | [AEROUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:39 | DEBUG | bot | [KAIAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:39 | DEBUG | bot | [MOVEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:40 | DEBUG | bot | [ORCAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:40 | DEBUG | bot | [ACXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:41 | DEBUG | bot | [SPXUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:41 | DEBUG | bot | [VIRTUALUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:42 | DEBUG | bot | [MEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:42 | DEBUG | bot | [VELODROMEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:43 | DEBUG | bot | [AVAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:43 | DEBUG | bot | [MOCAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:44 | DEBUG | bot | [VANAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:44 | DEBUG | bot | [PENGUUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:45 | DEBUG | bot | [HYPEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:45 | DEBUG | bot | [USUALUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:46 | DEBUG | bot | [CGPTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:46 | DEBUG | bot | [KMNOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:47 | DEBUG | bot | [FARTCOINUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:47 | DEBUG | bot | [AIXBTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:48 | DEBUG | bot | [DEXEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:48 | DEBUG | bot | [PHAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:49 | DEBUG | bot | [ZEREBROUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:49 | DEBUG | bot | [GRIFFAINUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:50 | DEBUG | bot | [BIOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:50 | DEBUG | bot | [SWARMSUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:51 | DEBUG | bot | [ALCHUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:51 | DEBUG | bot | [COOKIEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:52 | DEBUG | bot | [DUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:52 | DEBUG | bot | [SONICUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:53 | DEBUG | bot | [AVAAIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:53 | DEBUG | bot | [SUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:54 | DEBUG | bot | [TRUMPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:54 | DEBUG | bot | [MELANIAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:55 | DEBUG | bot | [ARCUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:55 | DEBUG | bot | [SOLVUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:56 | DEBUG | bot | [VINEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:31:56 | DEBUG | bot | [ANIMEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:57 | DEBUG | bot | [VVVUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:58 | DEBUG | bot | [PIPPINUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:58 | DEBUG | bot | [BERAUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:59 | DEBUG | bot | [TSTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:31:59 | DEBUG | bot | [LAYERUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:00 | DEBUG | bot | [IPUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:00 | DEBUG | bot | [BROCCOLIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:01 | DEBUG | bot | [B3USDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:01 | DEBUG | bot | [HEIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:02 | DEBUG | bot | [SHELLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:02 | DEBUG | bot | [GPSUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:03 | DEBUG | bot | [KAITOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:03 | DEBUG | bot | [REDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:04 | DEBUG | bot | [BMTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:04 | DEBUG | bot | [MUBARAKUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:05 | DEBUG | bot | [TUTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:06 | DEBUG | bot | [FORMUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:06 | DEBUG | bot | [EPICUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:07 | DEBUG | bot | [PARTIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:07 | DEBUG | bot | [NILUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:08 | DEBUG | bot | [PLUMEUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:08 | DEBUG | bot | [JELLYJELLYUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:09 | DEBUG | bot | [WALUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:09 | DEBUG | bot | [MLNUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:10 | DEBUG | bot | [GUNUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:10 | DEBUG | bot | [STOUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:11 | DEBUG | bot | [ATHUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:11 | DEBUG | bot | [BABYUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:12 | DEBUG | bot | [FHEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:12 | DEBUG | bot | [PROMPTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:13 | DEBUG | bot | [WCTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:13 | DEBUG | bot | [FLUIDUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:14 | DEBUG | bot | [KERNELUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:14 | DEBUG | bot | [BANKUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:15 | DEBUG | bot | [AERGOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:15 | DEBUG | bot | [HYPERUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:16 | DEBUG | bot | [ZORAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:16 | DEBUG | bot | [TROLLUSDT] Успешно: ISOLATED Margin, Lev=3.0x
+2026-04-02 23:32:17 | DEBUG | bot | [INITUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:17 | DEBUG | bot | [SIGNUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:18 | DEBUG | bot | [JSTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:18 | DEBUG | bot | [CTKUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:19 | DEBUG | bot | [HAEDALUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:19 | DEBUG | bot | [PUNDIXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:20 | DEBUG | bot | [SYRUPUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:20 | DEBUG | bot | [B2USDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:21 | DEBUG | bot | [ALPINEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:21 | DEBUG | bot | [ASRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:22 | DEBUG | bot | [SXTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:22 | DEBUG | bot | [NXPCUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:23 | DEBUG | bot | [BANANAS31USDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:23 | DEBUG | bot | [CVCUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:24 | DEBUG | bot | [AWEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:24 | DEBUG | bot | [SOONUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:25 | DEBUG | bot | [BUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:25 | DEBUG | bot | [BROCCOLIF3BUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:26 | DEBUG | bot | [HUMAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:26 | DEBUG | bot | [SOPHUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:27 | DEBUG | bot | [AUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:32:27 | DEBUG | bot | [BOBUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:28 | DEBUG | bot | [LAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:28 | DEBUG | bot | [PUMPBTCUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:29 | DEBUG | bot | [HOMEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:29 | DEBUG | bot | [RESOLVUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:30 | DEBUG | bot | [SQDUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:30 | DEBUG | bot | [TAIKOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:31 | DEBUG | bot | [SPKUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:31 | DEBUG | bot | [FUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:32 | DEBUG | bot | [NEWTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:32 | DEBUG | bot | [HUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:33 | DEBUG | bot | [SAHARAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:33 | DEBUG | bot | [ICNTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:34 | DEBUG | bot | [PUMPUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:34 | DEBUG | bot | [TACUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:35 | DEBUG | bot | [USELESSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:35 | DEBUG | bot | [ERAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:36 | DEBUG | bot | [TAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:37 | DEBUG | bot | [BICOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:37 | DEBUG | bot | [TREEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:38 | DEBUG | bot | [ESPORTSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:38 | DEBUG | bot | [NAORISUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:39 | DEBUG | bot | [MYXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:39 | DEBUG | bot | [TOWNSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:40 | DEBUG | bot | [PROVEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:40 | DEBUG | bot | [IDOLUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:41 | DEBUG | bot | [INUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:41 | DEBUG | bot | [XNYUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:42 | DEBUG | bot | [AIOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:42 | DEBUG | bot | [SAPIENUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:43 | DEBUG | bot | [BTRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:43 | DEBUG | bot | [BASUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:44 | DEBUG | bot | [MITOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:44 | DEBUG | bot | [WLFIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:45 | DEBUG | bot | [QUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:45 | DEBUG | bot | [SOMIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:46 | DEBUG | bot | [ARIAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:46 | DEBUG | bot | [TAKEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:47 | DEBUG | bot | [OPENUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:47 | DEBUG | bot | [AVNTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:48 | DEBUG | bot | [LINEAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:48 | DEBUG | bot | [SKYUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:49 | DEBUG | bot | [HOLOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:49 | DEBUG | bot | [UBUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:50 | DEBUG | bot | [XPINUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:50 | DEBUG | bot | [ZKCUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:51 | DEBUG | bot | [TOSHIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:51 | DEBUG | bot | [BARDUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:52 | DEBUG | bot | [AIAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:52 | DEBUG | bot | [STBLUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:53 | DEBUG | bot | [ASTERUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:53 | DEBUG | bot | [TRADOORUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:54 | DEBUG | bot | [XANUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:54 | DEBUG | bot | [BLESSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:55 | DEBUG | bot | [HEMIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:55 | DEBUG | bot | [COAIUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:32:56 | DEBUG | bot | [XPLUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:56 | DEBUG | bot | [MIRAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:57 | DEBUG | bot | [HANAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:57 | DEBUG | bot | [LIGHTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:58 | DEBUG | bot | [AKEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:58 | DEBUG | bot | [NOMUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:59 | DEBUG | bot | [FFUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:32:59 | DEBUG | bot | [TRUTHUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:00 | DEBUG | bot | [EDENUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:00 | DEBUG | bot | [2ZUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:01 | DEBUG | bot | [EVAAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:01 | DEBUG | bot | [LYNUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:02 | DEBUG | bot | [KGENUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:02 | DEBUG | bot | [4USDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:03 | DEBUG | bot | [GIGGLEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:03 | DEBUG | bot | [METUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:04 | DEBUG | bot | [CLOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:04 | DEBUG | bot | [EULUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:05 | DEBUG | bot | [RECALLUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:05 | DEBUG | bot | [ENSOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:06 | DEBUG | bot | [YBUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:06 | DEBUG | bot | [ZBTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:07 | DEBUG | bot | [LABUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:07 | DEBUG | bot | [BLUAIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:08 | DEBUG | bot | [TURTLEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:08 | DEBUG | bot | [APRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:09 | DEBUG | bot | [MONUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:09 | DEBUG | bot | [ATUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:10 | DEBUG | bot | [MMTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:10 | DEBUG | bot | [KITEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:11 | DEBUG | bot | [CCUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:11 | DEBUG | bot | [TRUSTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:12 | DEBUG | bot | [UAIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:12 | DEBUG | bot | [FOLKSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:13 | DEBUG | bot | [STABLEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:13 | DEBUG | bot | [JCTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:14 | DEBUG | bot | [ALLOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:14 | DEBUG | bot | [BEATUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:15 | DEBUG | bot | [PIEVERSEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:15 | DEBUG | bot | [SENTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:16 | DEBUG | bot | [IRYSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:16 | DEBUG | bot | [RLSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:17 | DEBUG | bot | [WETUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:17 | DEBUG | bot | [POWERUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:18 | DEBUG | bot | [NIGHTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:19 | DEBUG | bot | [CYSUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:19 | DEBUG | bot | [USUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:20 | DEBUG | bot | [RAVEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:20 | DEBUG | bot | [ZKPUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:21 | DEBUG | bot | [GUAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:21 | DEBUG | bot | [LITUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:22 | DEBUG | bot | [MAGMAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:22 | DEBUG | bot | [BREVUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:23 | DEBUG | bot | [COLLECTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:23 | DEBUG | bot | [WHITEWHALEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:24 | DEBUG | bot | [ZAMAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:24 | DEBUG | bot | [FOGOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:25 | DEBUG | bot | [FRAXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:25 | DEBUG | bot | [SPORTFUNUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:26 | DEBUG | bot | [ACUUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:26 | DEBUG | bot | [SKRUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:27 | DEBUG | bot | [ELSAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:27 | DEBUG | bot | [FIGHTUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:28 | DEBUG | bot | [SPACEUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:28 | DEBUG | bot | [TSLAUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:29 | DEBUG | bot | [XAUUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:29 | DEBUG | bot | [BIRBUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:30 | DEBUG | bot | [GWEIUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:30 | DEBUG | bot | [XAGUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:31 | DEBUG | bot | [INXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:31 | DEBUG | bot | [XPDUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:32 | DEBUG | bot | [HOODUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:32 | DEBUG | bot | [INTCUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:33 | DEBUG | bot | [NVDAUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:33 | DEBUG | bot | [CRCLUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:34 | DEBUG | bot | [METAUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:34 | DEBUG | bot | [GOOGLUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:35 | DEBUG | bot | [AAPLUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:35 | DEBUG | bot | [AMZNUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:36 | DEBUG | bot | [COINUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:36 | DEBUG | bot | [MSTRUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:37 | DEBUG | bot | [BABAUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:37 | DEBUG | bot | [ACNUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:38 | DEBUG | bot | [UNHUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:38 | DEBUG | bot | [RDDTUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:39 | DEBUG | bot | [PLTRUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:39 | DEBUG | bot | [ORCLUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:40 | DEBUG | bot | [TRIAUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:40 | DEBUG | bot | [ESPUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:41 | DEBUG | bot | [AZTECUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:41 | DEBUG | bot | [OPNUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:42 | DEBUG | bot | [ROBOUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:42 | DEBUG | bot | [XPTUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:43 | DEBUG | bot | [KATUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:43 | DEBUG | bot | [COPPERUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:44 | DEBUG | bot | [XTIUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:44 | DEBUG | bot | [XBRUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:45 | DEBUG | bot | [NAS100USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:45 | DEBUG | bot | [GER40USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:46 | DEBUG | bot | [UK100USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:46 | DEBUG | bot | [HK50USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:47 | DEBUG | bot | [US2000USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:47 | DEBUG | bot | [SPYXUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:48 | DEBUG | bot | [AUS200USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:48 | DEBUG | bot | [VIXUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:49 | DEBUG | bot | [HSCHKDUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:49 | DEBUG | bot | [TW88USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:50 | DEBUG | bot | [SP500USDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:50 | DEBUG | bot | [EWYUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:51 | DEBUG | bot | [CFGUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:51 | DEBUG | bot | [EWJUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:52 | DEBUG | bot | [EDGEXUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:52 | DEBUG | bot | [NGUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:53 | DEBUG | bot | [PAYPUSDT] Успешно: ISOLATED Margin, Lev=10.0x
+2026-04-02 23:33:53 | DEBUG | bot | [BSBUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:54 | DEBUG | bot | [PRLUSDT] Успешно: ISOLATED Margin, Lev=21x
+2026-04-02 23:33:55 | DEBUG | bot | [BASEDUSDT] Успешно: ISOLATED Margin, Lev=20.0x
+2026-04-02 23:33:55 | INFO | bot | ✅ Глобальная настройка завершена.
+2026-04-02 23:33:56 | INFO | bot | 🤖 Запуск супервизора Telegram...
+2026-04-02 23:34:06 | INFO | bot | Stopping TG supervisor...
+2026-04-02 23:34:06 | WARNING | bot | 
+🛑 Получен сигнал прерывания. Остановка...
+2026-04-02 23:34:06 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-02 23:34:06 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-02 23:34:07 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-02 23:35:14 | INFO | bot | ⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...
+2026-04-02 23:35:14 | INFO | bot | 🔄 Загрузка спецификаций Phemex...
+2026-04-02 23:35:14 | ERROR | bot | [BTCUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:15 | ERROR | bot | [ETHUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:15 | ERROR | bot | [XRPUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:16 | ERROR | bot | [ADAUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:16 | ERROR | bot | [SOLUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:17 | ERROR | bot | [UNIUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:17 | ERROR | bot | [DOTUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:18 | ERROR | bot | [LINKUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:18 | ERROR | bot | [ATOMUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:19 | ERROR | bot | [LTCUSDT] Ошибка настройки: private api request failed: phemex error [39108]: please check leverage format.
+2026-04-02 23:35:19 | WARNING | bot | 
+🛑 Получен сигнал прерывания. Остановка...
+2026-04-02 23:35:19 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-02 23:35:19 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-02 23:35:19 | INFO | bot | ✅ Программа безопасно завершена.

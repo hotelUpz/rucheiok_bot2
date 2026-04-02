@@ -11,7 +11,7 @@ from typing import Dict, List, Tuple, Any
 
 from c_log import UnifiedLogger
 
-logger = UnifiedLogger("utils")
+logger = UnifiedLogger("bot")
 
 class BlackListManager:
     """Управление черным списком: парсинг, квотирование, сохранение."""

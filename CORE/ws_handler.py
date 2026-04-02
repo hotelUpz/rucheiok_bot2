@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from CORE.bot import TradingBot
     from CORE.models import ActivePosition
 
-logger = UnifiedLogger("core")
+logger = UnifiedLogger("bot")
 
 
 class PrivateWSHandler:
