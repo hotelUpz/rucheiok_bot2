@@ -194,12 +194,21 @@ class OrderExecutor:
             if price <= 0: 
                 return
 
-            margin_size_cfg = self.tb.cfg.get("risk", {}).get("margin_size", "row")
-            base_vol_usdt: float = signal.get("row_vol_usdt", price * signal.get("row_vol_asset", 0)) if str(margin_size_cfg).lower() == "row" else float(margin_size_cfg)
+            # --- ИЗВЛЕКАЕМ НАСТРОЙКИ РИСКА И ПЛЕЧО ---
+            risk_cfg = self.tb.cfg.get("risk", {})
+            margin_size_cfg = risk_cfg.get("margin_size", "row")
+            leverage_val = float(risk_cfg.get("leverage", {}).get("val", 1.0))
+
+            # --- РАСЧЕТ ИТОГОВОГО ОБЪЕМА (NOTIONAL) ---
+            if str(margin_size_cfg).lower() == "row":
+                base_vol_usdt: float = float(signal.get("row_vol_usdt", price * signal.get("row_vol_asset", 0)))
+            else:
+                # Если задана фиксированная маржа, умножаем ее на плечо
+                base_vol_usdt: float = float(margin_size_cfg) * leverage_val
 
             target_vol_usdt: float = min(
-                base_vol_usdt * (1 + self.tb.cfg.get("risk", {}).get("margin_over_size_pct", 1) / 100), 
-                self.tb.cfg.get("risk", {}).get("notional_limit", 5000)
+                base_vol_usdt * (1 + risk_cfg.get("margin_over_size_pct", 1) / 100), 
+                risk_cfg.get("notional_limit", 5000)
             )
             qty: float = round_step(target_vol_usdt / price, spec.lot_size)
             if qty <= 0: 
