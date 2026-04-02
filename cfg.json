@@ -38,7 +38,7 @@
         "leverage": {
             "set_previous": true,
             "used_by_cache": false,
-            "val": 21,
+            "val": 22,
             "delay_sec": 0.3,
             "margin_mode": 2
         },

@@ -1,0 +1,8 @@
+2026-04-02 23:58:21 | INFO | setup | 🔄 Загрузка спецификаций Phemex...
+2026-04-02 23:58:22 | ERROR | setup | [BTCUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 23:58:22 | ERROR | setup | [ETHUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 23:58:23 | ERROR | setup | [XRPUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 23:58:23 | ERROR | setup | [ADAUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 23:58:24 | ERROR | setup | [SOLUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 23:58:25 | ERROR | setup | [UNIUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}
+2026-04-02 23:58:25 | ERROR | setup | [DOTUSDT] Ошибка настройки: private api request failed: http 401: {"code": "401","msg": "401 miss signature."}

@@ -1,36 +1,7 @@
-2026-04-02 23:29:39 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:39 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:40 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:40 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:41 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:41 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:42 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:42 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:43 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:43 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:44 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:44 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:45 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:45 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:46 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
-2026-04-02 23:29:58 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000SHIBUSDT
-2026-04-02 23:30:36 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000PEPEUSDT
-2026-04-02 23:30:37 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000FLOKIUSDT
-2026-04-02 23:30:38 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000XECUSDT
-2026-04-02 23:30:52 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000BONKUSDT
-2026-04-02 23:30:55 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000SATSUSDT
-2026-04-02 23:30:55 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000RATSUSDT
-2026-04-02 23:31:23 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000000BABYDOGEUSDT
-2026-04-02 23:31:27 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000CATUSDT
-2026-04-02 23:31:32 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000000MOGUSDT
-2026-04-02 23:31:36 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [10500]: Failed to find symbol U1000CHEEMSUSDT
-2026-04-02 23:35:14 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:15 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:15 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:16 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:16 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:17 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:17 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:18 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:18 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-02 23:35:19 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-02 23:58:22 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 23:58:22 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 23:58:23 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 23:58:23 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 23:58:24 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 23:58:25 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
+2026-04-02 23:58:25 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}

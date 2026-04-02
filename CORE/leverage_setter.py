@@ -12,7 +12,7 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from API.PHEMEX.symbol import SymbolInfo
 
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("setup")
 
 class GlobalLeverageSetter:
     def __init__(self, api_key: str, api_secret: str, leverage_val: Optional[float], 
@@ -36,21 +36,38 @@ class GlobalLeverageSetter:
         save_json_safe(self.cache_path, data)
 
     async def _apply_setup_with_fallback(self, client: PhemexPrivateClient, sym: str, target_lev: float, max_lev: float) -> float | None:
+        safe_target_lev = float(int(max_lev)) if target_lev > max_lev else target_lev
+
         try:
             if self.margin_mode == 2:
-                # Включаем CROSS: шлем строго 0 (биржа переключит режим)
-                await client.set_leverage(sym, 0, mode=self.api_pos_mode)
+                # Включаем CROSS маржу (для Кросса плечо задавать не нужно, Phemex сделает сам)
+                await client.set_cross_margin(sym)
                 logger.debug(f"[{sym}] Успешно: CROSS Margin")
                 return target_lev
             else:
-                # Включаем ISOLATED: шлем реальное плечо (с защитой от лимита)
-                safe_lev = min(target_lev, max_lev)
-                await client.set_leverage(sym, safe_lev, mode=self.api_pos_mode)
-                logger.debug(f"[{sym}] Успешно: ISOLATED Margin, Lev={safe_lev}x")
-                return float(safe_lev)
+                # Включаем ISOLATED маржу (просто ставим плечо)
+                await client.set_leverage(sym, safe_target_lev, mode=self.api_pos_mode)
+                logger.debug(f"[{sym}] Успешно: ISOLATED Margin, Lev={safe_target_lev}x")
+                return safe_target_lev
+
         except Exception as e:
             err = str(e).lower()
-            if "has no change" in err or "same" in err: return target_lev
+            if "has no change" in err or "same" in err: 
+                return float(safe_target_lev) if self.margin_mode == 1 else target_lev
+            
+            # Фолбэк на максимальное плечо ТОЛЬКО для Isolated
+            if self.margin_mode != 2 and ("leverage" in err or "11088" in err or safe_target_lev > max_lev):
+                fallback_lev = float(int(max_lev))
+                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено. Фолбэк на {fallback_lev}x...")
+                try:
+                    await client.set_leverage(sym, fallback_lev, mode=self.api_pos_mode)
+                    return fallback_lev
+                except Exception as fb_e:
+                    if "has no change" in str(fb_e).lower() or "same" in str(fb_e).lower():
+                        return fallback_lev
+                    logger.error(f"[{sym}] Ошибка Fallback: {fb_e}")
+                    return None
+            
             logger.error(f"[{sym}] Ошибка настройки: {err[:100]}")
             return None
 
@@ -69,13 +86,19 @@ class GlobalLeverageSetter:
 
         async with aiohttp.ClientSession() as session:
             client = PhemexPrivateClient(self.api_key, self.api_secret, session, retries=1)
+            success_count, skipped_count = 0, 0
+            
             for spec in symbols_info:
                 sym = spec.symbol
                 if self.leverage_val is None or sym in self.black_list or sym in current_cache:
+                    skipped_count += 1
                     continue
+                
                 res_lev = await self._apply_setup_with_fallback(client, sym, self.leverage_val, spec.max_leverage)
                 new_cache[sym] = res_lev
+                if res_lev is not None:
+                    success_count += 1
                 await asyncio.sleep(self.delay_sec)
 
         self._save_cache(new_cache)
-        logger.info(f"✅ Глобальная настройка завершена.")
+        logger.info(f"✅ Готово. Настроено: {success_count}, Пропущено: {skipped_count}")

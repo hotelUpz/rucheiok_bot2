@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
-import json
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -142,3 +141,7 @@ if __name__ == "__main__":
 # git config --global push.autoSetupRemote true
 # ssh -T git@github.com
 # git log -1
+
+# git add .
+# git commit -m "plh37"
+# git push
