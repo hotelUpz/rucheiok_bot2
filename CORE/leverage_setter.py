@@ -46,35 +46,36 @@ class GlobalLeverageSetter:
         save_json_safe(self.cache_path, data)
 
     async def _apply_setup_with_fallback(self, client: PhemexPrivateClient, sym: str, target_lev: float, max_lev: float) -> float | None:
+        safe_target_lev = target_lev
+        
+        # Предварительная защита: если просим больше лимита
+        if target_lev > max_lev:
+            logger.warning(f"[{sym}] Запрошено {target_lev}x, лимит {max_lev}x. Сразу применяем фолбэк...")
+            safe_target_lev = float(int(max_lev))
+
         try:
             if self.margin_mode == 2:
-                # Для CROSS маржи: только эндпоинт switch-isolated. Плечо не ставим. 
-                # Иначе биржа перекинет позицию в ISOLATED.
-                await client.set_margin_mode(sym, margin_mode=2, leverage=0, mode="hedged")
+                # Включаем CROSS: просто шлем нулевое плечо в рабочий эндпоинт
+                await client.set_leverage(sym, "Merged", 0, mode=self.api_pos_mode)
                 logger.debug(f"[{sym}] Успешно: CROSS Margin")
-                return target_lev
+                return safe_target_lev
             else:
-                # Для ISOLATED: просто ставим плечо. Биржа сама включит Isolated.
-                await client.set_leverage(sym, "Merged", target_lev, mode="hedged")
-                logger.debug(f"[{sym}] Успешно: ISOLATED Margin, Lev={target_lev}x")
-                return target_lev
+                # Включаем ISOLATED: шлем реальное плечо
+                await client.set_leverage(sym, "Merged", safe_target_lev, mode=self.api_pos_mode)
+                logger.debug(f"[{sym}] Успешно: ISOLATED Margin, Lev={safe_target_lev}x")
+                return safe_target_lev
 
         except Exception as e:
-            err_msg = str(e).lower()
+            err = str(e).lower()
+            if "has no change" in err or "same" in err: 
+                return safe_target_lev
             
-            if "has no change" in err_msg or "same" in err_msg:
-                return target_lev
-            
-            is_out_of_range = (
-                "leverage" in err_msg and ("exceed" in err_msg or "range" in err_msg or "max" in err_msg or "20003" in err_msg)
-            ) or "11088" in err_msg or target_lev > max_lev
-
-            # В Кросс-марже плечо не используется, фолбэк применим только для Isolated
-            if is_out_of_range and self.margin_mode != 2:
-                fallback_lev = max(1.0, float(int(max_lev)))
-                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено (лимит). Фолбэк на {fallback_lev}x...")
+            # Фолбэк на максимальное плечо (имеет смысл только для Isolated)
+            if self.margin_mode != 2 and ("leverage" in err or "11088" in err or safe_target_lev > max_lev):
+                fallback_lev = float(int(max_lev))
+                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено. Фолбэк на {fallback_lev}x...")
                 try:
-                    await client.set_leverage(sym, "Merged", fallback_lev, mode="hedged")
+                    await client.set_leverage(sym, "Merged", fallback_lev, mode=self.api_pos_mode)
                     return fallback_lev
                 except Exception as fb_e:
                     if "has no change" in str(fb_e).lower() or "same" in str(fb_e).lower():
@@ -82,7 +83,7 @@ class GlobalLeverageSetter:
                     logger.error(f"[{sym}] Ошибка Fallback: {fb_e}")
                     return None
             
-            logger.error(f"[{sym}] Ошибка настройки: {err_msg[:100]}")
+            logger.error(f"[{sym}] Ошибка настройки: {err[:100]}")
             return None
 
     async def apply(self) -> None:
