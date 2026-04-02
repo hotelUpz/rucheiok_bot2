@@ -91,21 +91,28 @@ class ExitEngine:
             if self.tb.tg:
                 asyncio.create_task(self.tb.tg.send_message(f"⚠️ <b>ВНИМАНИЕ!</b>\nСработал НЕГАТИВНЫЙ сценарий по #{pos.symbol}."))
             return self.extrime_close.analyze(depth, pos, now)
-
-        # СТРОГО ПО ТЗ: Уважаем флаг average.enable
+        
+        # Уважаем флаг average.enable
+        avg_action = None
         if self.average.enable:
             avg_action = self.average.analyze(depth, pos, now)
-            if avg_action:
-                if avg_action["action"] == "TRIGGER_EXTRIME":
-                    pos.in_extrime_mode = True
-                    logger.warning(f"[EXIT] Сценарий Average исчерпал лимиты (min target rate). Запуск Extrime Mode.")
-                    if self.tb.tg:
-                        asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>EXTRIME MODE!</b>\n#{pos.symbol}: Average сценарий дошел до минимума."))
-                    return self.extrime_close.analyze(depth, pos, now)
-                return avg_action
+            if avg_action and avg_action["action"] == "TRIGGER_EXTRIME":
+                pos.in_extrime_mode = True
+                logger.warning(f"[EXIT] Сценарий Average исчерпал лимиты (min target rate). Запуск Extrime Mode.")
+                if self.tb.tg:
+                    asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>EXTRIME MODE!</b>\n#{pos.symbol}: Average сценарий дошел до минимума."))
+                return self.extrime_close.analyze(depth, pos, now)
 
-        interf_action = self.interference.analyze(depth, pos)
+        # Вызываем Интерференцию параллельно (передаем now для учета stab_ttl)
+        interf_action = self.interference.analyze(depth, pos, now)
+        
+        # Если сработала скупка - отдаем Экзекьютору (он не перекроет Average на следующем тике,
+        # так как это разные стороны стакана)
         if interf_action:
             return interf_action
+
+        # Если сработал Average (Сдвиг или Выстрел ТП)
+        if avg_action:
+            return avg_action
 
         return None

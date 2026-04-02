@@ -11,28 +11,28 @@ import json
 import random
 import time
 from dataclasses import dataclass
-from typing import Awaitable, Callable, Dict, Iterable, List, Optional
+from typing import Awaitable, Callable, Dict, Iterable, List, Optional, Tuple
 
 import aiohttp
 from c_log import UnifiedLogger
 
 logger = UnifiedLogger("api")
 
-# PriceLevel = Tuple[float, float]  # (price, qty)
-
-# @dataclass(frozen=True)
-# class DepthTop:
-#     symbol: str
-#     bids: List[PriceLevel]
-#     asks: List[PriceLevel]
-#     event_time_ms: int
+PriceLevel = Tuple[float, float]  # (price, qty)
 
 @dataclass(frozen=True)
 class DepthTop:
     symbol: str
-    bids: Dict[float, float]  # Теперь словари для скорости
-    asks: Dict[float, float]
+    bids: List[PriceLevel]
+    asks: List[PriceLevel]
     event_time_ms: int
+
+# @dataclass(frozen=True)
+# class DepthTop:
+#     symbol: str
+#     bids: Dict[float, float]  # Теперь словари для скорости
+#     asks: Dict[float, float]
+#     event_time_ms: int
 
 class PhemexStakanStream:
     WS_URL = "wss://ws.phemex.com"
@@ -127,10 +127,10 @@ class PhemexStakanStream:
             if q <= 0: book.pop(p, None)
             else: book[p] = q
 
-    # def _top_n(self, bids: Dict[float, float], asks: Dict[float, float]) -> Tuple[List[PriceLevel], List[PriceLevel]]:
-    #     b = sorted(bids.items(), key=lambda x: x[0], reverse=True)[: self.depth]
-    #     a = sorted(asks.items(), key=lambda x: x[0])[: self.depth]
-    #     return ([(p, q) for p, q in b], [(p, q) for p, q in a])
+    def _top_n(self, bids: Dict[float, float], asks: Dict[float, float]) -> Tuple[List[PriceLevel], List[PriceLevel]]:
+        b = sorted(bids.items(), key=lambda x: x[0], reverse=True)[: self.depth]
+        a = sorted(asks.items(), key=lambda x: x[0])[: self.depth]
+        return ([(p, q) for p, q in b], [(p, q) for p, q in a])
 
     def _parse_book_msg(self, payload: Dict) -> Optional[DepthTop]:
         if not isinstance(payload, dict): return None
@@ -149,13 +149,13 @@ class PhemexStakanStream:
 
         self._apply_side(bids, ob.get("bids") or [])
         self._apply_side(asks, ob.get("asks") or [])
-        # top_b, top_a = self._top_n(bids, asks)
+        top_b, top_a = self._top_n(bids, asks)
 
         ts = payload.get("timestamp")
         ts_i = self._to_int(ts, int(time.time() * 1000))
         event_ms = ts_i // 1_000_000 if ts_i > 1_000_000_000_000 else ts_i
 
-        return DepthTop(symbol=sym_u, bids=bids.copy(), asks=asks.copy(), event_time_ms=int(event_ms))
+        return DepthTop(symbol=sym_u, bids=top_b, asks=top_a, event_time_ms=int(event_ms))
 
     async def _run_chunk(self, symbols: List[str], on_depth: Callable[[DepthTop], Awaitable[None]]) -> None:
         backoff = self.reconnect_min_sec

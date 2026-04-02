@@ -61,14 +61,22 @@ class PhemexPrivateClient:
         logger.error(f"API Request Failed ({method} {path}): {last_err}")
         raise RuntimeError(f"Private API request failed: {last_err}")
     
-    async def set_margin_mode(self, symbol: str, margin_mode: int, leverage: float) -> Dict[str, Any]:
+    async def set_margin_mode(self, symbol: str, margin_mode: int, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
         """
         Переключение режима маржи:
         targetMarginMode: 1 = Isolated, 2 = Cross
-        (Phemex требует передавать buy/sell leverage при смене режима)
         """
-        lev_str = float_to_str(leverage)
-        query_no_q = f"buyLeverageRr={lev_str}&sellLeverageRr={lev_str}&symbol={symbol}&targetMarginMode={margin_mode}"
+        if int(margin_mode) == 2:
+            # Для Кросс-маржи плечи передавать нельзя - сервер их выкинет -> 401 Miss Signature
+            query_no_q = f"symbol={symbol}&targetMarginMode={margin_mode}"
+        else:
+            # Для Изолированной маржи плечи обязательны (алфавитный порядок ключей сохранен)
+            lev_str = float_to_str(leverage)
+            if mode == "hedged":
+                query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}&targetMarginMode={margin_mode}"
+            else:
+                query_no_q = f"buyLeverageRr={lev_str}&sellLeverageRr={lev_str}&symbol={symbol}&targetMarginMode={margin_mode}"
+                
         return await self._request("PUT", "/g-positions/switch-isolated", query_no_q=query_no_q)
 
     async def set_leverage(self, symbol: str, pos_side: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
