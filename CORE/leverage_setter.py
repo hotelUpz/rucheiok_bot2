@@ -39,9 +39,12 @@ class GlobalLeverageSetter:
         self.use_cache = use_cache
         self.cache_path = Path(cache_path)
         self.delay_sec = delay_sec
+        
+        # Хардкодим биржевой режим аккаунта, так как бот использует posSide
+        self.api_pos_mode = "hedged"
 
     def _load_cache(self) -> Dict[str, Any]:
-        """Считываем словарь кэша плечей."""
+        """Считываем словарь кэша плечей. Если use_cache=False, возвращаем пустой словарь для пересборки."""
         if not self.use_cache or not self.cache_path.exists():
             return {}
         try:
@@ -52,9 +55,7 @@ class GlobalLeverageSetter:
             return {}
 
     def _save_cache(self, data: Dict[str, Any]) -> None:
-        """Сохраняем финальный словарь на диск."""
-        if not self.use_cache:
-            return
+        """Сохраняем финальный словарь на диск ВСЕГДА (создаем/обновляем слепок)."""
         try:
             with open(self.cache_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
@@ -62,40 +63,52 @@ class GlobalLeverageSetter:
             logger.error(f"Ошибка записи {self.cache_path.name}: {e}")
 
     async def _apply_setup_with_fallback(self, client: PhemexPrivateClient, sym: str, target_lev: float, max_lev: float) -> float | None:
-        """
-        Вспомогательный метод: пробует установить плечо. 
-        При превышении лимита монеты — ставит максимально возможное.
-        """
+        safe_target_lev = target_lev
+        
+        # Предварительная защита: если мы изначально знаем, что просим больше лимита
+        if target_lev > max_lev:
+            logger.warning(f"[{sym}] Запрошено {target_lev}x, но лимит {max_lev}x. Сразу применяем фолбэк...")
+            safe_target_lev = max(1, int(max_lev))  # Принудительно целое число
+
         try:
-            # Просто устанавливаем плечо. Phemex автоматически включит Isolated режим.
-            await client.set_leverage(sym, "Merged", target_lev, mode="hedged")
-            logger.debug(f"[{sym}] Успешно: Lev={target_lev}x (Isolated)")
-            return target_lev
+            if self.margin_mode == 2:
+                # Включаем CROSS маржу
+                await client.set_margin_mode(sym, 2, safe_target_lev, mode=self.api_pos_mode)
+                logger.debug(f"[{sym}] Успешно: Lev={safe_target_lev}x (CROSS Margin)")
+            else:
+                # Включаем ISOLATED маржу (Phemex сам включает Isolated при смене плеча)
+                await client.set_leverage(sym, "Merged", safe_target_lev, mode=self.api_pos_mode)
+                logger.debug(f"[{sym}] Успешно: Lev={safe_target_lev}x (ISOLATED Margin)")
+            return safe_target_lev
 
         except Exception as e:
             err_msg = str(e).lower()
-            
-            # Кейс А: Параметры уже стоят
             if "has no change" in err_msg or "same" in err_msg:
-                return target_lev
+                return safe_target_lev
             
-            # Кейс Б: Детерминация превышения плеча (Ошибка 11088 или текст)
-            is_out_of_range = (
-                "leverage" in err_msg and ("exceed" in err_msg or "range" in err_msg or "max" in err_msg)
-            ) or "11088" in err_msg or target_lev > max_lev
+            # Если мы уже на фолбэке, и он упал - выходим
+            if safe_target_lev == max(1, int(max_lev)):
+                logger.error(f"[{sym}] Ошибка настройки (лимит исчерпан): {err_msg[:100]}")
+                return None
 
-            if is_out_of_range:
-                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено (лимит). Фолбэк на {max_lev}x...")
+            # Пробуем фолбэк, если ошибка связана с плечом
+            is_out_of_range = "leverage" in err_msg and ("exceed" in err_msg or "range" in err_msg or "max" in err_msg or "20003" in err_msg)
+            
+            if is_out_of_range or "11088" in err_msg:
+                fallback_lev = max(1, int(max_lev))
+                logger.warning(f"[{sym}] Плечо {target_lev}x отклонено. Фолбэк на {fallback_lev}x...")
                 try:
-                    await client.set_leverage(sym, "Merged", max_lev, mode="hedged")
-                    return max_lev
+                    if self.margin_mode == 2:
+                        await client.set_margin_mode(sym, 2, fallback_lev, mode=self.api_pos_mode)
+                    else:
+                        await client.set_leverage(sym, "Merged", fallback_lev, mode=self.api_pos_mode)
+                    return fallback_lev
                 except Exception as fb_e:
                     if "has no change" in str(fb_e).lower() or "same" in str(fb_e).lower():
-                        return max_lev
+                        return fallback_lev
                     logger.error(f"[{sym}] Критическая ошибка Fallback: {fb_e}")
                     return None
             
-            # Кейс В: Прочие ошибки (Signature, Network и т.д.)
             logger.error(f"[{sym}] Ошибка настройки: {err_msg[:100]}")
             return None
 
@@ -120,32 +133,26 @@ class GlobalLeverageSetter:
 
         async with aiohttp.ClientSession() as session:
             client = PhemexPrivateClient(self.api_key, self.api_secret, session, retries=1)
-            
             success_count = 0
             skipped_count = 0
             
             for spec in symbols_info:
                 sym = spec.symbol
 
-                # Условие 1: leverage_val == None -> Полный скип установки
                 if self.leverage_val is None:
                     skipped_count += 1
                     continue
 
-                # Условие 2: Черный список -> Скип
                 if sym in self.black_list:
                     skipped_count += 1
                     continue
 
-                # Условие 3: Кэш (если включен) -> Скип
                 if self.use_cache and sym in current_cache:
                     skipped_count += 1
                     continue
 
-                # Выполняем установку с логикой фолбэка
                 res_lev = await self._apply_setup_with_fallback(client, sym, self.leverage_val, spec.max_leverage)
                 
-                # Сохраняем результат (даже если None - для фиксации фейла в текущей сессии)
                 new_cache[sym] = res_lev
                 if res_lev is not None:
                     success_count += 1

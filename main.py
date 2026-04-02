@@ -74,23 +74,27 @@ async def _main():
             delay_sec = leverage_cfg.get("delay_sec", 0.3)
         else:
             raise TypeError(f"Expected dict for leverage_cfg, got {type(leverage_cfg).__name__}")
-            
-        # 1. Запуск глобальной конфигурации
-        logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
-        setter = GlobalLeverageSetter(
-            api_key=api_key,
-            api_secret=api_secret,
-            leverage_val=leverage_val,
-            margin_mode=margin_mode,
-            black_list=bot.black_list,
-            use_cache=use_cache,
-            cache_path=CACHE_PATH,
-            delay_sec=delay_sec
-        )
-        await setter.apply()
+        
+        if leverage_val:
+            # 1. Запуск глобальной конфигурации
+            logger.info("⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...")
+            setter = GlobalLeverageSetter(
+                api_key=api_key,
+                api_secret=api_secret,
+                leverage_val=leverage_val,
+                margin_mode=margin_mode,
+                black_list=bot.black_list,
+                use_cache=use_cache,
+                cache_path=CACHE_PATH,
+                delay_sec=delay_sec
+            )
+            await setter.apply()
 
-        print("lev set succ")
-        return
+            print("lev set succ")
+            # return
+        
+        else:
+            logger.info("⚙️ Скип установки (Leverage & Margin), так как leverage_val == None")
 
         # 2. Инициализация TG и Торговли
         if tg_enabled:
