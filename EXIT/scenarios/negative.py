@@ -21,7 +21,7 @@ class NegativeScenario:
         time_in_pos = now - pos.opened_at
         if time_in_pos < self.stab_neg: return None
 
-        # Идемпотентно юзаем хелпер
+        # --- ВМЕСТО РУЧНОГО ПОЛУЧЕНИЯ ЦЕН И РАСЧЕТА СПРЕДА ---
         is_negative = check_is_negative(pos, depth, self.negative_spread_pct)
 
         if is_negative:
