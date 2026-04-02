@@ -281,10 +281,11 @@ class PrivateWSHandler:
             pos: ActivePosition = self.tb.state.active_positions[pos_key]
 
             if real_size == 0:
-                close_price: float = external_fills.get(pos_key) or self.tb.phemex_prices.get(sym, pos.current_close_price)
-                if close_price <= 0: close_price = pos.entry_price
-                logger.warning(f"⚠️ [{pos_key}] ВНЕШНЕЕ ЗАКРЫТИЕ! Сторона {side_ws} обнулилась.")
-                await self._finalize_external_close(sym, pos_key, pos, close_price)
+                if pos.qty > 0:  # <--- КРИТИЧЕСКАЯ ЗАЩИТА
+                    close_price: float = external_fills.get(pos_key) or self.tb.price_manager.get_prices(sym)[1]
+                    if close_price <= 0: close_price = pos.entry_price
+                    logger.warning(f"⚠️ [{pos_key}] ВНЕШНЕЕ ЗАКРЫТИЕ! Сторона {side_ws} обнулилась.")
+                    await self._finalize_external_close(sym, pos_key, pos, close_price)
             elif pos.qty != real_size and pos_key not in self.tb.state.pending_entry_orders:
                 logger.debug(f"🔄 [{pos_key}] Объем синхронизирован: Было {pos.qty} -> Стало {real_size}")
                 pos.qty = real_size
