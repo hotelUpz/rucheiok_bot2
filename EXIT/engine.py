@@ -61,19 +61,13 @@ class ExitEngine:
                 pos.in_breakeven_mode = True
                 pos.breakeven_start_ts = now
                 pos.current_target_rate = 0.0
-
                 target_price = ttl_action.get("price")
                 if not target_price or target_price <= 0:
                     target_price = self.ttl_close.build_target_price(pos)
 
                 logger.warning(f"[EXIT] TTL позиции истек. Перевод цели в TTL-target.")
                 if self.tb.tg:
-                    asyncio.create_task(
-                        self.tb.tg.send_message(
-                            f"⌛ <b>БУ РЕЖИМ</b>\n#{pos.symbol}: Истек TTL, цель переведена в TTL-target."
-                        )
-                    )
-
+                    asyncio.create_task(self.tb.tg.send_message(f"⌛ <b>БУ РЕЖИМ</b>\n#{pos.symbol}: Истек TTL, цель переведена в TTL-target."))
                 return {"action": "UPDATE_TARGET", "price": target_price, "reason": "TTL_BREAKEVEN"}
 
             if ttl_action["action"] == "TRIGGER_EXTRIME":
@@ -84,6 +78,23 @@ class ExitEngine:
                     asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>EXTRIME MODE!</b>\n#{pos.symbol}: Лимитка БУ не сработала!"))
                 return self.extrime_close.analyze(depth, pos, now)
 
+        # 1. ПЕРВЫМ ИДЕТ СРЕДНИЙ (т.к. он может обнулить таймер негатива)
+        avg_action = None
+        if self.average.enable:
+            avg_action = self.average.analyze(depth, pos, now)
+            if avg_action:
+                if avg_action["action"] == "TRIGGER_EXTRIME":
+                    pos.in_extrime_mode = True
+                    logger.warning(f"[EXIT] Сценарий Average исчерпал лимиты (min target rate). Запуск Extrime Mode.")
+                    if self.tb.tg:
+                        asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>EXTRIME MODE!</b>\n#{pos.symbol}: Average дошел до минимума."))
+                    return self.extrime_close.analyze(depth, pos, now)
+                
+                # Если произошел Шифт - сразу возвращаем запрос на отмену ордера
+                if avg_action["action"] == "CANCEL_CLOSE":
+                    return avg_action
+
+        # 2. ПОТОМ НЕГАТИВНЫЙ (после того как Average мог дать подышать)
         neg_action = self.negative.analyze(depth, pos, now)
         if neg_action and neg_action["action"] == "TRIGGER_EXTRIME":
             pos.in_extrime_mode = True
@@ -91,27 +102,13 @@ class ExitEngine:
             if self.tb.tg:
                 asyncio.create_task(self.tb.tg.send_message(f"⚠️ <b>ВНИМАНИЕ!</b>\nСработал НЕГАТИВНЫЙ сценарий по #{pos.symbol}."))
             return self.extrime_close.analyze(depth, pos, now)
-        
-        # Уважаем флаг average.enable
-        avg_action = None
-        if self.average.enable:
-            avg_action = self.average.analyze(depth, pos, now)
-            if avg_action and avg_action["action"] == "TRIGGER_EXTRIME":
-                pos.in_extrime_mode = True
-                logger.warning(f"[EXIT] Сценарий Average исчерпал лимиты (min target rate). Запуск Extrime Mode.")
-                if self.tb.tg:
-                    asyncio.create_task(self.tb.tg.send_message(f"🆘 <b>EXTRIME MODE!</b>\n#{pos.symbol}: Average сценарий дошел до минимума."))
-                return self.extrime_close.analyze(depth, pos, now)
 
-        # Вызываем Интерференцию параллельно (передаем now для учета stab_ttl)
+        # 3. ПАРАЛЛЕЛЬНО ИНТЕРФЕРЕНЦИЯ (перебивает обычный хантинг)
         interf_action = self.interference.analyze(depth, pos, now)
-        
-        # Если сработала скупка - отдаем Экзекьютору (он не перекроет Average на следующем тике,
-        # так как это разные стороны стакана)
         if interf_action:
             return interf_action
 
-        # Если сработал Average (Сдвиг или Выстрел ТП)
+        # 4. ВОЗВРАТ ХАНТИНГА
         if avg_action:
             return avg_action
 

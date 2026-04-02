@@ -172,9 +172,26 @@ class PrivateWSHandler:
         if pos.close_order_id != order_id:
             return 
 
+        # if status == "PartiallyFilled":
+        #     if cum_qty > 0: 
+        #         asyncio.create_task(self._cancel_remainder(symbol, pos_key, order_id, pos_side, pos, "close_cancel_requested", "ВЫХОД"))
+        #     return
+
         if status == "PartiallyFilled":
             if cum_qty > 0: 
-                asyncio.create_task(self._cancel_remainder(symbol, pos_key, order_id, pos_side, pos, "close_cancel_requested", "ВЫХОД"))
+                async def _delayed_cancel():
+                    # Вычисляем, сколько еще осталось от hunting_timeout_sec
+                    wait_time = pos.hunting_active_until - time.time()
+                    if wait_time > 0:
+                        await asyncio.sleep(wait_time)
+                    
+                    # Просыпаемся и проверяем: актуален ли еще этот ордер?
+                    # Если за время сна его налили полностью (qty <= 0) 
+                    # или уже отменили, то ничего не делаем.
+                    if pos.close_order_id == order_id and pos.qty > 0 and not pos.close_cancel_requested:
+                        await self._cancel_remainder(symbol, pos_key, order_id, pos_side, pos, "close_cancel_requested", "ВЫХОД")
+                
+                asyncio.create_task(_delayed_cancel())
             return
 
         if status in ("Canceled", "Rejected", "Deactivated"):

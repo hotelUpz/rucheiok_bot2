@@ -23,6 +23,7 @@ class OrderExecutor:
     def __init__(self, tb: 'TradingBot') -> None:
         self.tb = tb
         self.locks: Dict[str, asyncio.Lock] = {}
+        self.hunting_timeout_sec = float(self.tb.cfg.get("exit", {}).get("hunting_timeout_sec", 1.0))
 
     def get_lock(self, pos_key: str) -> asyncio.Lock:
         if pos_key not in self.locks:
@@ -109,8 +110,7 @@ class OrderExecutor:
                 # ⏱ ВЗВОД ТАЙМЕРА ОХОТЫ
                 # Устанавливаем флаг "Охоты" (заморозки пересмотра цели) ДО сетевого запроса, 
                 # чтобы WS-поток не обогнал REST-ответ.
-                hunting_timeout: float = float(self.tb.cfg.get("exit", {}).get("hunting_timeout_sec", 1.0))
-                pos.hunting_active_until = time.time() + hunting_timeout
+                pos.hunting_active_until = time.time() + self.hunting_timeout_sec
 
                 try:
                     resp: Dict[str, Any] = await self.tb.private_client.place_limit_order(
@@ -124,7 +124,7 @@ class OrderExecutor:
                         pos.close_cancel_requested = False
                         
                         reason: str = action.get("reason", "")
-                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {hunting_timeout}с")
+                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {self.hunting_timeout}с")
                         await self.tb.state.save()
                     else:
                         # Тихий отказ (не вернулся ID) - снимаем блок
