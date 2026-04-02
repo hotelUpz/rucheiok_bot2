@@ -36,6 +36,7 @@
     "quota_asset": "USDT",
     "risk": {
         "leverage": {
+            "set_previous": true,
             "used_by_cache": false,
             "val": 21,
             "delay_sec": 0.3,
