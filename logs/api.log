@@ -1,16 +1,113 @@
-2026-04-02 23:58:22 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-02 23:58:22 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-02 23:58:23 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-02 23:58:23 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-02 23:58:24 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-02 23:58:25 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-02 23:58:25 | ERROR | api | API Request Failed (PUT /g-positions/switch-isolated): HTTP 401: {"code": "401","msg": "401 Miss Signature."}
-2026-04-03 00:03:44 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:44 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:45 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:45 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:46 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:46 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:47 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:47 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
-2026-04-03 00:03:48 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [39108]: please check leverage format.
+2026-04-03 01:17:58 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:17:58 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:17:59 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:17:59 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:00 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:00 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:01 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:01 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:02 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:02 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:03 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:03 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:04 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:04 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:18:05 | ERROR | api | API Request Failed (PUT /g-positions/leverage): Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 31 монет.
+2026-04-03 01:30:58 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:30:58 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-03 01:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 31 монет.
+2026-04-03 01:31:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:08 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-03 01:31:09 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:09 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:09 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-03 01:31:15 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 31 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:15 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-03 01:31:16 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:16 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 01:31:16 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 31 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:36:02 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-03 02:36:02 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-03 02:36:03 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-03 02:36:03 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:44 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-03 02:40:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 31 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-03 02:40:45 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:40:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:54:16 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-03 02:54:16 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-03 02:56:30 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 31 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-03 02:56:30 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-03 02:56:30 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-03 02:56:30 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.

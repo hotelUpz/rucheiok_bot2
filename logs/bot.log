@@ -1,12 +1,348 @@
-2026-04-02 23:58:21 | INFO | bot | ⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...
-2026-04-02 23:58:25 | WARNING | bot | 
+2026-04-03 01:17:27 | INFO | bot | ⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...
+2026-04-03 01:17:32 | WARNING | bot | 
 🛑 Получен сигнал прерывания. Остановка...
-2026-04-02 23:58:25 | INFO | bot | 🧹 Очистка ресурсов...
-2026-04-02 23:58:25 | INFO | bot | 💾 Финальное сохранение стейта на диск...
-2026-04-02 23:58:26 | INFO | bot | ✅ Программа безопасно завершена.
-2026-04-03 00:03:44 | INFO | bot | ⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...
-2026-04-03 00:03:48 | WARNING | bot | 
+2026-04-03 01:17:32 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-03 01:17:32 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-03 01:17:33 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-03 01:17:52 | INFO | bot | ⚙️ Запуск глобальной конфигурации параметров (Leverage & Margin)...
+2026-04-03 01:18:09 | WARNING | bot | 
 🛑 Получен сигнал прерывания. Остановка...
-2026-04-03 00:03:48 | INFO | bot | 🧹 Очистка ресурсов...
-2026-04-03 00:03:48 | INFO | bot | 💾 Финальное сохранение стейта на диск...
-2026-04-03 00:03:49 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-03 01:18:09 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-03 01:18:09 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-03 01:18:09 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-03 01:30:35 | INFO | bot | ⚙️ Скип установки (Leverage & Margin), так как set_previous == false
+2026-04-03 01:30:36 | INFO | bot | 🤖 Запуск супервизора Telegram...
+2026-04-03 01:30:53 | INFO | bot | ▶️ Запуск торговых процессов...
+2026-04-03 01:30:53 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>{'set_previous': False, 'used_by_cache': False, 'val': 22, 'delay_sec': 0.3, 'margin_mode': 2}x</b> | Margin Mode: <b>None</b>
+Margin Size: <b>row</b> | Notional Limit: <b>800 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>2s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.2%</b>
+Sprd 3 row: &gt;= <b>0.25%</b>
+H/B rate: <b>6</b> | Max B/A dist: <b>0.5</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.15%</b> | TTL: <b>2s</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>0.7</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-04-03 01:30:55 | INFO | bot | 🔄 Прогрев кэша цен (Binance/Phemex)...
+2026-04-03 01:30:57 | INFO | bot | ⏱ Чекер фандинга запущен. Обновление каждые: 60с, Порог: 1.0%, Скип за: 1800с.
+2026-04-03 01:31:03 | INFO | bot | ⏹ Остановка процессов...
+2026-04-03 01:31:05 | INFO | bot | ▶️ Запуск торговых процессов...
+2026-04-03 01:31:05 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>{'set_previous': False, 'used_by_cache': False, 'val': 22, 'delay_sec': 0.3, 'margin_mode': 2}x</b> | Margin Mode: <b>None</b>
+Margin Size: <b>row</b> | Notional Limit: <b>800 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>2s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.2%</b>
+Sprd 3 row: &gt;= <b>0.25%</b>
+H/B rate: <b>6</b> | Max B/A dist: <b>0.5</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.15%</b> | TTL: <b>2s</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>0.7</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-04-03 01:31:07 | INFO | bot | 🔄 Прогрев кэша цен (Binance/Phemex)...
+2026-04-03 01:31:08 | INFO | bot | ⏱ Чекер фандинга запущен. Обновление каждые: 60с, Порог: 1.0%, Скип за: 1800с.
+2026-04-03 01:31:09 | INFO | bot | ⏹ Остановка процессов...
+2026-04-03 01:31:12 | INFO | bot | ▶️ Запуск торговых процессов...
+2026-04-03 01:31:12 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>{'set_previous': False, 'used_by_cache': False, 'val': 22, 'delay_sec': 0.3, 'margin_mode': 2}x</b> | Margin Mode: <b>None</b>
+Margin Size: <b>row</b> | Notional Limit: <b>800 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>2s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.2%</b>
+Sprd 3 row: &gt;= <b>0.25%</b>
+H/B rate: <b>6</b> | Max B/A dist: <b>0.5</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.15%</b> | TTL: <b>2s</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>0.7</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-04-03 01:31:14 | INFO | bot | 🔄 Прогрев кэша цен (Binance/Phemex)...
+2026-04-03 01:31:15 | INFO | bot | ⏱ Чекер фандинга запущен. Обновление каждые: 60с, Порог: 1.0%, Скип за: 1800с.
+2026-04-03 02:30:13 | INFO | bot | 💸 Фандинг-блок! Под запретом 3 монет: NOMUSDT, STOUSDT, SYNUSDT...
+2026-04-03 02:35:26 | INFO | bot | Stopping TG supervisor...
+2026-04-03 02:35:26 | WARNING | bot | 
+🛑 Получен сигнал прерывания. Остановка...
+2026-04-03 02:35:26 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-03 02:35:26 | INFO | bot | ⏹ Остановка процессов...
+2026-04-03 02:35:26 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-03 02:35:26 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-03 02:35:52 | INFO | bot | ⚙️ Скип установки (Leverage & Margin), так как set_previous == false
+2026-04-03 02:35:53 | INFO | bot | 🤖 Запуск супервизора Telegram...
+2026-04-03 02:36:00 | INFO | bot | ▶️ Запуск торговых процессов...
+2026-04-03 02:36:00 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>{'set_previous': False, 'used_by_cache': False, 'val': 22, 'delay_sec': 0.3, 'margin_mode': 2}x</b> | Margin Mode: <b>None</b>
+Margin Size: <b>row</b> | Notional Limit: <b>50 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>2s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.2%</b>
+Sprd 3 row: &gt;= <b>0.25%</b>
+H/B rate: <b>6</b> | Max B/A dist: <b>0.5</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.15%</b> | TTL: <b>2s</b>
+Funding: <b>False</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>0.7</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-04-03 02:36:01 | INFO | bot | 🔄 Прогрев кэша цен (Binance/Phemex)...
+2026-04-03 02:38:29 | INFO | bot | Stopping TG supervisor...
+2026-04-03 02:38:29 | WARNING | bot | 
+🛑 Получен сигнал прерывания. Остановка...
+2026-04-03 02:38:29 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-03 02:38:29 | INFO | bot | ⏹ Остановка процессов...
+2026-04-03 02:38:29 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-03 02:38:30 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-03 02:40:23 | INFO | bot | ⚙️ Скип установки (Leverage & Margin), так как set_previous == false
+2026-04-03 02:40:24 | INFO | bot | 🤖 Запуск супервизора Telegram...
+2026-04-03 02:40:42 | INFO | bot | ▶️ Запуск торговых процессов...
+2026-04-03 02:40:42 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>{'set_previous': False, 'used_by_cache': False, 'val': 22, 'delay_sec': 0.3, 'margin_mode': 2}x</b> | Margin Mode: <b>None</b>
+Margin Size: <b>row</b> | Notional Limit: <b>50 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>0s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.1%</b>
+Sprd 3 row: &gt;= <b>0.15%</b>
+H/B rate: <b>3</b> | Max B/A dist: <b>0.75</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.1%</b> | TTL: <b>0s</b>
+Funding: <b>False</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>1.0</b> -&gt; Min: <b>0.3</b> | Shift: <b>-0.2</b> / 60s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>60s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>600s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+2.5%</b> | Orient: <b>0.0</b>
+2026-04-03 02:40:43 | INFO | bot | 🔄 Прогрев кэша цен (Binance/Phemex)...
+2026-04-03 02:40:49 | INFO | bot | 🚀 [NIGHTUSDT_LONG] ОТКРЫТЬ ЛОНГ ОТПРАВЛЕН: по 0.04537 (Плановый объем: 1102.0498126515317)
+2026-04-03 02:40:49 | DEBUG | bot | 📝 [WS ORD] NIGHTUSDT_LONG | ID: e92c4f5c... | Status: Filled | execQty: 1102.04 | cumQty: 1102.04
+2026-04-03 02:40:49 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ЛОНГ] NIGHTUSDT_LONG. Статус: Filled, Налито: 1102.04
+2026-04-03 02:40:49 | INFO | bot | ✅ [NIGHTUSDT_LONG] Вход исполнен полностью. Объем: 1102.04
+2026-04-03 02:42:18 | DEBUG | bot | 📝 [WS ORD] NIGHTUSDT_LONG | ID: cf0b2363... | Status: Filled | execQty: 1102.04 | cumQty: 1102.04
+2026-04-03 02:42:18 | DEBUG | bot | [NIGHTUSDT_LONG] Учет исполнения: -1102.04. Остаток: 0.0
+2026-04-03 02:42:18 | INFO | bot | ✅ [NIGHTUSDT_LONG] ЗАКРЫТИЕ ЛОНГА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 02:42:18 | WARNING | bot | 🚨 КАРАНТИН #NIGHTUSDT: Навсегда (BlackList) (Failures: 1)
+2026-04-03 02:42:18 | INFO | bot | ✅ Цикл #NIGHTUSDT_LONG завершен. Сторона свободна.
+2026-04-03 02:43:15 | INFO | bot | 🚀 [EIGENUSDT_SHORT] ОТКРЫТЬ ШОРТ ОТПРАВЛЕН: по 0.1512 (Плановый объем: 330.6878306878307)
+2026-04-03 02:43:59 | DEBUG | bot | 📝 [WS ORD] EIGENUSDT_SHORT | ID: ef3336d9... | Status: Filled | execQty: 330.0 | cumQty: 330.0
+2026-04-03 02:43:59 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ШОРТ] EIGENUSDT_SHORT. Статус: Filled, Налито: 330.0
+2026-04-03 02:43:59 | INFO | bot | ✅ [EIGENUSDT_SHORT] Вход исполнен полностью. Объем: 330.0
+2026-04-03 02:45:25 | INFO | bot | ⚡ [EIGENUSDT_SHORT] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: DYNAMIC_TP_HIT | Объем: 330.0 | Цена: 0.151 | Охота: 0.5с
+2026-04-03 02:45:25 | DEBUG | bot | 📝 [WS ORD] EIGENUSDT_SHORT | ID: 5986e771... | Status: Filled | execQty: 330.0 | cumQty: 330.0
+2026-04-03 02:45:25 | DEBUG | bot | [EIGENUSDT_SHORT] Учет исполнения: -330.0. Остаток: 0.0
+2026-04-03 02:45:25 | INFO | bot | ✅ [EIGENUSDT_SHORT] ЗАКРЫТИЕ ШОРТА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 02:45:25 | INFO | bot | ✅ Цикл #EIGENUSDT_SHORT завершен. Сторона свободна.
+2026-04-03 02:45:26 | DEBUG | bot | 📝 [WS ORD] BANANAUSDT_LONG | ID: b1796115... | Status: Filled | execQty: 15.26 | cumQty: 15.26
+2026-04-03 02:45:26 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ЛОНГ] BANANAUSDT_LONG. Статус: Filled, Налито: 15.26
+2026-04-03 02:45:26 | INFO | bot | ✅ [BANANAUSDT_LONG] Вход исполнен полностью. Объем: 15.26
+2026-04-03 02:45:26 | INFO | bot | 🚀 [BANANAUSDT_LONG] ОТКРЫТЬ ЛОНГ ОТПРАВЛЕН: по 3.276 (Плановый объем: 15.262515262515263)
+2026-04-03 02:48:34 | INFO | bot | ⚡ [BANANAUSDT_LONG] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: DYNAMIC_TP_HIT | Объем: 15.26 | Цена: 3.278 | Охота: 0.5с
+2026-04-03 02:48:34 | DEBUG | bot | 📝 [WS ORD] BANANAUSDT_LONG | ID: d85e53be... | Status: Filled | execQty: 15.26 | cumQty: 15.26
+2026-04-03 02:48:34 | DEBUG | bot | [BANANAUSDT_LONG] Учет исполнения: -15.26. Остаток: 0.0
+2026-04-03 02:48:34 | INFO | bot | ✅ [BANANAUSDT_LONG] ЗАКРЫТИЕ ЛОНГА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 02:48:34 | INFO | bot | ✅ Цикл #BANANAUSDT_LONG завершен. Сторона свободна.
+2026-04-03 02:48:39 | DEBUG | bot | 📝 [WS ORD] BSBUSDT_LONG | ID: 5f749cde... | Status: Filled | execQty: 228.0 | cumQty: 228.0
+2026-04-03 02:48:39 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ЛОНГ] BSBUSDT_LONG. Статус: Filled, Налито: 228.0
+2026-04-03 02:48:39 | INFO | bot | ✅ [BSBUSDT_LONG] Вход исполнен полностью. Объем: 228.0
+2026-04-03 02:48:39 | INFO | bot | 🚀 [BSBUSDT_LONG] ОТКРЫТЬ ЛОНГ ОТПРАВЛЕН: по 0.21869 (Плановый объем: 228.6341396497325)
+2026-04-03 02:53:04 | INFO | bot | ⚡ [BSBUSDT_LONG] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: DYNAMIC_TP_HIT | Объем: 228.0 | Цена: 0.21884 | Охота: 0.5с
+2026-04-03 02:53:04 | DEBUG | bot | 📝 [WS ORD] BSBUSDT_LONG | ID: c3718e51... | Status: Filled | execQty: 228.0 | cumQty: 228.0
+2026-04-03 02:53:04 | DEBUG | bot | [BSBUSDT_LONG] Учет исполнения: -228.0. Остаток: 0.0
+2026-04-03 02:53:04 | INFO | bot | ✅ [BSBUSDT_LONG] ЗАКРЫТИЕ ЛОНГА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 02:53:04 | INFO | bot | ✅ Цикл #BSBUSDT_LONG завершен. Сторона свободна.
+2026-04-03 02:53:21 | DEBUG | bot | 📝 [WS ORD] PRLUSDT_LONG | ID: f218624f... | Status: Filled | execQty: 343.0 | cumQty: 343.0
+2026-04-03 02:53:21 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ЛОНГ] PRLUSDT_LONG. Статус: Filled, Налито: 343.0
+2026-04-03 02:53:21 | INFO | bot | ✅ [PRLUSDT_LONG] Вход исполнен полностью. Объем: 343.0
+2026-04-03 02:53:21 | INFO | bot | 🚀 [PRLUSDT_LONG] ОТКРЫТЬ ЛОНГ ОТПРАВЛЕН: по 0.1457 (Плановый объем: 343.17089910775564)
+2026-04-03 02:54:12 | DEBUG | bot | 📝 [WS ORD] PRLUSDT_LONG | ID: 28c8fa8b... | Status: PartiallyFilled | execQty: 144.0 | cumQty: 144.0
+2026-04-03 02:54:12 | DEBUG | bot | [PRLUSDT_LONG] Учет исполнения: -144.0. Остаток: 199.0
+2026-04-03 02:54:12 | DEBUG | bot | 📝 [WS ORD] PRLUSDT_LONG | ID: 28c8fa8b... | Status: Filled | execQty: 199.0 | cumQty: 343.0
+2026-04-03 02:54:12 | DEBUG | bot | [PRLUSDT_LONG] Учет исполнения: -199.0. Остаток: 0.0
+2026-04-03 02:54:12 | INFO | bot | ✅ [PRLUSDT_LONG] ЗАКРЫТИЕ ЛОНГА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 02:54:12 | WARNING | bot | 🚨 КАРАНТИН #PRLUSDT: Навсегда (BlackList) (Failures: 1)
+2026-04-03 02:54:12 | INFO | bot | ✅ Цикл #PRLUSDT_LONG завершен. Сторона свободна.
+2026-04-03 02:54:16 | ERROR | bot | [BASUSDT_LONG] ❌ Ошибка выставления открывающего ордера: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-03 02:54:16 | ERROR | bot | [BASUSDT_LONG] ❌ Ошибка выставления открывающего ордера: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-03 02:54:25 | INFO | bot | Stopping TG supervisor...
+2026-04-03 02:54:25 | WARNING | bot | 
+🛑 Получен сигнал прерывания. Остановка...
+2026-04-03 02:54:25 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-03 02:54:25 | INFO | bot | ⏹ Остановка процессов...
+2026-04-03 02:54:25 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-03 02:54:26 | INFO | bot | ✅ Программа безопасно завершена.
+2026-04-03 02:56:22 | INFO | bot | ⚙️ Скип установки (Leverage & Margin), так как set_previous == false
+2026-04-03 02:56:23 | INFO | bot | 🤖 Запуск супервизора Telegram...
+2026-04-03 02:56:27 | INFO | bot | ▶️ Запуск торговых процессов...
+2026-04-03 02:56:27 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>{'set_previous': False, 'used_by_cache': False, 'val': 22, 'delay_sec': 0.3, 'margin_mode': 2}x</b> | Margin Mode: <b>None</b>
+Margin Size: <b>row</b> | Notional Limit: <b>50 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True | Lines: 1500
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>0s</b>
+Vol Limits: <b>350 - 750 USDT</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+ROC SMA Window: <b>5</b>
+Sprd 2 row: &gt;= <b>0.1%</b>
+Sprd 3 row: &gt;= <b>0.15%</b>
+H/B rate: <b>3</b> | Max B/A dist: <b>0.75</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.1%</b> | TTL: <b>0s</b>
+Funding: <b>False</b> | Thresh: &gt;= <b>1.0%</b> | Skip before: <b>1800s</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Average:</b> True | Stab TTL: <b>0s</b>
+└ Trgt: <b>1.0</b> -&gt; Min: <b>0.7</b> | Shift: <b>-0.2</b> / 10s
+<b>Negative:</b> True | Stab TTL: <b>1.5s</b>
+└ Spread &lt;= <b>0%</b> for <b>40s</b>
+<b>Interference:</b> False | Avg Vol: <b>3%</b> | Max Vol: <b>9%</b>
+<b>TTL Close:</b> True | TTL: <b>60s</b> | Wait: <b>2s</b> | Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+└ Incr Frac: <b>+5.0%</b> | Orient: <b>0.0</b>
+2026-04-03 02:56:28 | INFO | bot | 🔄 Прогрев кэша цен (Binance/Phemex)...
+2026-04-03 02:56:31 | INFO | bot | 🚀 [BANANAUSDT_LONG] ОТКРЫТЬ ЛОНГ ОТПРАВЛЕН: по 3.287 (Плановый объем: 15.211439002129602)
+2026-04-03 02:56:31 | DEBUG | bot | 📝 [WS ORD] BANANAUSDT_LONG | ID: ed8d3a84... | Status: Filled | execQty: 15.21 | cumQty: 15.21
+2026-04-03 02:56:31 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ЛОНГ] BANANAUSDT_LONG. Статус: Filled, Налито: 15.21
+2026-04-03 02:56:31 | INFO | bot | ✅ [BANANAUSDT_LONG] Вход исполнен полностью. Объем: 15.21
+2026-04-03 02:57:24 | WARNING | bot | [EXIT] Сценарий Average исчерпал лимиты (min target rate). Запуск Extrime Mode.
+2026-04-03 02:57:24 | INFO | bot | ⚡ [BANANAUSDT_LONG] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: EXTRIME_RETRY_1 | Объем: 15.21 | Цена: 3.287 | Охота: 0.5с
+2026-04-03 02:58:19 | DEBUG | bot | 📝 [WS ORD] BANANAUSDT_LONG | ID: a6397429... | Status: Canceled | execQty: 15.21 | cumQty: 0.0
+2026-04-03 02:58:20 | INFO | bot | ⚡ [BANANAUSDT_LONG] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: EXTRIME_RETRY_4 | Объем: 15.21 | Цена: 3.284 | Охота: 0.5с
+2026-04-03 03:00:00 | DEBUG | bot | 📝 [WS ORD] BANANAUSDT_LONG | ID: e7ad3259... | Status: Created | execQty: 15.21 | cumQty: 0.0
+2026-04-03 03:00:05 | DEBUG | bot | 📝 [WS ORD] BANANAUSDT_LONG | ID: 61319d7f... | Status: Filled | execQty: 15.21 | cumQty: 15.21
+2026-04-03 03:00:05 | DEBUG | bot | [BANANAUSDT_LONG] Учет исполнения: -15.21. Остаток: 0.0
+2026-04-03 03:00:05 | INFO | bot | ✅ [BANANAUSDT_LONG] ЗАКРЫТИЕ ЛОНГА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 03:00:05 | WARNING | bot | 🚨 КАРАНТИН #BANANAUSDT: Навсегда (BlackList) (Failures: 1)
+2026-04-03 03:00:05 | INFO | bot | ✅ Цикл #BANANAUSDT_LONG завершен. Сторона свободна.
+2026-04-03 03:00:10 | INFO | bot | 🚀 [GMTUSDT_LONG] ОТКРЫТЬ ЛОНГ ОТПРАВЛЕН: по 0.00975 (Плановый объем: 5128.205128205128)
+2026-04-03 03:00:10 | DEBUG | bot | 📝 [WS ORD] GMTUSDT_LONG | ID: 33253271... | Status: Filled | execQty: 5128.0 | cumQty: 5128.0
+2026-04-03 03:00:10 | INFO | bot | 🟢 [ВХОД: ОТКРЫТЬ ЛОНГ] GMTUSDT_LONG. Статус: Filled, Налито: 5128.0
+2026-04-03 03:00:10 | INFO | bot | ✅ [GMTUSDT_LONG] Вход исполнен полностью. Объем: 5128.0
+2026-04-03 03:00:34 | DEBUG | bot | 📝 [WS ORD] GMTUSDT_LONG | ID: 52cf4120... | Status: Filled | execQty: 5128.0 | cumQty: 5128.0
+2026-04-03 03:00:34 | DEBUG | bot | [GMTUSDT_LONG] Учет исполнения: -5128.0. Остаток: 0.0
+2026-04-03 03:00:34 | INFO | bot | ✅ [GMTUSDT_LONG] ЗАКРЫТИЕ ЛОНГА ПОЛНОСТЬЮ ЗАВЕРШЕНО.
+2026-04-03 03:00:34 | WARNING | bot | 🚨 КАРАНТИН #GMTUSDT: Навсегда (BlackList) (Failures: 1)
+2026-04-03 03:00:34 | INFO | bot | ✅ Цикл #GMTUSDT_LONG завершен. Сторона свободна.
+2026-04-03 03:00:38 | INFO | bot | Stopping TG supervisor...
+2026-04-03 03:00:38 | WARNING | bot | 
+🛑 Получен сигнал прерывания. Остановка...
+2026-04-03 03:00:38 | INFO | bot | 🧹 Очистка ресурсов...
+2026-04-03 03:00:38 | INFO | bot | ⏹ Остановка процессов...
+2026-04-03 03:00:38 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-03 03:00:39 | INFO | bot | ✅ Программа безопасно завершена.

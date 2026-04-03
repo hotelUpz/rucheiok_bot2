@@ -36,14 +36,14 @@
     "quota_asset": "USDT",
     "risk": {
         "leverage": {
-            "set_previous": true,
+            "set_previous": false,
             "used_by_cache": false,
             "val": 22,
             "delay_sec": 0.3,
             "margin_mode": 2
         },
         "margin_size": "row",
-        "notional_limit": 800,
+        "notional_limit": 50,
         "margin_over_size_pct": 1,
         "hedge_mode": false,
         "quarantine": {
@@ -67,21 +67,21 @@
                     "roc_sma_window": 5
                 },
                 "bottom": {
-                    "min_spread_between_two_row_pct": 0.2,
-                    "min_spread_between_three_row_pct": 0.25
+                    "min_spread_between_two_row_pct": 0.1,
+                    "min_spread_between_three_row_pct": 0.15
                 },
-                "header_to_bottom_desired_rate": 6,
-                "max_bid_ask_distance_rate": 0.5,
-                "pattern_ttl_sec": 2
+                "header_to_bottom_desired_rate": 3,
+                "max_bid_ask_distance_rate": 0.75,
+                "pattern_ttl_sec": 0
             },
             "binance": {
                 "enable": true,
-                "min_price_spread_pct": 0.15,
+                "min_price_spread_pct": 0.1,
                 "update_prices_sec": 1.1,
-                "spread_ttl_sec": 2
+                "spread_ttl_sec": 0
             },
             "phemex_funding_filter": {
-                "enable": true,
+                "enable": false,
                 "check_interval_sec": 60,
                 "skip_before_counter_sec": 1800,
                 "funding_threshold_pct": 1.0
@@ -94,16 +94,16 @@
             "average": {
                 "enable": true,
                 "stabilization_ttl": 0,
-                "target_rate": 0.7,
+                "target_rate": 1.0,
                 "shift_demotion": 0.2,
-                "min_target_rate": 0.3,
-                "shift_ttl": 60
+                "min_target_rate": 0.7,
+                "shift_ttl": 10
             },
             "negative": {
                 "enable": true,
                 "stabilization_ttl": 1.5,
                 "negative_spread_pct": 0,
-                "negative_ttl": 60
+                "negative_ttl": 40
             }
         },
         "interference": {
@@ -114,7 +114,7 @@
         },
         "position_ttl_close": {
             "enable": true,
-            "position_ttl": 600,
+            "position_ttl": 60,
             "breakeven_wait_sec": 2,
             "to_entry_orientation": 0.0
         },
@@ -123,7 +123,7 @@
             "retry_ttl": 3,
             "retry_num": "inf",
             "bid_to_ask_orientation": 0.0,
-            "increase_fraction": 2.5
+            "increase_fraction": 5.0
         }
     }
 }

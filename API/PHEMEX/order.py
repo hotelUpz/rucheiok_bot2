@@ -58,20 +58,12 @@ class PhemexPrivateClient:
         raise RuntimeError(f"Private API request failed: {last_err}")
 
     async def set_leverage(self, symbol: str, leverage: float, mode: str = "hedged") -> Dict[str, Any]:
-        """Устанавливает плечо (0 = Cross, >0 = Isolated)."""
-        lev_val = int(leverage) if float(leverage).is_integer() else float(leverage)
-        
-        if lev_val == 0:
-            # КРИТИЧНО: Для Cross-маржи Phemex требует передавать единый leverageRr=0, 
-            # даже в Hedge режиме. long/shortLeverageRr не принимают 0!
-            query_no_q = f"leverageRr=0&symbol={symbol}"
+        """Старый добрый рабочий метод установки плеча через Query"""
+        lev_str = str(int(leverage)) if float(leverage).is_integer() else str(float(leverage))
+        if mode == "hedged":
+            query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}"
         else:
-            lev_str = str(lev_val)
-            if mode == "hedged":
-                query_no_q = f"longLeverageRr={lev_str}&shortLeverageRr={lev_str}&symbol={symbol}"
-            else:
-                query_no_q = f"leverageRr={lev_str}&symbol={symbol}"
-                
+            query_no_q = f"leverageRr={lev_str}&symbol={symbol}"
         return await self._request("PUT", "/g-positions/leverage", query_no_q=query_no_q)
 
     async def place_limit_order(self, symbol: str, side: str, qty: float, price: float, pos_side: str) -> Dict[str, Any]:
@@ -86,8 +78,7 @@ class PhemexPrivateClient:
         return await self._request("DELETE", "/g-orders/cancel", query_no_q=query_no_q)
 
     async def cancel_all_orders(self, symbol: str) -> Dict[str, Any]:
-        if not symbol or len(symbol) < 3:
-            return {}
+        if not symbol or len(symbol) < 3: return {}
         return await self._request("DELETE", "/g-orders/all", query_no_q=f"symbol={symbol}")
 
     async def get_active_positions(self) -> Dict[str, Any]:

@@ -1,5 +1,49 @@
 {
-    "positions": {},
-    "fails": {},
-    "quarantine": {}
+    "positions": {
+        "VETUSDT_LONG": {
+            "symbol": "VETUSDT",
+            "side": "LONG",
+            "entry_price": 0.00674,
+            "qty": 0.0,
+            "init_qty": 7418.397626112759,
+            "init_ask1": 0.00674,
+            "init_bid1": 0.00673,
+            "base_target_price_100": 0.00675,
+            "opened_at": 1775174438.5828748,
+            "current_target_rate": 1.0,
+            "current_close_price": 0.0,
+            "close_order_id": null,
+            "is_average_stabilized": false,
+            "last_shift_ts": 0.0,
+            "last_negative_check_ts": 1775174438.5828917,
+            "negative_duration_sec": 0.0,
+            "in_breakeven_mode": false,
+            "breakeven_start_ts": 0.0,
+            "in_extrime_mode": false,
+            "extrime_retries_count": 0,
+            "last_extrime_try_ts": 0.0,
+            "entry_cancel_requested": false,
+            "interference_cancel_requested": false,
+            "close_cancel_requested": false,
+            "entry_finalized": false,
+            "interf_bought_qty": 0.0,
+            "interference_disabled": false,
+            "failed_interference_prices": {},
+            "place_order_fails": 0
+        }
+    },
+    "fails": {
+        "NIGHTUSDT": 1,
+        "EIGENUSDT": 0,
+        "BANANAUSDT": 1,
+        "BSBUSDT": 0,
+        "PRLUSDT": 1,
+        "GMTUSDT": 1
+    },
+    "quarantine": {
+        "NIGHTUSDT": Infinity,
+        "PRLUSDT": Infinity,
+        "BANANAUSDT": Infinity,
+        "GMTUSDT": Infinity
+    }
 }
