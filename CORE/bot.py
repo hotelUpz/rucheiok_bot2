@@ -134,7 +134,8 @@ class TradingBot:
                 size = float(item.get("sizeRq", item.get("size", 0)))
                 if size != 0:
                     symbol = item.get("symbol")
-                    pos_side = "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"
+                    pos_side_raw = item.get("posSide", item.get("side", "")).lower()
+                    pos_side = "LONG" if pos_side_raw in ("long", "buy") else "SHORT"
                     pos_key = f"{symbol}_{pos_side}"
                     exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
 

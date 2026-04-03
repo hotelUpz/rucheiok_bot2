@@ -29,72 +29,145 @@
 
 
 
-## СТАТУС ЗАКРЫТЫХ ПРОБЛЕМ (2026-04-03) — ВСЕ ЗАКРЫТЫ ✅
+
+
+## CRITICAL
 
 ---
 
-### [C1] ✅ FIXED — Торговля не стартует когда TG включён
-**Файл:** `main.py`
-`bot.start()` вынесен из ветки `else` в общий блок — вызывается всегда, независимо от TG.
+### ~~🔴 Критические уязвимости (Race Conditions)~~ ✅ ЗАКРЫТО
+
+#### ~~1. Гонка HTTP и WS при «скупке помех» (Interference)~~ ✅ FIXED
+**Где:** `CORE/executor.py` (метод `handle_exit_action`, блок `BUY_OUT_INTERFERENCE`) и `CORE/ws_handler.py`.
+**Суть проблемы:** Вы гениально решили проблему гонки REST/WS при *входе* в позицию с помощью флага `PENDING_HTTP`. Но забыли применить этот же паттерн для ордеров интерференции!
+Когда бот отправляет лимитку на скупку помехи, Phemex может исполнить ее моментально и прислать событие по WebSocket **раньше**, чем HTTP-запрос вернет `order_id`.
+
+**Что произойдет:**
+1. WS получает событие. Ищет `order_id` в `pending_interference_orders`, но его там еще нет (HTTP не вернул ответ).
+2. Роутер (`process_phemex_message`) использует fallback, понимает, что это ордер по текущей монете, и отправляет его в метод `_process_close` (так как он числится в `active_positions`).
+3. В `_process_close` выполняется код: `pos.qty = max(0.0, pos.qty - exec_qty)`.
+**Итог:** Вместо того чтобы *добавить* купленный объем помехи к позиции, бот **вычтет** его. Математика позиции (`pos.qty`) сломается, бот начнет выставлять неверные TP, и в итоге на бирже останутся незакрытые хвосты.
+
+✅ **Как исправить (`CORE/executor.py`):**
+В блоке `BUY_OUT_INTERFERENCE` (строка ~155) сделайте предварительное резервирование:
+```python
+# ПЕРЕД try:
+self.tb.state.pending_interference_orders[pos_key] = "PENDING_HTTP"
+
+try:
+    resp = await self.tb.private_client.place_limit_order(...)
+    order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
+    if order_id:
+        if self.tb.state.pending_interference_orders.get(pos_key) == "PENDING_HTTP":
+            self.tb.state.pending_interference_orders[pos_key] = order_id
+        # ...
+except Exception as e:
+    self.tb.state.pending_interference_orders.pop(pos_key, None) # Не забыть очистить при ошибке!
+    # ...
+```
+Затем в `CORE/ws_handler.py` в `_process_interference` добавьте логику распознавания `PENDING_HTTP`, по аналогии с `_process_entry`.
+
+#### ~~2. Зависшие ордера при динамическом выходе (Dynamic Close)~~ ✅ FIXED
+**Где:** `CORE/executor.py` и `CORE/ws_handler.py`.
+**Суть проблемы:** Та же проблема с частичным исполнением (Partial Fill) закрывающих ордеров. Если экстрим-ордер (или Dynamic Close) ударит по стакану, частично исполнится, и WS прилетит быстрее HTTP, метод `_process_close` обработает его правильно (объем уменьшится). Но затем он дойдет до строки `if pos.close_order_id != order_id: return`. Так как HTTP еще не записал `close_order_id`, условие сработает, и бот выйдет из функции.
+**Итог:** Критически важный таймер `_handle_partial_fill_cancellation` (снос остатка ордера) **никогда не запустится**. Остаток позиции повиснет мертвым грузом в стакане навсегда.
+
+✅ **Как исправить (`CORE/executor.py`):**
+Использовать флаг `PENDING_HTTP` для переменной `pos.close_order_id`, либо переписать логику маппинга в WS, чтобы он понимал, что ордер "в полете".
+*Самый простой фикс в WS (`CORE/ws_handler.py`):*
+```python
+# Вместо: if pos.close_order_id != order_id: return
+if pos.close_order_id not in (order_id, None, "PENDING_HTTP"): return
+```
+А в `executor.py` перед отправкой закрывающего ордера: `pos.close_order_id = "PENDING_HTTP"`.
 
 ---
 
-### [C2] ✅ FIXED — `set_blacklist([symbol])` стирает весь существующий blacklist
-**Файл:** `CORE/executor.py:98`
-Исправлено на `set_blacklist(list(self.tb.black_list) + [symbol])` — аддитивное добавление.
+### ~~🟠 Потенциальные баги (Edge Cases)~~ ✅ ЗАКРЫТО
+
+#### ~~3. Уязвимость регистра в модуле Recovery~~ ✅ FIXED
+**Где:** `CORE/bot.py`, метод `_recover_state`.
+**Код:** `pos_side = "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"`
+**Суть:** Биржевые API имеют свойство иногда без предупреждения менять регистр ответов (например, возвращать `"LONG"` вместо `"Long"`). В этом случае логика сломается, и бот закроет вашу позицию из кэша.
+✅ **Как исправить:**
+```python
+pos_side_raw = item.get("posSide", item.get("side", "")).lower()
+pos_side = "LONG" if pos_side_raw in ("long", "buy") else "SHORT"
+```
+(уже исправил). найди похожие уяязвимости и исправь.
+
+#### ~~4. Некорректная обработка задач (Tasks) в `main.py`~~ ✅ FIXED
+**Где:** `main.py`, метод `_main`.
+**Суть:** У вас используется `await asyncio.gather(*tasks)`. Если `tg_enabled = True`, в список `tasks` добавляется только один воркер — `tg_task`. Функция `gather` завершает работу, когда завершаются все переданные в нее задачи.
+Если `polling_supervisor` вылетит с непредвиденной ошибкой или выйдет из цикла (например, CancelledError), `gather` завершится, скрипт выйдет из `_main`, и **торговый бот полностью отключится**, даже если торговые процессы внутри `TradingBot` работали штатно!
+✅ **Как исправить:**
+Вместо `gather` лучше использовать бесконечный `Event` для удержания главного цикла:
+```python
+stop_event = asyncio.Event()
+
+# ... запуск бота и tg_admin ...
+if tasks:
+    # Запускаем задачи в фоне, не привязывая смерть бота к смерти TG
+    for t in tasks:
+        asyncio.create_task(t)
+
+try:
+    await stop_event.wait() # Висим тут бесконечно
+except (asyncio.CancelledError, KeyboardInterrupt):
+    # Штатно глушим бота
+```
 
 ---
 
-### [C3] ✅ FIXED — Опечатка `"scenarious"` → `"scenarios"` (сценарии выхода)
-**Файлы:** `EXIT/engine.py:29`, `cfg.json:95`, `utils.py:77`
-Все три точки исправлены. TG-статус дашборд и ExitEngine теперь читают корректный ключ.
+### 🟡 Архитектура и Оптимизация
 
----
+#### 5. Мутация состояния (State) в обход Lock-ов
+**Где:** `CORE/bot.py` (`_orchestrate_market_tick`) и `EXIT/engine.py`.
+В главном пайплайне `bot.py` вы вызываете:
+```python
+action = self.exit_engine.evaluate_pipeline(snap, pos) # БЕЗ ЛОКА
+if action: 
+    await self.executor.handle_exit_action(symbol, pos_key, action) # ЛОК БЕРЕТСЯ ЗДЕСЬ
+```
+Внутри `evaluate_pipeline` вы жестко мутируете стейт позиции (например, `pos.in_breakeven_mode = True`, `pos.current_target_rate = 0.0`, меняете таймеры).
+Поскольку вы используете `asyncio` (один поток) и внутри `evaluate_pipeline` нет `await`, контекст не переключается, и гонки данных (data race) с WS формально **пока нет**.
+**НО!** Это очень хрупкий дизайн (Code Smell). Если завтра вы добавите `await` внутрь `NegativeScenario` (например, логгер или запрос к БД), WS может прислать сообщение посреди выполнения пайплайна и изменить `pos.qty`, что приведет к непредсказуемому поведению.
+✅ **Как исправить (Лучшая практика):**
+Блокируйте позицию на весь цикл принятия решения по выходу, а не только на момент отправки ордера:
+```python
+async with self.executor.get_lock(pos_key):
+    action = self.exit_engine.evaluate_pipeline(snap, pos)
+    if action:
+        await self.executor.handle_exit_action(symbol, pos_key, action)
+```
+*(Придется убрать взятие `lock` внутри самого `handle_exit_action`, чтобы не было Deadlock-а, либо использовать `asyncio.Condition` / реентерабельные локи, если вы используете сторонние либы).*
 
-### [C4] ✅ FIXED — `TEMP_CFG_PATH = CFG_PATH` — загрузка битого JSON удаляла live-конфиг
-**Файл:** `TG/admin.py:25`
-Разделены на два пути: `CFG_PATH = "cfg.json"`, `TEMP_CFG_PATH = "cfg.tmp.json"`.
-При ошибке валидации удаляется только временный файл, живой конфиг не затрагивается.
+#### 6. Очистка таймаутов (Memory Leak)
+**Где:** `ENTRY/signal_engine.py` (Словари `_signal_timeouts`, `_pattern_first_seen`, `_spread_first_seen`).
+Вы удаляете ключи из словарей (`keys_to_pop`), когда сигнал пропадает. Это отлично!
+Однако в `CORE/bot.py` в `_signal_timeouts` ключи добавляются (`self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec`), но **никогда не удаляются**. Если бот проработает пару месяцев и переберет сотни щиткоинов, этот словарь разрастется.
+✅ **Как исправить:**
+Периодически чистить словарь, либо в `_orchestrate_market_tick` делать проверку:
+```python
+# Очистка устаревших таймаутов (вызывать раз в X минут, либо так):
+if pos_key in self._signal_timeouts and time.time() > self._signal_timeouts[pos_key]:
+    del self._signal_timeouts[pos_key]
+```
 
----
+#### 7
+Много мест с тихим проглатыванием ошибок
+Есть несколько except: pass / except Exception: pass.
+Для HFT/бота это опасно: система может молча деградировать, а вы увидите уже следствие, а не причину.
 
-### [M1] ✅ FIXED — ConfigManager.reload_config — утечка asyncio-задачи
-**Файл:** `CORE/bot_utils.py`
-Добавлен `old_task.cancel()` перед созданием новой `_funding_task`.
+### 8
+Конфиг и runtime сильно связаны, но схема валидации слабая. -- добавить валидатор.
 
----
+### 9
+Есть слишком много фоновых create_task(...) без централизованного реестра и наблюдения. Проверить эту теорию. если есть проблема -- то предложить архитетктурное решение и внедрить.
 
-### [M2] ✅ FIXED — `finalize_dust_position` без lock
-**Файл:** `CORE/bot.py`
-Вызов обёрнут в `async with self.executor.get_lock(pos_key)`.
+### 10
+перенести импорт AdminTgBot внутрь if tg_enabled:;
+сделать так, чтобы бот мог стартовать без aiogram, если TG выключен.
 
----
-
-### [M3] ✅ FIXED — `_process_close`: `pos.qty` не обнулялся при `status == "Filled"`
-**Файл:** `CORE/ws_handler.py`
-При `status == "Filled"` явно выставляется `pos.qty = 0.0` до финализации.
-
----
-
-### [M4] ✅ FIXED — `bot.stop()` — AttributeError при неполном `start()`
-**Файл:** `CORE/bot.py:stop()`
-`self._price_updater_task` и остальные задачи заменены на `getattr(self, '...', None)`.
-Если `start()` упал до инициализации задач — `stop()` не падает.
-
----
-
-### [CRITICAL-4] ✅ FIXED — Position TTL: описание уточнено, реализация верна
-Реализация в `EXIT/position_ttl_close.py` корректна и соответствует двухэтапной схеме:
-1. По истечении `position_ttl` сек → `TRIGGER_BREAKEVEN` (цель переводится в БУ через `build_target_price`).
-2. Если за `breakeven_wait_sec` лимитка не закрыла позицию → `TRIGGER_EXTRIME`.
-Описание в "Жизненном цикле" исправлено.
-
----
-
-### [L3] ✅ FIXED — `_depth_worker_loop` — постоянный воркер вместо короткоживущих задач
-**Файл:** `CORE/bot.py`
-Заменено на постоянного воркера на символ с `asyncio.Event`. Задача создаётся один раз при первом тике символа и живёт до `stop()`. На каждый тик — только `event.set()`, новые `Task`-объекты не создаются.
-
-
-
-
+### 11
+нужно сделать тестовый енд-ту-енд прогон.

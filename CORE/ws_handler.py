@@ -85,6 +85,13 @@ class PrivateWSHandler:
         if not pos:
             return
 
+        # Фикс #1 TECH_DEBT: обновляем PENDING_HTTP → реальный order_id
+        saved_id = self.tb.state.pending_interference_orders.get(pos_key)
+        if saved_id == "PENDING_HTTP":
+            self.tb.state.pending_interference_orders[pos_key] = order_id
+        elif saved_id != order_id:
+            return
+
         if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
             pos.qty += exec_qty
             pos.interf_bought_qty += exec_qty
@@ -126,7 +133,11 @@ class PrivateWSHandler:
             self.tb.executor.finalize_position_cycle(symbol, pos_key, price_rp)
             return
 
-        if pos.close_order_id != order_id: return
+        # Фикс #2 TECH_DEBT: обновляем PENDING_HTTP → реальный order_id
+        if pos.close_order_id == "PENDING_HTTP":
+            pos.close_order_id = order_id
+        elif pos.close_order_id != order_id:
+            return
 
         if status == "PartiallyFilled" and cum_qty > 0 and not getattr(pos, "close_cancel_requested", False):
             pos.close_cancel_requested = True
@@ -162,13 +173,15 @@ class PrivateWSHandler:
 
             # Жесткий маппинг стейта
             for pk in (f"{symbol}_LONG", f"{symbol}_SHORT"):
+                stored_interf = self.tb.state.pending_interference_orders.get(pk)
+                stored_close = self.tb.state.active_positions[pk].close_order_id if pk in self.tb.state.active_positions else None
                 if order_id == self.tb.state.pending_entry_orders.get(pk) or \
-                   order_id == self.tb.state.pending_interference_orders.get(pk) or \
-                   (pk in self.tb.state.active_positions and self.tb.state.active_positions[pk].close_order_id == order_id):
+                   order_id == stored_interf or stored_interf == "PENDING_HTTP" or \
+                   order_id == stored_close or stored_close == "PENDING_HTTP":
                     pos_key = pk; break
 
-            # Phemex Hedge Fallback
-            if not pos_key and pos_side_raw in ("Long", "Short"):
+            # Phemex Hedge Fallback (фикс #3 TECH_DEBT: case-insensitive сравнение)
+            if not pos_key and pos_side_raw.lower() in ("long", "short"):
                 pk = f"{symbol}_{pos_side_raw.upper()}"
                 if pk in self.tb.state.active_positions: pos_key = pk
 
@@ -180,8 +193,9 @@ class PrivateWSHandler:
             price_rp = float(ord_info.get("execPriceRp", 0) or ord_info.get("priceRp", 0) or ord_info.get("price", 0))
 
             # ИНВАРИАНТ маршрутизации: интерференция проверяется первой
-            if pos_key in self.tb.state.pending_interference_orders and \
-               order_id == self.tb.state.pending_interference_orders.get(pos_key):
+            # Фикс #1 TECH_DEBT: обрабатываем и PENDING_HTTP (гонка HTTP/WS)
+            interf_stored = self.tb.state.pending_interference_orders.get(pos_key)
+            if interf_stored is not None and (order_id == interf_stored or interf_stored == "PENDING_HTTP"):
                 await self._process_interference(symbol, pos_key, order_id, status, pos_side_raw, price_rp, exec_qty)
             elif pos_key in self.tb.state.pending_entry_orders:
                 await self._process_entry(symbol, pos_key, order_id, status, pos_side_raw, cum_qty)

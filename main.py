@@ -108,10 +108,10 @@ async def _main():
 
         await bot.start()
 
-        if tasks:
-            await asyncio.gather(*tasks)
-        else:
-            while True: await asyncio.sleep(3600)
+        # Фикс #4 TECH_DEBT: не привязываем жизнь бота к TG-задаче.
+        # Задачи уже запущены как create_task — просто ждём вечно.
+        stop_event = asyncio.Event()
+        await stop_event.wait()
                 
     except (asyncio.CancelledError, KeyboardInterrupt):
         logger.warning("\n🛑 Получен сигнал прерывания. Остановка...")

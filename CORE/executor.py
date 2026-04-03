@@ -192,29 +192,35 @@ class OrderExecutor:
                         pos.close_order_id = None
 
                 pos.current_close_price = target_price
-                
+
                 # ⏱ ВЗВОД ТАЙМЕРА ОХОТЫ
                 pos.hunting_active_until = time.time() + self.hunting_timeout_sec
+
+                # Блокируем стейт от гонок с вебсокетом (фикс #2 TECH_DEBT)
+                pos.close_order_id = "PENDING_HTTP"
 
                 try:
                     resp: Dict[str, Any] = await self.tb.private_client.place_limit_order(
                         symbol=symbol, side=close_side, qty=pos.qty, price=target_price, pos_side=pos_side
                     )
                     order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-                    
+
                     if order_id:
-                        pos.close_order_id = order_id
+                        if pos.close_order_id == "PENDING_HTTP":
+                            pos.close_order_id = order_id
                         pos.place_order_fails = 0
                         pos.close_cancel_requested = False
-                        
+
                         reason: str = action.get("reason", "")
                         logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {self.hunting_timeout_sec}с")
                         await self.tb.state.save()
                     else:
                         pos.hunting_active_until = 0.0
+                        pos.close_order_id = None
                         
                 except Exception as e:
                     pos.hunting_active_until = 0.0
+                    pos.close_order_id = None
                     logger.error(f"[{pos_key}] ❌ Ошибка выстрела ТП: {e}")
                     pos.place_order_fails += 1
                     await self._handle_order_fail(symbol, pos_key, pos)
@@ -237,10 +243,13 @@ class OrderExecutor:
                 interf_qty: float = round_step(min(action['qty'], available / interf_price), spec.lot_size)
                 order_value_usdt: float = interf_qty * interf_price
 
-                if interf_qty <= 0 or order_value_usdt < self.tb.min_exchange_notional: 
+                if interf_qty <= 0 or order_value_usdt < self.tb.min_exchange_notional:
                     pos.interference_disabled = True
                     await self.tb.state.save()
                     return
+
+                # Блокируем стейт от гонок с вебсокетом (фикс #1 TECH_DEBT)
+                self.tb.state.pending_interference_orders[pos_key] = "PENDING_HTTP"
 
                 try:
                     resp = await self.tb.private_client.place_limit_order(
@@ -248,19 +257,23 @@ class OrderExecutor:
                     )
                     order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
                     if order_id:
-                        self.tb.state.pending_interference_orders[pos_key] = order_id
+                        if self.tb.state.pending_interference_orders.get(pos_key) == "PENDING_HTTP":
+                            self.tb.state.pending_interference_orders[pos_key] = order_id
                         pos.interference_cancel_requested = False
-                        pos.place_order_fails = 0 
+                        pos.place_order_fails = 0
                         logger.info(f"🛒 [{pos_key}] СКУПКА ПОМЕХИ: Отправлен ордер {interf_qty} шт. по {interf_price}")
                         await self.tb.state.save()
+                    else:
+                        self.tb.state.pending_interference_orders.pop(pos_key, None)
                 except Exception as e:
+                    self.tb.state.pending_interference_orders.pop(pos_key, None)
                     if "TE_NO_ENOUGH_AVAILABLE_BALANCE" in str(e):
                         pos.interference_disabled = True
                         logger.warning(f"[{pos_key}] ⛔ Скупка помех отключена: недостаточно баланса.")
                     else:
                         logger.error(f"[{pos_key}] ❌ Ошибка скупки помехи: {e}")
                         pos.failed_interference_prices[str(interf_price)] = pos.failed_interference_prices.get(str(interf_price), 0) + 1
-                    
+
                     pos.place_order_fails += 1
                     await self._handle_order_fail(symbol, pos_key, pos)
 
