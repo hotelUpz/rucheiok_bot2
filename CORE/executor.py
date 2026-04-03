@@ -237,7 +237,7 @@ class OrderExecutor:
                 interf_qty: float = round_step(min(action['qty'], available / interf_price), spec.lot_size)
                 order_value_usdt: float = interf_qty * interf_price
 
-                if interf_qty <= 0 or order_value_usdt < 5.0: 
+                if interf_qty <= 0 or order_value_usdt < self.tb.min_exchange_notional: 
                     pos.interference_disabled = True
                     await self.tb.state.save()
                     return

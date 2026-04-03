@@ -32,7 +32,7 @@ class ExitEngine:
         self.negative = NegativeScenario(scenarios_cfg.get("negative", {}))
         self.ttl_close = PositionTTLClose(self.cfg.get("position_ttl_close", {}))
         self.extrime_close = ExtrimeClose(self.cfg.get("extrime_close", {}))
-        self.interference = Interference(self.cfg.get("interference", {}))
+        self.interference = Interference(self.cfg.get("interference", {}), self.tb.min_exchange_notional)
 
     def initialize_position_state(self, pos: ActivePosition):
         pos.current_target_rate = self.average.cfg.get("target_rate", 0.7)

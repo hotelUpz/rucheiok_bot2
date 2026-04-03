@@ -137,7 +137,7 @@ if __name__ == "__main__":
 # source .ssh-autostart.sh
 # git push --set-upstream origin master
 # git config --global push.autoSetupRemote true
-# ssh -T git@github.com
+# ssh -T git@github.com 
 # git log -1
 
 # git add .

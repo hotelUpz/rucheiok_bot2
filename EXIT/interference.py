@@ -18,7 +18,7 @@ class Interference:
     - Если уровень превысил max_retries_per_level — break (та же физика).
     - WS-ответ на заполнение обрабатывается в _process_interference (+qty), не в _process_close (-qty).
     """
-    def __init__(self, cfg: dict):
+    def __init__(self, cfg: dict, min_exchange_notional: float = 5.0):
         self.cfg = cfg
         self.enable = cfg.get("enable", False)
         
@@ -29,6 +29,7 @@ class Interference:
         self.avg_vol_pct = cfg.get("average_vol_pct_to_init_size", 3) / 100
         self.max_vol_pct = cfg.get("max_vol_pct_to_init_size", 9) / 100
         self.max_retries_per_level = cfg.get("max_retries_per_level", 2)
+        self.min_exchange_notional = min_exchange_notional
         
         # Скупаем только если ПНЛ нулевой или отрицательный (спред <= 0)
         self.negative_spread_pct = 0.0
@@ -66,7 +67,7 @@ class Interference:
             
             # Биржа не пропустит ордера меньше ~5 USDT
             approx_value_usdt = buy_qty * price
-            if approx_value_usdt < 5.0:
+            if approx_value_usdt < self.min_exchange_notional:
                 pos.interference_disabled = True
                 return None
                 

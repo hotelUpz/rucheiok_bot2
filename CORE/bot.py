@@ -83,13 +83,14 @@ class TradingBot:
         self._processing: Set[str] = set()
         self._latest_depth: Dict[str, DepthTop] = {}
         self._depth_workers: Dict[str, asyncio.Task] = {}
+        self._depth_events: Dict[str, asyncio.Event] = {}
         
         # Словарь для блокировки спама дублирующими сигналами на вход
         self._signal_timeouts: Dict[str, float] = {}
 
         self.cfg_manager = ConfigManager(CFG_PATH, self)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", False)
+        self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", 5.0)
 
     # ==========================================
     # ХЕЛПЕРЫ
@@ -266,17 +267,21 @@ class TradingBot:
             self._processing.discard(symbol)
 
     async def _depth_worker_loop(self, symbol: str):
+        event = self._depth_events[symbol]
         while self._is_running:
+            await event.wait()
+            event.clear()
             snap = self._latest_depth.pop(symbol, None)
-            if snap is None: break 
-            await self._orchestrate_market_tick(snap)
+            if snap is not None:
+                await self._orchestrate_market_tick(snap)
 
     async def _on_depth_received(self, snap: DepthTop):
         if not self._is_running: return
         self._latest_depth[snap.symbol] = snap
-        worker = self._depth_workers.get(snap.symbol)
-        if worker is None or worker.done():
+        if snap.symbol not in self._depth_events:
+            self._depth_events[snap.symbol] = asyncio.Event()
             self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker_loop(snap.symbol))
+        self._depth_events[snap.symbol].set()
 
     # ==========================================
     # ТОЧКИ ЗАПУСКА
@@ -342,6 +347,7 @@ class TradingBot:
             
         self._depth_workers.clear()
         self._latest_depth.clear()
+        self._depth_events.clear()
         self._processing.clear()
         self._signal_timeouts.clear()
 
