@@ -26,18 +26,18 @@ class PrivateWSHandler:
         """
         now = time.time()
         timeout = getattr(pos, timeout_attr, now)
-        
+
         # Если время еще есть - ждем в фоне (не блокируя стакан)
         if timeout > now:
             await asyncio.sleep(timeout - now)
-            
+
         # Проверяем, не исполнен ли он уже полностью за время сна
         is_still_pending = (
             order_id == self.tb.state.pending_entry_orders.get(pos_key) or
             order_id == pos.close_order_id or
             order_id == self.tb.state.pending_interference_orders.get(pos_key)
         )
-        
+
         if is_still_pending:
             logger.info(f"🧹 [{pos_key}] Время '{context}' истекло. Сносим остаток #{order_id[:8]}...")
             await self.tb.executor.cancel_order_via_ws(symbol, order_id, pos_side)
@@ -47,8 +47,8 @@ class PrivateWSHandler:
         saved_id = self.tb.state.pending_entry_orders.get(pos_key)
         if saved_id == "PENDING_HTTP":
             self.tb.state.pending_entry_orders[pos_key] = order_id
-        elif saved_id != order_id: return 
-            
+        elif saved_id != order_id: return
+
         pos = self.tb.state.active_positions.get(pos_key)
         if not pos: return
 
@@ -59,7 +59,7 @@ class PrivateWSHandler:
             pos.entry_finalized = True
             logger.info(f"🟢 [ВХОД] {pos_key}. Статус: {status}, Налито: {cum_qty}")
 
-        # Инвариант 3: Даем лимитке высказаться после первого налива
+        # Инвариант: Даем лимитке высказаться после первого налива
         if status == "PartiallyFilled" and cum_qty > 0 and not getattr(pos, "entry_cancel_requested", False):
             pos.entry_cancel_requested = True
             # Взводим таймер устояния ордера
@@ -74,6 +74,38 @@ class PrivateWSHandler:
                 self.tb.state.active_positions.pop(pos_key, None)
             await self.tb.state.save()
 
+    async def _process_interference(self, symbol: str, pos_key: str, order_id: str, status: str,
+                                    pos_side: str, price_rp: float, exec_qty: float) -> None:
+        """
+        ИНВАРИАНТ скупки интерференции: ордер интерференции ДОБАВЛЯЕТ к позиции.
+        pos.qty += exec_qty (не вычитать! это не закрытие, а доливка).
+        Маршрут: pending_interference_orders → этот метод (не _process_close).
+        """
+        pos = self.tb.state.active_positions.get(pos_key)
+        if not pos:
+            return
+
+        if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
+            pos.qty += exec_qty
+            pos.interf_bought_qty += exec_qty
+            logger.info(
+                f"🛒 [{pos_key}] ИНТЕРФЕРЕНЦИЯ ЗАПОЛНЕНА: +{exec_qty} шт. по {price_rp}. "
+                f"Куплено помех всего: {pos.interf_bought_qty:.6g}. Итого позиция: {pos.qty:.6g}"
+            )
+
+        # Частичное заполнение — взводим таймер и сносим остаток
+        if status == "PartiallyFilled" and exec_qty > 0 and not pos.interference_cancel_requested:
+            pos.interference_cancel_requested = True
+            pos.hunting_active_until = time.time() + self.tb.executor.hunting_timeout_sec
+            asyncio.create_task(self._handle_partial_fill_cancellation(
+                symbol, pos_key, order_id, pos_side, pos, "hunting_active_until", "ИНТЕРФЕРЕНЦИЯ"
+            ))
+
+        if status in ("Filled", "Canceled", "Rejected", "Deactivated"):
+            self.tb.state.pending_interference_orders.pop(pos_key, None)
+            pos.interference_cancel_requested = False
+            await self.tb.state.save()
+
     async def _process_close(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, price_rp: float, cum_qty: float, exec_qty: float) -> None:
         pos = self.tb.state.active_positions.get(pos_key)
         if not pos: return
@@ -81,15 +113,20 @@ class PrivateWSHandler:
         if status in ("Filled", "PartiallyFilled") and exec_qty > 0:
             pos.qty = max(0.0, pos.qty - exec_qty)
 
-        if pos.qty <= 0 or status == "Filled":
+        if status == "Filled":
+            pos.qty = 0.0
+
+        if pos.qty <= 0:
             semantic = "ЗАКРЫТИЕ ЛОНГА" if pos.side == "LONG" else "ЗАКРЫТИЕ ШОРТА"
-            logger.info(f"✅ [{pos_key}] {semantic} ЗАВЕРШЕНО.")
+            # Используем реальную цену исполнения (price_rp), не виртуальный ТП
+            fill_price = price_rp if price_rp > 0 else pos.current_close_price
+            logger.info(f"✅ [{pos_key}] {semantic} ЗАВЕРШЕНО по {fill_price}.")
             if self.tb.tg:
-                asyncio.create_task(self.tb.tg.send_message(Reporters.exit_success(pos_key, semantic, pos.current_close_price)))
+                asyncio.create_task(self.tb.tg.send_message(Reporters.exit_success(pos_key, semantic, fill_price)))
             self.tb.executor.finalize_position_cycle(symbol, pos_key, price_rp)
             return
 
-        if pos.close_order_id != order_id: return 
+        if pos.close_order_id != order_id: return
 
         if status == "PartiallyFilled" and cum_qty > 0 and not getattr(pos, "close_cancel_requested", False):
             pos.close_cancel_requested = True
@@ -98,18 +135,27 @@ class PrivateWSHandler:
             ))
 
         if status in ("Canceled", "Rejected", "Deactivated"):
-            pos.close_order_id = None 
+            pos.close_order_id = None
             pos.close_cancel_requested = False
             await self.tb.state.save()
 
     async def process_phemex_message(self, payload: Dict[str, Any]) -> None:
-        """Точка входа (роутер)."""
+        """
+        Точка входа (роутер WS событий).
+
+        Маршрутизация (приоритет сверху вниз):
+          1. pending_interference_orders → _process_interference (ДОБАВЛЯЕТ к позиции)
+          2. pending_entry_orders        → _process_entry
+          3. active_positions            → _process_close
+        ВАЖНО: интерференция должна проверяться ДО active_positions, иначе
+        она ошибочно попадет в _process_close и уменьшит pos.qty.
+        """
         orders = payload.get("orders_p", payload.get("orders", []))
-        
+
         for ord_info in orders:
             symbol = ord_info.get("symbol")
             if not symbol: continue
-                
+
             order_id = str(ord_info.get("orderID", ""))
             pos_key = None
             pos_side_raw = ord_info.get("posSide", ord_info.get("side", ""))
@@ -133,7 +179,11 @@ class PrivateWSHandler:
             cum_qty = float(ord_info.get("cumQtyRq", ord_info.get("cumQty", exec_qty)))
             price_rp = float(ord_info.get("execPriceRp", 0) or ord_info.get("priceRp", 0) or ord_info.get("price", 0))
 
-            if pos_key in self.tb.state.pending_entry_orders:
+            # ИНВАРИАНТ маршрутизации: интерференция проверяется первой
+            if pos_key in self.tb.state.pending_interference_orders and \
+               order_id == self.tb.state.pending_interference_orders.get(pos_key):
+                await self._process_interference(symbol, pos_key, order_id, status, pos_side_raw, price_rp, exec_qty)
+            elif pos_key in self.tb.state.pending_entry_orders:
                 await self._process_entry(symbol, pos_key, order_id, status, pos_side_raw, cum_qty)
             elif pos_key in self.tb.state.active_positions:
                 await self._process_close(symbol, pos_key, order_id, status, pos_side_raw, price_rp, cum_qty, exec_qty)

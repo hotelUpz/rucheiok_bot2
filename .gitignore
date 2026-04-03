@@ -1,5 +1,6 @@
 __pycache__
 .vscode
+.claude
 .env
 ssh_key.txt
 ssh_key.pub

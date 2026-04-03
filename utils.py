@@ -74,7 +74,7 @@ def get_config_summary(cfg: dict) -> str:
 
     # --- EXIT ---
     exit_cfg = cfg.get("exit", {})
-    scen = exit_cfg.get("scenarious", {})
+    scen = exit_cfg.get("scenarios", {})
     avg = scen.get("average", {})
     neg = scen.get("negative", {})
     inter = exit_cfg.get("interference", {})

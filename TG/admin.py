@@ -22,7 +22,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from CORE.bot import TradingBot
 
-TEMP_CFG_PATH = CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.json"
+CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.json"
+TEMP_CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.tmp.json"
 
 logger = UnifiedLogger("tg")
 

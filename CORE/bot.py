@@ -89,6 +89,7 @@ class TradingBot:
 
         self.cfg_manager = ConfigManager(CFG_PATH, self)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
+        self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", False)
 
     # ==========================================
     # ХЕЛПЕРЫ
@@ -175,9 +176,10 @@ class TradingBot:
 
             # 1.1 Зачистка огрызков (< 5 USDT)
             notional = pos.qty * p_price
-            if 0 < notional < 5.0 and pos.entry_finalized:
+            if 0 < notional < self.min_exchange_notional and pos.entry_finalized:
                 if self.tg: asyncio.create_task(self.tg.send_message(Reporters.dust_close(symbol, pos_key, p_price)))
-                await self.executor.finalize_dust_position(symbol, pos_key, pos)
+                async with self.executor.get_lock(pos_key):
+                    await self.executor.finalize_dust_position(symbol, pos_key, pos)
                 continue
 
             # 1.2 Ожидание налива
@@ -226,11 +228,6 @@ class TradingBot:
 
         try:
             signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-            
-            if self.tg:
-                msg = Reporters.entry_signal(symbol, signal, b_price, p_price)
-                asyncio.create_task(self.tg.send_message(msg))
-
             await self.executor.execute_entry(symbol, pos_key, signal, snap)
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
@@ -335,10 +332,10 @@ class TradingBot:
         if self._stream: self._stream.stop()
         await self.private_ws.aclose()
         
-        await self._await_task(self._price_updater_task)
-        await self._await_task(self._funding_task)
-        await self._await_task(self._private_ws_task)
-        await self._await_task(self._stream_task)
+        await self._await_task(getattr(self, '_price_updater_task', None))
+        await self._await_task(getattr(self, '_funding_task', None))
+        await self._await_task(getattr(self, '_private_ws_task', None))
+        await self._await_task(getattr(self, '_stream_task', None))
         
         for task in list(self._depth_workers.values()):
             await self._await_task(task)

@@ -95,17 +95,18 @@ async def _main():
         if tg_enabled:
             token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
             chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
-            
+
             if not token or not chat_id:
                 logger.error("Telegram включен, но token/chat_id не заданы.")
                 sys.exit(1)
-            
+
             tg_admin = AdminTgBot(token, chat_id, bot)
             tg_task = asyncio.create_task(polling_supervisor(tg_admin))
             tasks.append(tg_task)
         else:
             logger.warning("TG отключен. Автостарт торговли...")
-            await bot.start()
+
+        await bot.start()
 
         if tasks:
             await asyncio.gather(*tasks)
@@ -116,8 +117,7 @@ async def _main():
         logger.warning("\n🛑 Получен сигнал прерывания. Остановка...")
     finally:
         logger.info("🧹 Очистка ресурсов...")
-        await bot.stop()
-        await bot.aclose()
+        await bot.aclose()  # aclose() вызывает stop() внутри — двойной вызов был лишним
         
         for t in tasks:
             t.cancel()
@@ -143,3 +143,9 @@ if __name__ == "__main__":
 # git add .
 # git commit -m "plh37"
 # git push
+
+# pip install anthropic
+# npm install -g @anthropic-ai/claude-code
+
+# export ANTHROPIC_API_KEY=...
+# claude

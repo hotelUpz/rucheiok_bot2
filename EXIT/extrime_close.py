@@ -6,6 +6,16 @@ if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
 class ExtrimeClose:
+    """
+    Аварийный выход из позиции методом нарастающего давления.
+
+    Инвариант:
+    - Активируется только через _transition_to_extrime (ExitEngine).
+    - Каждые retry_ttl секунд вычисляет новую цену, сдвигая её в сторону рынка
+      на increase_fraction * spread * retries_count (нарастающее ухудшение).
+    - При retry_num="inf" не прекращается никогда (позиция будет закрыта).
+    - PLACE_EXTRIME_LIMIT — единственное возможное действие этого сценария.
+    """
     def __init__(self, cfg: dict):
         self.cfg = cfg
         self.enable = cfg.get("enable", True)

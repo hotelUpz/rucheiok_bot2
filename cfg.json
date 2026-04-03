@@ -43,7 +43,8 @@
             "margin_mode": 2
         },
         "margin_size": "row",
-        "notional_limit": 50,
+        "notional_limit": 50.0,
+        "min_exchange_notional": 5.0,
         "margin_over_size_pct": 1,
         "hedge_mode": false,
         "quarantine": {
@@ -83,22 +84,22 @@
                 "spread_ttl_sec": 0
             },
             "phemex_funding_filter": {
-                "enable": false,
+                "enable": true,
                 "check_interval_sec": 60,
                 "skip_before_counter_sec": 1800,
-                "funding_threshold_pct": 1.0
+                "funding_threshold_pct": 2.0
             }
         }
     },
     "exit": {
         "hunting_timeout_sec": 0.1,
-        "scenarious": {
+        "scenarios": {
             "average": {
                 "enable": true,
                 "stabilization_ttl": 0,
                 "target_rate": 1.0,
                 "shift_demotion": 0.2,
-                "min_target_rate": 0.7,
+                "min_target_rate": 0.8,
                 "shift_ttl": 10
             },
             "negative": {

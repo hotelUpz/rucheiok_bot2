@@ -29,5 +29,67 @@
 
 
 
-## CRITICAL
+## СТАТУС ЗАКРЫТЫХ ПРОБЛЕМ (2026-04-03) — ВСЕ ЗАКРЫТЫ ✅
+
+---
+
+### [C1] ✅ FIXED — Торговля не стартует когда TG включён
+**Файл:** `main.py`
+`bot.start()` вынесен из ветки `else` в общий блок — вызывается всегда, независимо от TG.
+
+---
+
+### [C2] ✅ FIXED — `set_blacklist([symbol])` стирает весь существующий blacklist
+**Файл:** `CORE/executor.py:98`
+Исправлено на `set_blacklist(list(self.tb.black_list) + [symbol])` — аддитивное добавление.
+
+---
+
+### [C3] ✅ FIXED — Опечатка `"scenarious"` → `"scenarios"` (сценарии выхода)
+**Файлы:** `EXIT/engine.py:29`, `cfg.json:95`, `utils.py:77`
+Все три точки исправлены. TG-статус дашборд и ExitEngine теперь читают корректный ключ.
+
+---
+
+### [C4] ✅ FIXED — `TEMP_CFG_PATH = CFG_PATH` — загрузка битого JSON удаляла live-конфиг
+**Файл:** `TG/admin.py:25`
+Разделены на два пути: `CFG_PATH = "cfg.json"`, `TEMP_CFG_PATH = "cfg.tmp.json"`.
+При ошибке валидации удаляется только временный файл, живой конфиг не затрагивается.
+
+---
+
+### [M1] ✅ FIXED — ConfigManager.reload_config — утечка asyncio-задачи
+**Файл:** `CORE/bot_utils.py`
+Добавлен `old_task.cancel()` перед созданием новой `_funding_task`.
+
+---
+
+### [M2] ✅ FIXED — `finalize_dust_position` без lock
+**Файл:** `CORE/bot.py`
+Вызов обёрнут в `async with self.executor.get_lock(pos_key)`.
+
+---
+
+### [M3] ✅ FIXED — `_process_close`: `pos.qty` не обнулялся при `status == "Filled"`
+**Файл:** `CORE/ws_handler.py`
+При `status == "Filled"` явно выставляется `pos.qty = 0.0` до финализации.
+
+---
+
+### [M4] ✅ FIXED — `bot.stop()` — AttributeError при неполном `start()`
+**Файл:** `CORE/bot.py:stop()`
+`self._price_updater_task` и остальные задачи заменены на `getattr(self, '...', None)`.
+Если `start()` упал до инициализации задач — `stop()` не падает.
+
+---
+
+## НИЗКОПРИОРИТЕТНЫЕ (оставлены, не блокируют запуск)
+
+### [L1] Магическая константа 5.0 USDT в трёх местах
+**Файлы:** `CORE/bot.py`, `CORE/executor.py`, `EXIT/interference.py`
+Вынести в конфиг при следующей итерации.
+
+### [L3] `_depth_worker_loop` — короткоживущие задачи при пустом снапе
+**Файл:** `CORE/bot.py`
+Не блокирует работу, но создаёт лишний GC-мусор при высоком потоке тиков.
 

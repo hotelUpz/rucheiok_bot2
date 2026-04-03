@@ -7,6 +7,17 @@ if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
 class Interference:
+    """
+    Скупка мелких помех в стакане на пути к TP.
+
+    Инвариант:
+    - Запускается только когда цена ещё НЕ ушла в профит (spread <= 0).
+    - Суммарный объём скупки ≤ max_vol_pct * init_qty.
+    - Каждый чанк ≤ avg_vol_pct * init_qty.
+    - Если помеха крупнее чанка — break (нельзя пробить физически).
+    - Если уровень превысил max_retries_per_level — break (та же физика).
+    - WS-ответ на заполнение обрабатывается в _process_interference (+qty), не в _process_close (-qty).
+    """
     def __init__(self, cfg: dict):
         self.cfg = cfg
         self.enable = cfg.get("enable", False)

@@ -13,7 +13,6 @@ from EXIT.scenarios.negative import NegativeScenario
 from EXIT.position_ttl_close import PositionTTLClose
 from EXIT.extrime_close import ExtrimeClose
 from EXIT.interference import Interference
-from CORE.bot_utils import Reporters
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
@@ -27,7 +26,7 @@ class ExitEngine:
     def __init__(self, exit_cfg: Dict[str, Any], tb: "TradingBot"):
         self.cfg = exit_cfg
         self.tb = tb
-        scenarios_cfg = self.cfg.get("scenarious", {})
+        scenarios_cfg = self.cfg.get("scenarios", {})
 
         self.average = AverageScenario(scenarios_cfg.get("average", {}))
         self.negative = NegativeScenario(scenarios_cfg.get("negative", {}))
@@ -50,19 +49,27 @@ class ExitEngine:
 
     def evaluate_pipeline(self, depth: DepthTop, pos: ActivePosition) -> Optional[Dict[str, Any]]:
         """
-        Единый пайплайн оценки выхода.
-        Возвращает СТРОГО ActionDict для CORE/executor.py
+        Единый пайплайн оценки выхода. Приоритет убывает сверху вниз.
+
+        Порядок проверок (от наивысшего приоритета к низшему):
+          [P1] Extrime     — если уже активирован, ни о чём другом речи нет
+          [P2] TTL         — глобальный таймаут → БУ → Extrime
+          [P3] Negative    — затяжной убыток → Extrime
+          [P4] Interference — скупка мелких помех (перебивает Average)
+          [P5] Average      — основной охотник TP (дефолтный сценарий)
+
+        Возвращает СТРОГО детерминированный ActionDict или None.
         """
         now = time.time()
 
         if not depth.asks or not depth.bids:
             return None
 
-        # 1. Если уже в экстриме — другие сценарии мертвы, долбим стакан
+        # [P1] Extrime-режим — если уже активирован, только долбим стакан
         if pos.in_extrime_mode:
             return self.extrime_close.analyze(depth, pos, now)
 
-        # 2. Проверка глобального TTL (Время жизни)
+        # [P2] Глобальный TTL
         ttl_action = self.ttl_close.analyze(pos, now)
         if ttl_action:
             if ttl_action["action"] == "TRIGGER_BREAKEVEN":
@@ -70,58 +77,58 @@ class ExitEngine:
                 pos.breakeven_start_ts = now
                 pos.current_target_rate = 0.0
                 target_price = ttl_action.get("price") or self.ttl_close.build_target_price(pos)
-
-                logger.warning(f"⌛ [EXIT] #{pos.symbol} TTL позиции истек. Перевод цели в безубыток.")
+                lifetime = round(now - pos.opened_at, 1)
+                logger.info(f"⌛ [EXIT] #{pos.symbol} TTL истек ({lifetime}с). Цель переведена в БУ: {target_price}")
+                pos_key = f"{pos.symbol}_{pos.side}"
                 if self.tb.tg:
                     asyncio.create_task(self.tb.tg.send_message(
-                        f"⌛ <b>БУ РЕЖИМ</b>\nМонета: #{pos.symbol}\nИстек TTL, цель переведена в безубыток."
+                        f"⌛ <b>БУ РЕЖИМ</b>\n#{pos_key}\nВремя в сделке: {lifetime}с. Цель переведена в БУ: {target_price}"
                     ))
                 return {"action": "UPDATE_TARGET", "price": target_price, "reason": "TTL_BREAKEVEN"}
 
             elif ttl_action["action"] == "TRIGGER_EXTRIME":
                 pos.in_breakeven_mode = False
-                self._activate_extrime_mode(pos, "БУ-лимитка по TTL не сработала")
+                self._transition_to_extrime(pos, "БУ-лимитка по TTL не сработала")
                 return self.extrime_close.analyze(depth, pos, now)
 
-        # 3. Сценарий Average (Поиск объемов и плавный сдвиг цели)
-        avg_action = None
+        # [P3] Негативный сценарий (затяжной убыток)
+        neg_action = self.negative.analyze(depth, pos, now)
+        if neg_action and neg_action.get("action") == "TRIGGER_EXTRIME":
+            self._transition_to_extrime(pos, "Затяжной негативный PnL")
+            return self.extrime_close.analyze(depth, pos, now)
+
+        # [P4] Скупка помех (Интерференция) — перебивает Average
+        interf_action = self.interference.analyze(depth, pos, now)
+        if interf_action and interf_action.get("action") == "BUY_OUT_INTERFERENCE":
+            return interf_action
+
+        # [P5] Основной сценарий (Average) — дефолтный охотник
         if self.average.enable:
             avg_action = self.average.analyze(depth, pos, now)
             if avg_action:
-                # Внутренний сигнал от average, что двигаться некуда -> уходим в экстрим
-                if avg_action.get("action") == "TRIGGER_EXTRIME":
-                    self._activate_extrime_mode(pos, "Average исчерпал лимиты уступок")
+                act = avg_action.get("action")
+                if act == "TRIGGER_EXTRIME":
+                    self._transition_to_extrime(pos, "Average исчерпал лимиты уступок")
                     return self.extrime_close.analyze(depth, pos, now)
-                
-                # Если требуется сброс старого ордера для переоценки
-                if avg_action.get("action") == "CANCEL_CLOSE":
+
+                if act in ("CANCEL_CLOSE", "PLACE_DYNAMIC_CLOSE", "UPDATE_TARGET"):
                     return avg_action
-
-        # 4. Негативный сценарий (топтание в минусе)
-        neg_action = self.negative.analyze(depth, pos, now)
-        if neg_action and neg_action.get("action") == "TRIGGER_EXTRIME":
-            self._activate_extrime_mode(pos, "Затяжной негативный PnL")
-            return self.extrime_close.analyze(depth, pos, now)
-
-        # 5. Скупка помех (Интерференция) - перебивает обычный хантинг
-        interf_action = self.interference.analyze(depth, pos, now)
-        if interf_action:
-            return interf_action
-
-        # 6. Возврат результата Average (Выстрел по стакану PLACE_DYNAMIC_CLOSE или UPDATE_TARGET)
-        if avg_action:
-            return avg_action
 
         return None
 
-    def _activate_extrime_mode(self, pos: ActivePosition, reason: str):
-        """Хелпер для жесткого перевода в Экстрим-режим с нотификацией."""
+    def _transition_to_extrime(self, pos: ActivePosition, reason: str):
+        """
+        Штатный переход в экстрим-режим.
+        ИНВАРИАНТ: переход идемпотентен — повторный вызов игнорируется.
+        TG-уведомление отправляется ОДИН РАЗ при первом входе.
+        """
         if not pos.in_extrime_mode:
             pos.in_extrime_mode = True
-            pos.hunting_active_until = 0.0 # Сбрасываем заморозки
+            pos.hunting_active_until = 0.0
             pos.extrime_retries_count = 0
-            
-            logger.error(f"🚨 [EXIT] #{pos.symbol} Активация EXTRIME MODE! Причина: {reason}")
+            pos_key = f"{pos.symbol}_{pos.side}"
+            logger.info(f"🔄 [EXIT] #{pos_key} Переход в EXTRIME CLOSE. Причина: {reason}")
             if self.tb.tg:
-                pos_key = f"{pos.symbol}_{pos.side}"
-                asyncio.create_task(self.tb.tg.send_message(Reporters.extreme_close(pos.symbol, pos_key, reason)))
+                asyncio.create_task(self.tb.tg.send_message(
+                    f"⚠️ <b>EXTRIME CLOSE</b>\n#{pos_key}\nПричина: {reason}"
+                ))

@@ -19,7 +19,21 @@ if TYPE_CHECKING:
 logger = UnifiedLogger("bot")
 
 class OrderExecutor:
-    """Асинхронный отправитель торговых приказов на биржу. Оперирует локами для защиты от гонок потоков."""
+    """
+    Единственная точка отправки ордеров на биржу.
+
+    Ключевые инварианты:
+    - get_lock(pos_key): один AsyncLock на pos_key предотвращает гонки потоков.
+    - execute_entry: блокирует pos_key через PENDING_HTTP до получения order_id.
+    - handle_exit_action:
+        * CANCEL_CLOSE       — отмена физического ордера, сброс close_order_id
+        * UPDATE_TARGET      — смена виртуальной цели (pos.current_close_price)
+        * PLACE_DYNAMIC_CLOSE/PLACE_EXTRIME_LIMIT — cancel+place с идемпотентной проверкой цены
+        * BUY_OUT_INTERFERENCE — доливка к позиции (не закрытие!)
+    - pos.current_close_price = цена последнего размещённого ордера (только Executor пишет).
+    - finalize_position_cycle: зачистка, карантин, сохранение — вызывается из ws_handler.
+    - _transition_to_extrime вызывается через self.tb.exit_engine (единая точка с TG).
+    """
     
     def __init__(self, tb: 'TradingBot') -> None:
         self.tb = tb
@@ -81,7 +95,7 @@ class OrderExecutor:
                 q_hours = q_cfg.get("quarantine_hours", 24)
                 if str(q_hours).lower() == "inf":
                     self.tb.state.quarantine_until[symbol] = float("inf")
-                    self.tb.set_blacklist([symbol])
+                    self.tb.set_blacklist(list(self.tb.black_list) + [symbol])
                     q_msg = "Навсегда (BlackList)"
                 else:
                     self.tb.state.quarantine_until[symbol] = time.time() + float(q_hours) * 3600
@@ -107,11 +121,16 @@ class OrderExecutor:
         if pos.place_order_fails >= max_fails:
             if pos.qty > 0:
                 if not pos.in_extrime_mode:
-                    logger.error(f"[{pos_key}] ⚠️ Лимит ошибок исчерпан! Перевод в EXTRIME MODE.")
-                    pos.in_extrime_mode = True
-                    pos.place_order_fails = 0 
+                    # Делаем переход через единственную точку входа (TG + сброс счётчиков)
+                    logger.error(f"[{pos_key}] ⚠️ Лимит ошибок API исчерпан! Перевод в EXTRIME MODE.")
+                    self.tb.exit_engine._transition_to_extrime(pos, "Лимит ошибок API исчерпан")
+                    pos.place_order_fails = 0
                 else:
                     logger.error(f"[{pos_key}] 🚨 КРИТИЧЕСКИЙ ОТКАЗ! Экстрим-ордера отклоняются биржей. Ручное вмешательство! Позиция ({pos.qty} шт) СОХРАНЕНА.")
+                    if self.tb.tg:
+                        asyncio.create_task(self.tb.tg.send_message(
+                            Reporters.extrime_alert(symbol, f"Позиция {pos.qty} шт. Требуется ручное вмешательство!")
+                        ))
             else:
                 logger.error(f"[{pos_key}] 🗑 Ошибки API до открытия позиции. Сбрасываем стейт.")
                 self.tb.state.active_positions.pop(pos_key, None)
@@ -298,6 +317,11 @@ class OrderExecutor:
                 await self.tb.state.save()
                 semantic: str = "ОТКРЫТЬ ЛОНГ" if signal["side"] == "LONG" else "ОТКРЫТЬ ШОРТ"
                 logger.info(f"🚀 [{pos_key}] {semantic} ОТПРАВЛЕН: по {price} (Плановый объем: {qty})")
+                if self.tb.tg:
+                    b_price, p_price = self.tb.price_manager.get_prices(symbol)
+                    asyncio.create_task(self.tb.tg.send_message(
+                        Reporters.entry_signal(symbol, signal, b_price, p_price)
+                    ))
             else:
                 self.tb.state.active_positions.pop(pos_key, None)
                 self.tb.state.pending_entry_orders.pop(pos_key, None)

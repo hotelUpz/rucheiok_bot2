@@ -5,6 +5,14 @@ if TYPE_CHECKING:
     from CORE.models import ActivePosition
 
 class PositionTTLClose:
+    """
+    Глобальный таймаут позиции.
+
+    Инвариант (двухэтапный):
+    1. После position_ttl секунд → TRIGGER_BREAKEVEN (ExitEngine переводит цель в БУ).
+    2. Если БУ-лимитка не закрыла позицию за breakeven_wait_sec → TRIGGER_EXTRIME.
+    Оба шага происходят ровно по одному разу благодаря флагу pos.in_breakeven_mode.
+    """
     def __init__(self, cfg: dict):
         self.cfg = cfg
         self.enable = cfg.get("enable", True)

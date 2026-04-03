@@ -1,13 +1,13 @@
 # ============================================================
 # FILE: CORE/bot_utils.py
-# ROLE: Вспомогательные сервисы (BlackList, PriceCache)
+# ROLE: Вспомогательные сервисы (BlackList, PriceCache, Reporters, Config)
 # ============================================================
 from __future__ import annotations
 
 import asyncio
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple, Any, TYPE_CHECKING
+from typing import Dict, List, Tuple, TYPE_CHECKING
 from ENTRY.signal_engine import SignalEngine
 from EXIT.engine import ExitEngine
 from c_log import UnifiedLogger
@@ -35,7 +35,6 @@ class BlackListManager:
             if full_sym not in new_bl:
                 new_bl.append(full_sym)
                 
-            # Вариации OG/0G
             if "OG" in full_sym:
                 new_bl.append(full_sym.replace("OG", "0G"))
             if "0G" in full_sym:
@@ -74,7 +73,6 @@ class PriceCacheManager:
         self._is_running = False
 
     async def warmup(self):
-        """Единоразовый прогрев до старта основного цикла"""
         await self._fetch()
 
     async def _fetch(self):
@@ -98,8 +96,8 @@ class PriceCacheManager:
         self._is_running = False
 
     def get_prices(self, symbol: str) -> Tuple[float, float]:
-        """Возвращает (binance_price, phemex_price)"""
         return self.binance_prices.get(symbol, 0.0), self.phemex_prices.get(symbol, 0.0)
+
 
 class ConfigManager:
     def __init__(self, cfg_path: Path | str, tb: "TradingBot"):
@@ -114,19 +112,22 @@ class ConfigManager:
             self.tb.cfg = new_cfg
             self.tb.max_active_positions = self.tb.cfg.get("app", {}).get("max_active_positions", 1)
             
-            # Делегируем обновление ЧС утилите
             self.tb.black_list = self.tb.bl_manager.load_from_config(self.tb.cfg.get("black_list", []))
             if hasattr(self.tb.state, 'black_list'):
                 self.tb.state.black_list = self.tb.black_list
 
-            old_ff = getattr(self.tb.entry_engine, 'funding_filter', None) if hasattr(self.tb, 'entry_engine') else None
+            # ИСПРАВЛЕНИЕ: Использование signal_engine
+            old_ff = getattr(self.tb.signal_engine, 'funding_filter', None) if hasattr(self.tb, 'signal_engine') else None
             if old_ff: old_ff.stop()
 
-            self.tb.entry_engine = SignalEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
+            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
             self.tb.exit_engine = ExitEngine(self.tb.cfg["exit"], self.tb)
 
             if getattr(self.tb, '_is_running', False):
-                self.tb._funding_task = asyncio.create_task(self.tb.entry_engine.funding_filter.run())
+                old_task = getattr(self.tb, '_funding_task', None)
+                if old_task and not old_task.done():
+                    old_task.cancel()
+                self.tb._funding_task = asyncio.create_task(self.tb.signal_engine.funding_filter.run())
 
             return True, "Конфигурация успешно обновлена в памяти!"
         except Exception as e:
@@ -152,12 +153,13 @@ class Reporters:
         )
 
     @staticmethod
-    def extreme_close(symbol: str, pos_key: str, reason: str) -> str:
-        return f"🚨 <b>EXTREME CLOSE TRIGGERED</b>\n#{pos_key}\nПричина: {reason}"
+    def extrime_alert(symbol: str, reason: str) -> str:
+        """Используется только при КРИТИЧЕСКОЙ ошибке Экстрим-ордеров."""
+        return f"🚨 <b>КРИТИЧЕСКИЙ ОТКАЗ API</b>\n#{symbol}\nЭкстрим ордера отклоняются. {reason}"
 
     @staticmethod
     def ttl_close(symbol: str, pos_key: str, lifetime_sec: float) -> str:
-        return f"⏳ <b>TTL LIMIT REACHED</b>\n#{pos_key}\nВремя в сделке: {lifetime_sec} сек. Принудительный выход."
+        return f"⏳ <b>БУ РЕЖИМ</b>\n#{pos_key}\nВремя в сделке: {lifetime_sec} сек. Цель переведена в БУ."
 
     @staticmethod
     def dust_close(symbol: str, pos_key: str, price: float) -> str:
