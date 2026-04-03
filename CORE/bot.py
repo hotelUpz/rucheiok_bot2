@@ -25,7 +25,7 @@ from EXIT.engine import ExitEngine
 from CORE.models import BotState
 from CORE.executor import OrderExecutor
 from CORE.ws_handler import PrivateWSHandler
-from CORE.bot_utils import BlackListManager, PriceCacheManager
+from CORE.bot_utils import BlackListManager, PriceCacheManager, ConfigManager, signal_template
 from c_log import UnifiedLogger
 from TG.tg_sender import TelegramSender
 from utils import get_config_summary
@@ -40,6 +40,7 @@ logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
+
 class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
@@ -47,7 +48,7 @@ class TradingBot:
         quota_asset = self.cfg.get("quota_asset", "USDT")
 
         # Инициализация сервисов (Черный список и Кэш цен)
-        self.bl_manager = BlackListManager(CFG_PATH, quota_asset)
+        self.bl_manager = BlackListManager(CFG_PATH, quota_asset)        
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
         
         self.state = BotState(black_list=self.black_list)
@@ -92,53 +93,18 @@ class TradingBot:
         self._stream_task: asyncio.Task | None = None
         self._price_updater_task: asyncio.Task | None = None
 
-    async def aclose(self):
-        await self.stop()
-        logger.info("💾 Финальное сохранение стейта на диск...")
-        await self.state.save()
+        self.cfg_manager = ConfigManager(CFG_PATH, self)
+        self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
 
-        await self.phemex_sym_api.aclose()
-        await self.binance_ticker_api.aclose()
-        await self.phemex_ticker_api.aclose()
-        await self.phemex_funding_api.aclose()
-        if self.tg:
-            await self.tg.aclose()
-        if self.session and not self.session.closed:
-            await self.session.close()
-
+    # ==========================================
+    # ХЕЛПЕРЫ
+    # ==========================================
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
         task.cancel()
         try: await task
         except asyncio.CancelledError: pass
         except Exception as e: logger.debug(f"Task shutdown note: {e}")
-
-    def reload_config(self) -> tuple[bool, str]:
-        try:
-            with open(CFG_PATH, "r", encoding="utf-8") as f:
-                new_cfg = json.load(f)
-
-            self.cfg = new_cfg
-            self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
-            
-            # Делегируем обновление ЧС утилите
-            self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
-            if hasattr(self.state, 'black_list'):
-                self.state.black_list = self.black_list
-
-            old_ff = getattr(self.entry_engine, 'funding_filter', None) if hasattr(self, 'entry_engine') else None
-            if old_ff: old_ff.stop()
-
-            self.entry_engine = EntryEngine(self.cfg["entry"], self.phemex_funding_api)
-            self.exit_engine = ExitEngine(self.cfg["exit"], self)
-
-            if getattr(self, '_is_running', False):
-                self._funding_task = asyncio.create_task(self.entry_engine.funding_filter.run())
-
-            return True, "Конфигурация успешно обновлена в памяти!"
-        except Exception as e:
-            logger.error(f"Config reload error: {e}")
-            return False, f"Ошибка загрузки в память: {e}"
 
     def set_blacklist(self, symbols: list) -> tuple[bool, str]:
         # Вся черновая работа с ЧС передана менеджеру
@@ -193,25 +159,8 @@ class TradingBot:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
     # ==========================================
-    # ИСПРАВЛЕННЫЕ И БЕЗОПАСНЫЕ ВОРКЕРЫ СТАКАНА
+    # ВОРКЕРЫ СТАКАНА
     # ==========================================
-    async def _depth_worker_loop(self, symbol: str):
-        """Безопасный цикл обработки стакана без рекурсии в finally."""
-        while self._is_running:
-            snap = self._latest_depth.pop(symbol, None)
-            if snap is None:
-                break # Нет свежих данных - гасим воркер, он освобождает память
-            await self._process_depth(snap)
-
-    async def _on_depth_received(self, snap: DepthTop):
-        if not self._is_running: return
-        self._latest_depth[snap.symbol] = snap
-        
-        worker = self._depth_workers.get(snap.symbol)
-        # Если воркера нет или он завершил цикл обработки (done) - запускаем новый
-        if worker is None or worker.done():
-            self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker_loop(snap.symbol))
-
     async def _process_depth(self, snap: DepthTop):
         if not self._is_running: return
         symbol = snap.symbol
@@ -247,12 +196,11 @@ class TradingBot:
                     if action: 
                         await self.executor.handle_exit_action(symbol, pos_key, action)
             
-            # 2. Логика слотов и Hedge Mode
-            hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
+            # 2. Логика слотов и Hedge Mode            
             has_long = pos_long_key in self.state.active_positions or pos_long_key in self.state.in_flight_orders
             has_short = pos_short_key in self.state.active_positions or pos_short_key in self.state.in_flight_orders
 
-            if not hedge_mode and (has_long or has_short): return
+            if not self.hedge_mode and (has_long or has_short): return
 
             active_symbols = set(p.symbol for p in self.state.active_positions.values())
             in_flight_symbols = set(k.split("_")[0] for k in self.state.in_flight_orders)
@@ -276,12 +224,35 @@ class TradingBot:
                     await self.executor.execute_entry(symbol, pos_key, signal, snap)
                 finally:
                     self.state.in_flight_orders.discard(pos_key)
+                
+                msg = signal_template(symbol, signal, b_price, p_price)
+                asyncio.create_task(self.tg.send_message(msg))
                     
         except Exception as e:
             logger.debug(f"Scan error: {e}")
         finally:
             self._processing.discard(symbol)
 
+    async def _depth_worker_loop(self, symbol: str):
+        """Безопасный цикл обработки стакана без рекурсии в finally."""
+        while self._is_running:
+            snap = self._latest_depth.pop(symbol, None)
+            if snap is None:
+                break # Нет свежих данных - гасим воркер, он освобождает память
+            await self._process_depth(snap)
+
+    async def _on_depth_received(self, snap: DepthTop):
+        if not self._is_running: return
+        self._latest_depth[snap.symbol] = snap
+        
+        worker = self._depth_workers.get(snap.symbol)
+        # Если воркера нет или он завершил цикл обработки (done) - запускаем новый
+        if worker is None or worker.done():
+            self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker_loop(snap.symbol))
+
+    # ==========================================
+    # ТОЧКИ ВХОДА
+    # ==========================================
     async def start(self):
         if getattr(self, '_is_running', False): return
         self._is_running = True
@@ -290,8 +261,7 @@ class TradingBot:
         summary = get_config_summary(self.cfg)
         logger.info(f"⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ\n{summary}")
 
-        if self.tg:
-            asyncio.create_task(self.tg.send_message("🟢 <b>ТОРГОВЛЯ НАЧАТА</b>"))
+        if self.tg: asyncio.create_task(self.tg.send_message("🟢 <b>ТОРГОВЛЯ НАЧАТА</b>"))
 
         symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
@@ -310,10 +280,25 @@ class TradingBot:
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
         self._stream_task = asyncio.create_task(self._stream.run(self._on_depth_received))
 
+    async def aclose(self):
+        await self.stop()
+        logger.info("💾 Финальное сохранение стейта на диск...")
+        await self.state.save()
+
+        await self.phemex_sym_api.aclose()
+        await self.binance_ticker_api.aclose()
+        await self.phemex_ticker_api.aclose()
+        await self.phemex_funding_api.aclose()
+        if self.tg:
+            await self.tg.aclose()
+        if self.session and not self.session.closed:
+            await self.session.close()
+
     async def stop(self):
         if not getattr(self, '_is_running', False): return
         self._is_running = False
         logger.info("⏹ Остановка процессов...")
+        if self.tg: await self.tg.send_message("⏹ Остановка процессов...")
 
         self.price_manager.stop()
         self.entry_engine.funding_filter.stop()

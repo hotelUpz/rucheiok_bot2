@@ -156,13 +156,13 @@ class PrivateWSHandler:
                 if pos.side == "LONG" and price_rp < pos.entry_price: is_loss = True
                 if pos.side == "SHORT" and price_rp > pos.entry_price: is_loss = True
 
-            pnl_str: str = f"+{price_rp}" if not is_loss else str(price_rp)
+            # pnl_str: str = f"+{price_rp}" if not is_loss else str(price_rp)
             logger.info(f"✅ [{pos_key}] {semantic} ПОЛНОСТЬЮ ЗАВЕРШЕНО.")
             
             if self.tb.tg:
                 asyncio.create_task(self.tb.tg.send_message(
-                    f"✅ <b>Тейк-профит исполнен! ({semantic})</b>\nМонета: #{symbol}\n"
-                    f"PnL: {pnl_str}. Цена выхода: {pos.current_close_price}"
+                    f"✅ <b>Позиция закрыта ({semantic})</b>\nМонета: #{symbol}\n"
+                    f"Цена выхода: {pos.current_close_price}"
                 ))
             
             self._process_pnl(symbol, pos_key, is_loss, pos.current_close_price)
@@ -172,26 +172,9 @@ class PrivateWSHandler:
         if pos.close_order_id != order_id:
             return 
 
-        # if status == "PartiallyFilled":
-        #     if cum_qty > 0: 
-        #         asyncio.create_task(self._cancel_remainder(symbol, pos_key, order_id, pos_side, pos, "close_cancel_requested", "ВЫХОД"))
-        #     return
-
         if status == "PartiallyFilled":
             if cum_qty > 0: 
-                async def _delayed_cancel():
-                    # Вычисляем, сколько еще осталось от hunting_timeout_sec
-                    wait_time = pos.hunting_active_until - time.time()
-                    if wait_time > 0:
-                        await asyncio.sleep(wait_time)
-                    
-                    # Просыпаемся и проверяем: актуален ли еще этот ордер?
-                    # Если за время сна его налили полностью (qty <= 0) 
-                    # или уже отменили, то ничего не делаем.
-                    if pos.close_order_id == order_id and pos.qty > 0 and not pos.close_cancel_requested:
-                        await self._cancel_remainder(symbol, pos_key, order_id, pos_side, pos, "close_cancel_requested", "ВЫХОД")
-                
-                asyncio.create_task(_delayed_cancel())
+                asyncio.create_task(self._cancel_remainder(symbol, pos_key, order_id, pos_side, pos, "close_cancel_requested", "ВЫХОД"))
             return
 
         if status in ("Canceled", "Rejected", "Deactivated"):

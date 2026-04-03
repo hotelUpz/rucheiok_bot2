@@ -817,3 +817,13 @@
     #             self.active_positions[sym] = ActivePosition.from_dict(pos_data)
     #     except Exception as e:
     #         logger.error(f"Ошибка чтения стейта: {e}")
+
+
+
+# if __name__ == "__main__":
+#     try:
+#         if sys.platform == 'win32':
+#             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+#         asyncio.run(_main())
+#     except KeyboardInterrupt:
+#         pass

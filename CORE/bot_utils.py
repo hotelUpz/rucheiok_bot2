@@ -7,11 +7,30 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple, Any
-
+from typing import Dict, List, Tuple, Any, TYPE_CHECKING
+from ENTRY.engine import EntryEngine
+from EXIT.engine import ExitEngine
 from c_log import UnifiedLogger
 
+if TYPE_CHECKING:
+    from CORE.bot import TradingBot
+
 logger = UnifiedLogger("bot")
+
+def signal_template(symbol, signal, b_price, p_price):
+    return (
+        f"Монета: <b>#{symbol}</b>\n"
+        f"Направление: {signal.get('side', "?")}\n"
+        f"Цена срабатывания (стакан): {signal['price']}\n"
+        f"Spread (3 уровня): {signal['spr3_pct']}%\n"
+        f"Множитель (Rate): {signal['rate']}x\n\n"
+        f"Объем первого уровня в USDT: {round(signal.get("row_vol_usdt", 0), 2) or "none"}\n\n"
+        f"🔥 <b>Горячие цены:</b>\n"
+        f"Binance: {b_price}\n"
+        f"Phemex: {p_price}\n"                
+        f"Binance/Phemex Spread_%: {round(signal.get("spread", 0), 4) or "none"}\n"
+    )
+
 
 class BlackListManager:
     """Управление черным списком: парсинг, квотирование, сохранение."""
@@ -95,3 +114,35 @@ class PriceCacheManager:
     def get_prices(self, symbol: str) -> Tuple[float, float]:
         """Возвращает (binance_price, phemex_price)"""
         return self.binance_prices.get(symbol, 0.0), self.phemex_prices.get(symbol, 0.0)
+
+class ConfigManager:
+    def __init__(self, cfg_path: Path | str, tb: "TradingBot"):
+        self.cfg_path = cfg_path
+        self.tb = tb
+
+    def reload_config(self) -> tuple[bool, str]:
+        try:
+            with open(self.cfg_path, "r", encoding="utf-8") as f:
+                new_cfg = json.load(f)
+
+            self.tb.cfg = new_cfg
+            self.tb.max_active_positions = self.tb.cfg.get("app", {}).get("max_active_positions", 1)
+            
+            # Делегируем обновление ЧС утилите
+            self.tb.black_list = self.tb.bl_manager.load_from_config(self.tb.cfg.get("black_list", []))
+            if hasattr(self.tb.state, 'black_list'):
+                self.tb.state.black_list = self.tb.black_list
+
+            old_ff = getattr(self.tb.entry_engine, 'funding_filter', None) if hasattr(self.tb, 'entry_engine') else None
+            if old_ff: old_ff.stop()
+
+            self.tb.entry_engine = EntryEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
+            self.tb.exit_engine = ExitEngine(self.tb.cfg["exit"], self.tb)
+
+            if getattr(self.tb, '_is_running', False):
+                self.tb._funding_task = asyncio.create_task(self.tb.entry_engine.funding_filter.run())
+
+            return True, "Конфигурация успешно обновлена в памяти!"
+        except Exception as e:
+            logger.error(f"Config reload error: {e}")
+            return False, f"Ошибка загрузки в память: {e}"

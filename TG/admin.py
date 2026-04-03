@@ -17,6 +17,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from c_log import UnifiedLogger
 from utils import get_config_summary
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from CORE.bot import TradingBot
 
 TEMP_CFG_PATH = CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.json"
 
@@ -27,7 +31,7 @@ class BotStates(StatesGroup):
     waiting_for_config = State()
 
 class AdminTgBot:
-    def __init__(self, token: str, chat_id: str, trading_bot):
+    def __init__(self, token: str, chat_id: str, trading_bot: "TradingBot"):
         self.bot = Bot(token=token, default=DefaultBotProperties(parse_mode="HTML"))
         self.dp = Dispatcher()
         self.chat_id = str(chat_id)
@@ -207,7 +211,7 @@ class AdminTgBot:
                 os.replace(file_path, CFG_PATH)
                 
                 # ГЛАВНЫЙ ФИКС: ПРИМЕНЯЕМ В ОПЕРАТИВНУЮ ПАМЯТЬ
-                success, reload_msg = self.tb.reload_config()
+                success, reload_msg = self.tb.cfg_manager.reload_config()
                 
                 if success:
                     await msg.answer("✅ <b>Настройки загружены и применены «НА ЛЕТУ»!</b>\n\nНажмите <b>📊 Статус</b>, чтобы убедиться.\n<i>(Останавливать бота не нужно)</i>")
