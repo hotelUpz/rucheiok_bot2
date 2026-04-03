@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
 
-class EntryEngine:
+class SignalEngine:
     def __init__(self, cfg: Dict[str, Any], funding_api: PhemexFunding):
         self.cfg = cfg
         self.phemex_cfg: Dict[str, Any] = cfg["pattern"]["phemex"]

@@ -8,7 +8,7 @@ import asyncio
 import json
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, TYPE_CHECKING
-from ENTRY.engine import EntryEngine
+from ENTRY.signal_engine import SignalEngine
 from EXIT.engine import ExitEngine
 from c_log import UnifiedLogger
 
@@ -16,20 +16,6 @@ if TYPE_CHECKING:
     from CORE.bot import TradingBot
 
 logger = UnifiedLogger("bot")
-
-def signal_template(symbol, signal, b_price, p_price):
-    return (
-        f"Монета: <b>#{symbol}</b>\n"
-        f"Направление: {"🟢 LONG 📈" if signal["side"] == "LONG" else "🔴 SHORT 📉"}\n"
-        f"Цена срабатывания (стакан): {signal['price']}\n"
-        f"Spread (3 уровня): {signal['spr3_pct']}%\n"
-        f"Множитель (Rate): {signal['rate']}x\n\n"
-        f"Объем первого уровня в USDT: {round(signal.get("row_vol_usdt", 0), 2) or "none"}\n\n"
-        f"🔥 <b>Горячие цены:</b>\n"
-        f"Binance: {b_price}\n"
-        f"Phemex: {p_price}\n"                
-        f"Binance/Phemex Spread_%: {round(signal.get("spread", 0), 4) or "none"}\n"
-    )
 
 
 class BlackListManager:
@@ -136,7 +122,7 @@ class ConfigManager:
             old_ff = getattr(self.tb.entry_engine, 'funding_filter', None) if hasattr(self.tb, 'entry_engine') else None
             if old_ff: old_ff.stop()
 
-            self.tb.entry_engine = EntryEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
+            self.tb.entry_engine = SignalEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
             self.tb.exit_engine = ExitEngine(self.tb.cfg["exit"], self.tb)
 
             if getattr(self.tb, '_is_running', False):
@@ -146,3 +132,37 @@ class ConfigManager:
         except Exception as e:
             logger.error(f"Config reload error: {e}")
             return False, f"Ошибка загрузки в память: {e}"
+
+
+class Reporters:
+    """Централизованный шаблонизатор отчетов для Телеграма и Логов."""
+    
+    @staticmethod
+    def entry_signal(symbol: str, signal: dict, b_price: float, p_price: float) -> str:
+        side_str = "🟢 LONG 📈" if signal.get('side') == "LONG" else "🔴 SHORT 📉"
+        return (
+            f"Монета: <b>#{symbol}</b>\n"
+            f"Направление: {side_str}\n"
+            f"Цена срабатывания: {signal.get('trigger_price', signal.get('price'))}\n"
+            f"Spread (3 уровня): {signal.get('spr3_pct', 0)}%\n"
+            f"Множитель (Rate): {signal.get('rate', 0)}x\n\n"
+            f"🔥 <b>Горячие цены:</b>\n"
+            f"Binance: {b_price}\n"
+            f"Phemex: {p_price}\n"
+        )
+
+    @staticmethod
+    def extreme_close(symbol: str, pos_key: str, reason: str) -> str:
+        return f"🚨 <b>EXTREME CLOSE TRIGGERED</b>\n#{pos_key}\nПричина: {reason}"
+
+    @staticmethod
+    def ttl_close(symbol: str, pos_key: str, lifetime_sec: float) -> str:
+        return f"⏳ <b>TTL LIMIT REACHED</b>\n#{pos_key}\nВремя в сделке: {lifetime_sec} сек. Принудительный выход."
+
+    @staticmethod
+    def dust_close(symbol: str, pos_key: str, price: float) -> str:
+        return f"🧹 <b>DUST CLEARED (< 5 USDT)</b>\n#{pos_key}\nState сброшен по цене {price}."
+
+    @staticmethod
+    def exit_success(pos_key: str, semantic: str, price: float) -> str:
+        return f"✅ <b>{semantic}</b>\nМонета: #{pos_key}\nЦена выхода: {price}"
