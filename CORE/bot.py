@@ -113,7 +113,17 @@ class TradingBot:
             self.black_list = self.bl_manager.symbols
             if hasattr(self.state, 'black_list'):
                 self.state.black_list = self.black_list
-        return success, msg
+        return success, msg    
+
+    async def quarantine_util(self, symbol) -> bool:        
+        if symbol in self.state.quarantine_until:
+            if time.time() > self.state.quarantine_until[symbol]:
+                del self.state.quarantine_until[symbol]
+                self.state.consecutive_fails[symbol] = 0
+                await self.state.save()
+                return True            
+            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return False
+        return True
     
     async def _recover_state(self):
         try:
@@ -163,17 +173,12 @@ class TradingBot:
     # ==========================================
     async def _process_depth(self, snap: DepthTop):
         if not self._is_running: return
-        symbol = snap.symbol
-        
-        if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
-        if symbol in self.state.quarantine_until:
-            if time.time() > self.state.quarantine_until[symbol]:
-                del self.state.quarantine_until[symbol]
-                self.state.consecutive_fails[symbol] = 0
-                await self.state.save()
-            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
 
+        symbol = snap.symbol
+        if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
         if symbol in self._processing: return
+        if not await self.quarantine_util(symbol): return
+
         self._processing.add(symbol)
         try:
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
