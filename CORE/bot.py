@@ -346,6 +346,6 @@ class TradingBot:
         self._depth_workers.clear()
         self._latest_depth.clear()
         self._processing.clear()
-        self.signal_timeout_sec.clear()
+        self._signal_timeouts.clear()
 
         await self.state.save()
