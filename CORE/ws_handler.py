@@ -43,7 +43,6 @@ class PrivateWSHandler:
             await self.tb.executor.cancel_order_via_ws(symbol, order_id, pos_side)
 
     # ------------------ Жизненный цикл событий ------------------
-
     async def _process_entry(self, symbol: str, pos_key: str, order_id: str, status: str, pos_side: str, cum_qty: float) -> None:
         saved_id = self.tb.state.pending_entry_orders.get(pos_key)
         if saved_id == "PENDING_HTTP":
@@ -60,8 +59,11 @@ class PrivateWSHandler:
             pos.entry_finalized = True
             logger.info(f"🟢 [ВХОД] {pos_key}. Статус: {status}, Налито: {cum_qty}")
 
+        # Инвариант 3: Даем лимитке высказаться после первого налива
         if status == "PartiallyFilled" and cum_qty > 0 and not getattr(pos, "entry_cancel_requested", False):
             pos.entry_cancel_requested = True
+            # Взводим таймер устояния ордера
+            pos.entry_active_until = time.time() + self.tb.executor.entry_timeout_sec
             asyncio.create_task(self._handle_partial_fill_cancellation(
                 symbol, pos_key, order_id, pos_side, pos, "entry_active_until", "ВХОД"
             ))

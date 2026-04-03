@@ -91,9 +91,80 @@ class TradingBot:
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
 
     # ==========================================
-    # ИНВАРИАНТЫ ПАЙПЛАЙНА
+    # ХЕЛПЕРЫ
     # ==========================================
+    async def _await_task(self, task: asyncio.Task | None):
+        if not task: return
+        task.cancel()
+        try: await task
+        except asyncio.CancelledError: pass
+        except Exception as e: logger.debug(f"Task shutdown note: {e}")
+
+    def set_blacklist(self, symbols: list) -> tuple[bool, str]:
+        success, msg = self.bl_manager.update_and_save(symbols)
+        if success:
+            self.black_list = self.bl_manager.symbols
+            if hasattr(self.state, 'black_list'):
+                self.state.black_list = self.black_list
+        return success, msg    
+
+    async def quarantine_util(self, symbol) -> bool:        
+        if symbol in self.state.quarantine_until:
+            if time.time() > self.state.quarantine_until[symbol]:
+                del self.state.quarantine_until[symbol]
+                self.state.consecutive_fails[symbol] = 0
+                await self.state.save()
+                return True            
+            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
+                return False
+        return True
     
+    async def _recover_state(self):
+        try:
+            self.state.load()
+            resp = await self.private_client.get_active_positions()
+            data_block = resp.get("data", {})
+            data = data_block.get("positions", []) if isinstance(data_block, dict) else data_block
+            if not isinstance(data, list): data = []
+
+            exchange_positions = {}
+            for item in data:
+                size = float(item.get("sizeRq", item.get("size", 0)))
+                if size != 0:
+                    symbol = item.get("symbol")
+                    pos_side = "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"
+                    pos_key = f"{symbol}_{pos_side}"
+                    exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
+
+            old_positions = dict(self.state.active_positions)
+            self.state.active_positions.clear()
+
+            for pos_key, pos in old_positions.items():
+                if pos_key in exchange_positions:
+                    exch_data = exchange_positions[pos_key]
+                    if pos.side != exch_data["side"]: continue
+                        
+                    try: await self.private_client.cancel_all_orders(pos.symbol)
+                    except Exception: pass
+
+                    pos.qty = exch_data["size"]
+                    pos.close_order_id = None
+                    pos.entry_finalized = pos.qty > 0
+                    pos.entry_cancel_requested = False
+                    pos.interference_cancel_requested = False
+
+                    self.state.active_positions[pos_key] = pos
+                    logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {pos_key}. Объем: {pos.qty}, Вход: {pos.entry_price}")
+                else:
+                    logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне. Удаляем из кэша.")
+
+            await self.state.save()
+        except Exception as e:
+            logger.error(f"❌ Ошибка Recovery: {e}")
+
+    # ==========================================
+    # ИНВАРИАНТЫ ПАЙПЛАЙНА
+    # ==========================================    
     async def _manage_position_lifecycle(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         """Инвариант 1: Контроль жизни текущих позиций (Огрызки, TTL, Экстрим, Охота)."""
         _, p_price = self.price_manager.get_prices(symbol)
@@ -167,7 +238,6 @@ class TradingBot:
     # ==========================================
     # ВОРКЕРЫ СТАКАНА
     # ==========================================
-
     async def _orchestrate_market_tick(self, snap: DepthTop):
         """Главный дирижер тиков. Пошаговый пайплайн."""
         if not self._is_running: return
@@ -233,7 +303,7 @@ class TradingBot:
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
         
-        self._funding_task = asyncio.create_task(self.entry_engine.funding_filter.run())
+        self._funding_task = asyncio.create_task(self.signal_engine.funding_filter.run())
         self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
@@ -261,7 +331,7 @@ class TradingBot:
         if self.tg: await self.tg.send_message("⏹ Остановка процессов...")
 
         self.price_manager.stop()
-        self.entry_engine.funding_filter.stop()
+        self.signal_engine.funding_filter.stop()
         if self._stream: self._stream.stop()
         await self.private_ws.aclose()
         
@@ -276,6 +346,6 @@ class TradingBot:
         self._depth_workers.clear()
         self._latest_depth.clear()
         self._processing.clear()
-        self._entry_timeouts.clear()
+        self.signal_timeout_sec.clear()
 
         await self.state.save()
