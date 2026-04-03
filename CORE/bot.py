@@ -8,7 +8,6 @@ import asyncio
 import time
 from typing import Dict, Any, Set, TYPE_CHECKING
 import os
-import json
 import aiohttp
 from pathlib import Path
 
@@ -47,7 +46,6 @@ class TradingBot:
         self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
         quota_asset = self.cfg.get("quota_asset", "USDT")
 
-        # Инициализация сервисов (Черный список и Кэш цен)
         self.bl_manager = BlackListManager(CFG_PATH, quota_asset)        
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
         
@@ -64,7 +62,6 @@ class TradingBot:
         self.phemex_funding_api = PhemexFunding()
         self.session = aiohttp.ClientSession()
         
-        # Настройка Менеджера цен
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         self.price_manager = PriceCacheManager(self.binance_ticker_api, self.phemex_ticker_api, upd_sec)
 
@@ -88,6 +85,10 @@ class TradingBot:
         self._processing: Set[str] = set()
         self._latest_depth: Dict[str, DepthTop] = {}
         self._depth_workers: Dict[str, asyncio.Task] = {}
+        
+        # Словарь для блокировки спама ордерами на вход
+        self._entry_timeouts: Dict[str, float] = {}
+
         self._funding_task: asyncio.Task | None = None
         self._private_ws_task: asyncio.Task | None = None
         self._stream_task: asyncio.Task | None = None
@@ -95,6 +96,7 @@ class TradingBot:
 
         self.cfg_manager = ConfigManager(CFG_PATH, self)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
+        self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0)
 
     # ==========================================
     # ХЕЛПЕРЫ
@@ -107,7 +109,6 @@ class TradingBot:
         except Exception as e: logger.debug(f"Task shutdown note: {e}")
 
     def set_blacklist(self, symbols: list) -> tuple[bool, str]:
-        # Вся черновая работа с ЧС передана менеджеру
         success, msg = self.bl_manager.update_and_save(symbols)
         if success:
             self.black_list = self.bl_manager.symbols
@@ -122,7 +123,8 @@ class TradingBot:
                 self.state.consecutive_fails[symbol] = 0
                 await self.state.save()
                 return True            
-            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return False
+            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
+                return False
         return True
     
     async def _recover_state(self):
@@ -169,9 +171,87 @@ class TradingBot:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
     # ==========================================
+    # БЛОК ЛОГИКИ СТАКАНА (РАЗНЕСЕННЫЕ МЕТОДЫ)
+    # ==========================================
+    async def _process_exits(self, snap: DepthTop, symbol: str, pos_long_key: str, pos_short_key: str) -> None:
+        """Метод делегирует оценку выхода (Тейки, Экстрим, TTL) движку exit_engine."""
+        for pos_key in (pos_long_key, pos_short_key):
+            if pos_key not in self.state.active_positions:
+                continue
+
+            pos: 'ActivePosition' = self.state.active_positions[pos_key]
+            
+            # Ждем пока ордер на вход нальется, прежде чем искать выход
+            if pos_key in self.state.pending_entry_orders and pos.qty <= 0: 
+                continue
+
+            # Блокируем анализ ТОЛЬКО если активна физическая охота по этой конкретной позиции
+            # (мы ударили по стакану и ждем ответа WS, чтобы не спамить изменениями цели).
+            if getattr(pos, 'hunting_active_until', 0) > time.time():
+                continue
+
+            action = self.exit_engine.analyze(snap, pos)
+            if action: 
+                await self.executor.handle_exit_action(symbol, pos_key, action)
+
+    def _check_slots(self, symbol: str, pos_long_key: str, pos_short_key: str) -> bool:
+        """Риск-менеджмент: проверка доступности слотов и Hedge Mode."""
+        has_long = pos_long_key in self.state.active_positions or pos_long_key in self.state.pending_entry_orders
+        has_short = pos_short_key in self.state.active_positions or pos_short_key in self.state.pending_entry_orders
+
+        if not self.hedge_mode and (has_long or has_short): 
+            return False
+
+        active_symbols = set(p.symbol for p in self.state.active_positions.values())
+        pending_symbols = set(k.split("_")[0] for k in self.state.pending_entry_orders)
+        used_slots = len(active_symbols | pending_symbols)
+
+        if used_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in pending_symbols:
+            return False
+
+        return True
+
+    async def _process_entry(self, snap: DepthTop, symbol: str) -> None:
+        """Поиск сигнала на вход и защищенная отправка ордера."""
+        b_price, p_price = self.price_manager.get_prices(symbol)
+        signal = self.entry_engine.analyze(snap, b_price, p_price)
+        
+        if not signal:
+            return
+
+        pos_key = f"{symbol}_{signal['side']}"
+        
+        # Если позиция уже есть или ордер в процессе выставления/налива
+        if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: 
+            return 
+
+        # Независимый таймаут для защиты от спама дублями ордеров (entry_active_until)
+        if pos_key in self._entry_timeouts and self._entry_timeouts[pos_key] > time.time():
+            return
+
+        # Блокируем этот ключ для входа на 1.5 секунды
+        self._entry_timeouts[pos_key] = time.time() + self.signal_timeout_sec
+
+        try:
+            signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
+            
+            if self.tg:
+                # Создаем копию сигнала и подменяем side на "разукрашку" специально для шаблона
+                tg_signal = signal.copy()
+                
+                # Передаем в вашу утилиту
+                entry_msg = signal_template(symbol, tg_signal, b_price, p_price)
+                asyncio.create_task(self.tg.send_message(entry_msg))
+
+            await self.executor.execute_entry(symbol, pos_key, signal, snap)
+        except Exception as e:
+            logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
+
+    # ==========================================
     # ВОРКЕРЫ СТАКАНА
     # ==========================================
     async def _process_depth(self, snap: DepthTop):
+        """Главный пайплайн принятия решений (Очищенный)."""
         if not self._is_running: return
 
         symbol = snap.symbol
@@ -183,55 +263,15 @@ class TradingBot:
         try:
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             
-            # 1. Обработка Выхода
-            for pos_key in (pos_long_key, pos_short_key):
-                if pos_key in self.state.active_positions:
-                    pos: 'ActivePosition' = self.state.active_positions[pos_key]
-                    
-                    if pos_key in self.state.pending_entry_orders and pos.qty <= 0: 
-                        continue
-                        
-                    # 🛑 БЛОКИРОВКА АНАЛИЗА ПРИ АКТИВНОЙ ОХОТЕ
-                    # Если мы ударили по стакану, даем ордеру минимальное время (напр. 1 сек).
-                    # Таймеры деградации цели замораживаются. Ждем развязки (Full Fill или Partial Fill).
-                    if pos.hunting_active_until > time.time():
-                        continue
-                        
-                    action: Dict[str, Any] | None = self.exit_engine.analyze(snap, pos)
-                    if action: 
-                        await self.executor.handle_exit_action(symbol, pos_key, action)
+            # 1. Поиск выхода для существующих позиций
+            await self._process_exits(snap, symbol, pos_long_key, pos_short_key)
             
-            # 2. Логика слотов и Hedge Mode            
-            has_long = pos_long_key in self.state.active_positions or pos_long_key in self.state.in_flight_orders
-            has_short = pos_short_key in self.state.active_positions or pos_short_key in self.state.in_flight_orders
-
-            if not self.hedge_mode and (has_long or has_short): return
-
-            active_symbols = set(p.symbol for p in self.state.active_positions.values())
-            in_flight_symbols = set(k.split("_")[0] for k in self.state.in_flight_orders)
-            used_slots = len(active_symbols | in_flight_symbols)
-
-            if used_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in in_flight_symbols:
+            # 2. Проверка лимитов квот и доступности слотов
+            if not self._check_slots(symbol, pos_long_key, pos_short_key):
                 return
-
-            # 3. Вход: Мгновенное чтение из кэша утилиты
-            b_price, p_price = self.price_manager.get_prices(symbol)
-            signal = self.entry_engine.analyze(snap, b_price, p_price)
             
-            if signal:
-                pos_key = f"{symbol}_{signal['side']}"
-                if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders or pos_key in self.state.in_flight_orders: 
-                    return 
-
-                self.state.in_flight_orders.add(pos_key)
-                try:
-                    signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-                    await self.executor.execute_entry(symbol, pos_key, signal, snap)
-                finally:
-                    self.state.in_flight_orders.discard(pos_key)
-                
-                msg = signal_template(symbol, signal, b_price, p_price)
-                asyncio.create_task(self.tg.send_message(msg))
+            # 3. Поиск сигнала на вход
+            await self._process_entry(snap, symbol)
                     
         except Exception as e:
             logger.debug(f"Scan error: {e}")
@@ -239,11 +279,10 @@ class TradingBot:
             self._processing.discard(symbol)
 
     async def _depth_worker_loop(self, symbol: str):
-        """Безопасный цикл обработки стакана без рекурсии в finally."""
         while self._is_running:
             snap = self._latest_depth.pop(symbol, None)
             if snap is None:
-                break # Нет свежих данных - гасим воркер, он освобождает память
+                break 
             await self._process_depth(snap)
 
     async def _on_depth_received(self, snap: DepthTop):
@@ -251,12 +290,11 @@ class TradingBot:
         self._latest_depth[snap.symbol] = snap
         
         worker = self._depth_workers.get(snap.symbol)
-        # Если воркера нет или он завершил цикл обработки (done) - запускаем новый
         if worker is None or worker.done():
             self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker_loop(snap.symbol))
 
     # ==========================================
-    # ТОЧКИ ВХОДА
+    # ТОЧКИ ВХОДА СИСТЕМЫ
     # ==========================================
     async def start(self):
         if getattr(self, '_is_running', False): return
@@ -273,7 +311,6 @@ class TradingBot:
 
         await self._recover_state()
 
-        # Прогрев и старт менеджера цен
         logger.info("🔄 Прогрев кэша цен (Binance/Phemex)...")
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
@@ -321,5 +358,6 @@ class TradingBot:
         self._depth_workers.clear()
         self._latest_depth.clear()
         self._processing.clear()
+        self._entry_timeouts.clear()
 
         await self.state.save()

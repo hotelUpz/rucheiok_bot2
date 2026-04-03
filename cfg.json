@@ -52,6 +52,8 @@
         }
     },
     "entry": {
+        "signal_timeout_sec": 0.5,
+        "entry_timeout_sec": 0.1,
         "pattern": {
             "phemex": {
                 "name": "Rucheiok pattern",
@@ -89,7 +91,7 @@
         }
     },
     "exit": {
-        "hunting_timeout_sec": 0.5,
+        "hunting_timeout_sec": 0.1,
         "scenarious": {
             "average": {
                 "enable": true,

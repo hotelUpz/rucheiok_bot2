@@ -20,7 +20,7 @@ logger = UnifiedLogger("bot")
 def signal_template(symbol, signal, b_price, p_price):
     return (
         f"Монета: <b>#{symbol}</b>\n"
-        f"Направление: {signal.get('side', "?")}\n"
+        f"Направление: {"🟢 LONG 📈" if signal["side"] == "LONG" else "🔴 SHORT 📉"}\n"
         f"Цена срабатывания (стакан): {signal['price']}\n"
         f"Spread (3 уровня): {signal['spr3_pct']}%\n"
         f"Множитель (Rate): {signal['rate']}x\n\n"
