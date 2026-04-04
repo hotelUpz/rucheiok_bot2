@@ -1,0 +1,52 @@
+2026-04-04 00:53:36 | INFO | average | [PIPPINUSDT] ✅ Average: стабилизация завершена. Виртуальный TP: 0.03049, Rate: 1.0
+2026-04-04 00:53:46 | INFO | average | [PIPPINUSDT] 📉 Average: СДВИГ ТП. Rate: 1.000 → 0.800 | Виртуальный TP: 0.03049 → 0.030474
+2026-04-04 00:53:56 | INFO | average | [PIPPINUSDT] 🔥 Average: Rate=0.8 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 00:55:00 | INFO | average | [CRCLUSDT] ✅ Average: стабилизация завершена. Виртуальный TP: 90.79, Rate: 1.0
+2026-04-04 00:55:10 | INFO | average | [CRCLUSDT] 📉 Average: СДВИГ ТП. Rate: 1.000 → 0.800 | Виртуальный TP: 90.79 → 90.768
+2026-04-04 02:04:09 | INFO | average | [ARKMUSDT] ✅ Average: стабилизация завершена. Виртуальный TP: 0.0958, Rate: 1.0
+2026-04-04 02:04:23 | INFO | average | [ARKMUSDT] 📉 Average: СДВИГ ТП. Rate: 1.000 → 0.800 | Виртуальный TP: 0.0958 → 0.09578
+2026-04-04 02:04:38 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.8 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:39 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:39 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:39 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:41 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:41 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:42 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:43 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:43 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:45 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:48 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:51 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:04:52 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:05:01 | INFO | average | [ARKMUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:05:25 | INFO | average | [SKLUSDT] ✅ Average: стабилизация завершена. Виртуальный TP: 0.00664, Rate: 1.0
+2026-04-04 02:05:49 | INFO | average | [SKLUSDT] 📉 Average: СДВИГ ТП. Rate: 1.000 → 0.800 | Виртуальный TP: 0.00664 → 0.006636
+2026-04-04 02:06:00 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.8 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:00 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:00 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:01 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:01 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:01 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:01 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:01 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:02 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:02 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:02 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:02 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:02 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:09 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:09 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:13 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:18 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:18 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:18 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:18 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:19 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:19 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:20 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:23 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:23 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:06:24 | INFO | average | [SKLUSDT] 🔥 Average: Rate=0.0 <= min=0.8. TRIGGER_EXTRIME.
+2026-04-04 02:47:01 | INFO | average | [ARPAUSDT] ✅ Average: стабилизация завершена. Виртуальный TP: 0.00916, Rate: 1.0
+2026-04-04 02:47:20 | INFO | average | [ARPAUSDT] 📉 Average: СДВИГ ТП. Rate: 1.000 → 0.800 | Виртуальный TP: 0.00916 → 0.009156
+2026-04-04 02:47:41 | INFO | average | [ARPAUSDT] 🔥 Average: Rate=0.8 <= min=0.8. TRIGGER_EXTRIME.

@@ -22,16 +22,22 @@
         "timezone": "Europe/Kyiv"
     },
     "black_list": [
-        "RIVER",
-        "SIREN",
-        "0G",
-        "PTB",
-        "ICP",
-        "MAGIC",
-        "REZ",
-        "DOOD", 
-        "DEGO",
-        "FIO"
+        "RIVERUSDT",
+        "SIRENUSDT",
+        "0GUSDT",
+        "OGUSDT",
+        "0GUSDT",
+        "OGUSDT",
+        "PTBUSDT",
+        "ICPUSDT",
+        "MAGICUSDT",
+        "REZUSDT",
+        "DOODUSDT",
+        "DEGOUSDT",
+        "FIOUSDT",
+        "PIPPINUSDT",
+        "SKLUSDT",
+        "ARPAUSDT"
     ],
     "quota_asset": "USDT",
     "risk": {
@@ -43,7 +49,7 @@
             "margin_mode": 2
         },
         "margin_size": "row",
-        "notional_limit": 50.0,
+        "notional_limit": 25.0,
         "min_exchange_notional": 5.0,
         "margin_over_size_pct": 1,
         "hedge_mode": false,
@@ -54,7 +60,7 @@
     },
     "entry": {
         "signal_timeout_sec": 0.5,
-        "entry_timeout_sec": 0.1,
+        "entry_timeout_sec": 0.5,
         "pattern": {
             "phemex": {
                 "name": "Rucheiok pattern",
@@ -92,7 +98,7 @@
         }
     },
     "exit": {
-        "hunting_timeout_sec": 0.1,
+        "hunting_timeout_sec": 0.5,
         "scenarios": {
             "average": {
                 "enable": true,

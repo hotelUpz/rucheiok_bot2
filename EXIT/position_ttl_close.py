@@ -30,13 +30,18 @@ class PositionTTLClose:
         if not self.enable:
             return None
 
-        if now - pos.opened_at >= self.position_ttl:
-            if not pos.in_breakeven_mode:
-                return {
-                    "action": "TRIGGER_BREAKEVEN",
-                    "reason": "TTL_EXPIRED",
-                    "price": self.build_target_price(pos),
-                }
+        # Breakeven уже активен (установлен Average ИЛИ нами ранее).
+        # Ждём breakeven_wait_sec и переводим в Extrime — независимо от position_ttl.
+        if pos.in_breakeven_mode:
             if now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
                 return {"action": "TRIGGER_EXTRIME", "reason": "BREAKEVEN_TIMEOUT"}
+            return None
+
+        # TTL позиции истёк → переводим цель в безубыток
+        if now - pos.opened_at >= self.position_ttl:
+            return {
+                "action": "TRIGGER_BREAKEVEN",
+                "reason": "TTL_EXPIRED",
+                "price": self.build_target_price(pos),
+            }
         return None

@@ -108,8 +108,24 @@ class ExitEngine:
             if avg_action:
                 act = avg_action.get("action")
                 if act == "TRIGGER_EXTRIME":
-                    self._transition_to_extrime(pos, "Average исчерпал лимиты уступок")
-                    return self.extrime_close.analyze(depth, pos, now)
+                    # Не бросаем сразу в extrime — сначала пробуем breakeven по цене входа
+                    # (аналогично TTL P2). TTL (P2) подхватит breakeven_start_ts и через
+                    # breakeven_wait_sec сам переведёт в extrime.
+                    if not pos.in_breakeven_mode:
+                        pos.in_breakeven_mode = True
+                        pos.breakeven_start_ts = now
+                        pos.current_target_rate = 0.0
+                        target_price = self.ttl_close.build_target_price(pos)
+                        lifetime = round(now - pos.opened_at, 1)
+                        pos_key = f"{pos.symbol}_{pos.side}"
+                        logger.info(f"⌛ [EXIT] #{pos_key} Average исчерпал лимиты ({lifetime}с). Цель → БУ: {target_price}")
+                        if self.tb.tg:
+                            asyncio.create_task(self.tb.tg.send_message(
+                                f"⌛ <b>БУ РЕЖИМ (Average)</b>\n#{pos_key}\nВремя: {lifetime}с. Цель → БУ: {target_price}"
+                            ))
+                        return {"action": "UPDATE_TARGET", "price": target_price, "reason": "AVERAGE_BREAKEVEN"}
+                    # Уже в breakeven — TTL (P2) подхватит переход в extrime
+                    return None
 
                 if act in ("CANCEL_CLOSE", "PLACE_DYNAMIC_CLOSE", "UPDATE_TARGET"):
                     return avg_action
@@ -126,6 +142,11 @@ class ExitEngine:
             pos.in_extrime_mode = True
             pos.hunting_active_until = 0.0
             pos.extrime_retries_count = 0
+            # ИНВАРИАНТ: сбрасываем current_close_price, чтобы первый extrime-выстрел
+            # не блокировался idempotency-проверкой executor-а.
+            # UPDATE_TARGET мог записать breakeven_price, а extrime вычисляет mid ≈ breakeven →
+            # abs(breakeven - mid) < tick_size → executor возвращался без выстрела.
+            pos.current_close_price = 0.0
             pos_key = f"{pos.symbol}_{pos.side}"
             logger.info(f"🔄 [EXIT] #{pos_key} Переход в EXTRIME CLOSE. Причина: {reason}")
             if self.tb.tg:

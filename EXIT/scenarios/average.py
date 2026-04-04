@@ -39,6 +39,10 @@ class AverageScenario:
         if not self.enable:
             return None
 
+        # В breakeven/extrime режиме Average уже не нужен — управление передано TTL/ExtrimeClose.
+        if pos.in_breakeven_mode or pos.in_extrime_mode:
+            return None
+
         time_in_pos = now - pos.opened_at
 
         # 1. ВЫЧИСЛЕНИЕ ВИРТУАЛЬНОЙ ЦЕЛИ (только локально, НЕ пишем в pos!)
@@ -62,6 +66,7 @@ class AverageScenario:
         # 2. ЛОГИКА СДВИГА (Shift) И КОМПРОМИССОВ
         if now - pos.last_shift_ts >= self.shift_ttl:
             if pos.current_target_rate <= self.min_target_rate:
+                pos.last_shift_ts = now  # блокируем повторный вход до следующего shift_ttl
                 logger.info(
                     f"[{pos.symbol}] 🔥 Average: Rate={pos.current_target_rate} <= min={self.min_target_rate}. "
                     f"TRIGGER_EXTRIME."

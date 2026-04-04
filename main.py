@@ -103,10 +103,11 @@ async def _main():
             tg_admin = AdminTgBot(token, chat_id, bot)
             tg_task = asyncio.create_task(polling_supervisor(tg_admin))
             tasks.append(tg_task)
+
+            # await bot.start()
         else:
             logger.warning("TG отключен. Автостарт торговли...")
-
-        await bot.start()
+            await bot.start()
 
         # Фикс #4 TECH_DEBT: не привязываем жизнь бота к TG-задаче.
         # Задачи уже запущены как create_task — просто ждём вечно.

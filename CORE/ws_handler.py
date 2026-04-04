@@ -134,12 +134,19 @@ class PrivateWSHandler:
             return
 
         # Фикс #2 TECH_DEBT: обновляем PENDING_HTTP → реальный order_id
+        # ИНВАРИАНТ: если статус терминальный (Canceled/Rejected) и close_order_id == PENDING_HTTP,
+        # это cancel-event от СТАРОГО ордера (прилетел через hedge-fallback пока новый ещё ждёт HTTP).
+        # Перезаписывать PENDING_HTTP нельзя — иначе HTTP-ответ нового ордера не сохранит его ID.
         if pos.close_order_id == "PENDING_HTTP":
+            if status in ("Canceled", "Rejected", "Deactivated"):
+                return
             pos.close_order_id = order_id
         elif pos.close_order_id != order_id:
             return
 
-        if status == "PartiallyFilled" and cum_qty > 0 and not getattr(pos, "close_cancel_requested", False):
+        # В extrime-режиме ордер должен висеть до следующего retry_ttl, а не сниматься
+        # через hunting_timeout_sec. ExtrimeClose сам отменит и переставит при следующей итерации.
+        if status == "PartiallyFilled" and cum_qty > 0 and not pos.close_cancel_requested and not pos.in_extrime_mode:
             pos.close_cancel_requested = True
             asyncio.create_task(self._handle_partial_fill_cancellation(
                 symbol, pos_key, order_id, pos_side, pos, "hunting_active_until", "ВЫХОД"
@@ -169,7 +176,16 @@ class PrivateWSHandler:
 
             order_id = str(ord_info.get("orderID", ""))
             pos_key = None
-            pos_side_raw = ord_info.get("posSide", ord_info.get("side", ""))
+            # Нормализуем posSide к Title-case ("Long"/"Short") — Phemex WS может слать
+            # разный кейс ("long"/"short"), а REST API cancel требует строго "Long"/"Short".
+            _ps_raw = ord_info.get("posSide", ord_info.get("side", ""))
+            _ps_lower = _ps_raw.lower()
+            if _ps_lower == "long":
+                pos_side_raw = "Long"
+            elif _ps_lower == "short":
+                pos_side_raw = "Short"
+            else:
+                pos_side_raw = _ps_raw  # "Merged" или пустая строка
 
             # Жесткий маппинг стейта
             for pk in (f"{symbol}_LONG", f"{symbol}_SHORT"):

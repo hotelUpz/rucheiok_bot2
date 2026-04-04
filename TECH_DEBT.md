@@ -29,145 +29,35 @@
 
 
 
+---
+## РЕШЁННЫЕ ПРОБЛЕМЫ (2026-04-04)
 
+### [CLOSED] Позиция зависала после Average breakeven
+**Симптом:** Average устанавливал breakeven в t=30с (position_ttl=60с). TTL проверял `now - opened_at >= 60` — условие не выполнялось ещё 30 секунд. Позиция висела в limbo.
+**Корень:** `PositionTTLClose.analyze()` проверял `in_breakeven_mode` только внутри блока `now - opened_at >= position_ttl`. Если breakeven установлен Average раньше — TTL его не видел.
+**Фикс:** `position_ttl_close.py` — проверка `in_breakeven_mode` вынесена ПЕРВОЙ, независимо от TTL. Как только breakeven активен (кем угодно), ждём `breakeven_wait_sec` и → Extrime.
 
-## CRITICAL
+### [CLOSED] Average спамил TRIGGER_EXTRIME после breakeven
+**Симптом:** После первого TRIGGER_EXTRIME engine ставил `pos.current_target_rate = 0.0` но не обновлял `last_shift_ts`. Каждый тик: shift-чек срабатывал, rate=0.0 <= 0.8 → 20+ логов/сек.
+**Фикс 1:** `average.py` — ранний выход `if pos.in_breakeven_mode or pos.in_extrime_mode: return None`.
+**Фикс 2:** `average.py` — при TRIGGER_EXTRIME теперь обновляем `pos.last_shift_ts = now` (защита от дублей до установки in_breakeven_mode).
+
+### [CLOSED] Misleading "Охота: 0.5с" в логе Extrime ордеров
+**Фикс:** `executor.py` — лог теперь показывает "Extrime" вместо hunting_timeout_sec для PLACE_EXTRIME_LIMIT.
 
 ---
+## РЕШЁННЫЕ ПРОБЛЕМЫ (2026-04-04, сессия 2)
 
-### ~~🔴 Критические уязвимости (Race Conditions)~~ ✅ ЗАКРЫТО
+### [CLOSED] Extrime не стрелял после BU-окна (огромная задержка вместо 2с)
+**Симптом:** После `TRIGGER_BREAKEVEN` экстрим-ордер появлялся через 20–35с вместо breakeven_wait_sec+retry_ttl = 5с. Логи: ARKMUSDT +33с, SKLUSDT +26с.
+**Корень:** `UPDATE_TARGET` записывал `pos.current_close_price = breakeven_price`. `_transition_to_extrime` этот сброс не делал. Первый extrime вычислял `target = mid ≈ breakeven_price` → idempotency-проверка executor-а `abs(breakeven - mid) < tick_size` → `True` → return без выстрела. Разблокировалось только когда рынок уходил от точки безубытка дальше чем на tick_size.
+**Фикс:** `engine.py _transition_to_extrime` — добавлен `pos.current_close_price = 0.0`. Теперь idempotency всегда пропускает первый выстрел (abs(0 − mid) >> tick_size). Антипаттерн проверен во всех точках вызова `_transition_to_extrime`.
 
-#### ~~1. Гонка HTTP и WS при «скупке помех» (Interference)~~ ✅ FIXED
-**Где:** `CORE/executor.py` (метод `handle_exit_action`, блок `BUY_OUT_INTERFERENCE`) и `CORE/ws_handler.py`.
-**Суть проблемы:** Вы гениально решили проблему гонки REST/WS при *входе* в позицию с помощью флага `PENDING_HTTP`. Но забыли применить этот же паттерн для ордеров интерференции!
-Когда бот отправляет лимитку на скупку помехи, Phemex может исполнить ее моментально и прислать событие по WebSocket **раньше**, чем HTTP-запрос вернет `order_id`.
+### [CLOSED] Смена лимитки каждый retry_ttl не работала для монет с малым спредом
+**Симптом:** Ордер не переставлялся при каждом retry_ttl. SKLUSDT закрывался 3+ минуты. Для монет с tick_size = spread эффективное смещение = 0 после round_step.
+**Корень:** `increase_fraction = 5%` от спреда при спреде = 1 тик → shift = 0.05 тика → round_step → та же цена → idempotency → return. Нужно было 20 retries = 60с для реального сдвига.
+**Фикс:** `executor.py PLACE_EXTRIME_LIMIT` — если новая цена (после round_step) совпадает с текущей, принудительно сдвигаем на 1 тик в сторону рынка (LONG: вниз, SHORT: вверх). Гарантирует смену ордера каждые `retry_ttl` секунд независимо от размера спреда и increase_fraction.
 
-**Что произойдет:**
-1. WS получает событие. Ищет `order_id` в `pending_interference_orders`, но его там еще нет (HTTP не вернул ответ).
-2. Роутер (`process_phemex_message`) использует fallback, понимает, что это ордер по текущей монете, и отправляет его в метод `_process_close` (так как он числится в `active_positions`).
-3. В `_process_close` выполняется код: `pos.qty = max(0.0, pos.qty - exec_qty)`.
-**Итог:** Вместо того чтобы *добавить* купленный объем помехи к позиции, бот **вычтет** его. Математика позиции (`pos.qty`) сломается, бот начнет выставлять неверные TP, и в итоге на бирже останутся незакрытые хвосты.
-
-✅ **Как исправить (`CORE/executor.py`):**
-В блоке `BUY_OUT_INTERFERENCE` (строка ~155) сделайте предварительное резервирование:
-```python
-# ПЕРЕД try:
-self.tb.state.pending_interference_orders[pos_key] = "PENDING_HTTP"
-
-try:
-    resp = await self.tb.private_client.place_limit_order(...)
-    order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-    if order_id:
-        if self.tb.state.pending_interference_orders.get(pos_key) == "PENDING_HTTP":
-            self.tb.state.pending_interference_orders[pos_key] = order_id
-        # ...
-except Exception as e:
-    self.tb.state.pending_interference_orders.pop(pos_key, None) # Не забыть очистить при ошибке!
-    # ...
-```
-Затем в `CORE/ws_handler.py` в `_process_interference` добавьте логику распознавания `PENDING_HTTP`, по аналогии с `_process_entry`.
-
-#### ~~2. Зависшие ордера при динамическом выходе (Dynamic Close)~~ ✅ FIXED
-**Где:** `CORE/executor.py` и `CORE/ws_handler.py`.
-**Суть проблемы:** Та же проблема с частичным исполнением (Partial Fill) закрывающих ордеров. Если экстрим-ордер (или Dynamic Close) ударит по стакану, частично исполнится, и WS прилетит быстрее HTTP, метод `_process_close` обработает его правильно (объем уменьшится). Но затем он дойдет до строки `if pos.close_order_id != order_id: return`. Так как HTTP еще не записал `close_order_id`, условие сработает, и бот выйдет из функции.
-**Итог:** Критически важный таймер `_handle_partial_fill_cancellation` (снос остатка ордера) **никогда не запустится**. Остаток позиции повиснет мертвым грузом в стакане навсегда.
-
-✅ **Как исправить (`CORE/executor.py`):**
-Использовать флаг `PENDING_HTTP` для переменной `pos.close_order_id`, либо переписать логику маппинга в WS, чтобы он понимал, что ордер "в полете".
-*Самый простой фикс в WS (`CORE/ws_handler.py`):*
-```python
-# Вместо: if pos.close_order_id != order_id: return
-if pos.close_order_id not in (order_id, None, "PENDING_HTTP"): return
-```
-А в `executor.py` перед отправкой закрывающего ордера: `pos.close_order_id = "PENDING_HTTP"`.
-
----
-
-### ~~🟠 Потенциальные баги (Edge Cases)~~ ✅ ЗАКРЫТО
-
-#### ~~3. Уязвимость регистра в модуле Recovery~~ ✅ FIXED
-**Где:** `CORE/bot.py`, метод `_recover_state`.
-**Код:** `pos_side = "LONG" if item.get("posSide", item.get("side", "")) in ("Long", "Buy") else "SHORT"`
-**Суть:** Биржевые API имеют свойство иногда без предупреждения менять регистр ответов (например, возвращать `"LONG"` вместо `"Long"`). В этом случае логика сломается, и бот закроет вашу позицию из кэша.
-✅ **Как исправить:**
-```python
-pos_side_raw = item.get("posSide", item.get("side", "")).lower()
-pos_side = "LONG" if pos_side_raw in ("long", "buy") else "SHORT"
-```
-(уже исправил). найди похожие уяязвимости и исправь.
-
-#### ~~4. Некорректная обработка задач (Tasks) в `main.py`~~ ✅ FIXED
-**Где:** `main.py`, метод `_main`.
-**Суть:** У вас используется `await asyncio.gather(*tasks)`. Если `tg_enabled = True`, в список `tasks` добавляется только один воркер — `tg_task`. Функция `gather` завершает работу, когда завершаются все переданные в нее задачи.
-Если `polling_supervisor` вылетит с непредвиденной ошибкой или выйдет из цикла (например, CancelledError), `gather` завершится, скрипт выйдет из `_main`, и **торговый бот полностью отключится**, даже если торговые процессы внутри `TradingBot` работали штатно!
-✅ **Как исправить:**
-Вместо `gather` лучше использовать бесконечный `Event` для удержания главного цикла:
-```python
-stop_event = asyncio.Event()
-
-# ... запуск бота и tg_admin ...
-if tasks:
-    # Запускаем задачи в фоне, не привязывая смерть бота к смерти TG
-    for t in tasks:
-        asyncio.create_task(t)
-
-try:
-    await stop_event.wait() # Висим тут бесконечно
-except (asyncio.CancelledError, KeyboardInterrupt):
-    # Штатно глушим бота
-```
-
----
-
-### 🟡 Архитектура и Оптимизация
-
-#### 5. Мутация состояния (State) в обход Lock-ов
-**Где:** `CORE/bot.py` (`_orchestrate_market_tick`) и `EXIT/engine.py`.
-В главном пайплайне `bot.py` вы вызываете:
-```python
-action = self.exit_engine.evaluate_pipeline(snap, pos) # БЕЗ ЛОКА
-if action: 
-    await self.executor.handle_exit_action(symbol, pos_key, action) # ЛОК БЕРЕТСЯ ЗДЕСЬ
-```
-Внутри `evaluate_pipeline` вы жестко мутируете стейт позиции (например, `pos.in_breakeven_mode = True`, `pos.current_target_rate = 0.0`, меняете таймеры).
-Поскольку вы используете `asyncio` (один поток) и внутри `evaluate_pipeline` нет `await`, контекст не переключается, и гонки данных (data race) с WS формально **пока нет**.
-**НО!** Это очень хрупкий дизайн (Code Smell). Если завтра вы добавите `await` внутрь `NegativeScenario` (например, логгер или запрос к БД), WS может прислать сообщение посреди выполнения пайплайна и изменить `pos.qty`, что приведет к непредсказуемому поведению.
-✅ **Как исправить (Лучшая практика):**
-Блокируйте позицию на весь цикл принятия решения по выходу, а не только на момент отправки ордера:
-```python
-async with self.executor.get_lock(pos_key):
-    action = self.exit_engine.evaluate_pipeline(snap, pos)
-    if action:
-        await self.executor.handle_exit_action(symbol, pos_key, action)
-```
-*(Придется убрать взятие `lock` внутри самого `handle_exit_action`, чтобы не было Deadlock-а, либо использовать `asyncio.Condition` / реентерабельные локи, если вы используете сторонние либы).*
-
-#### 6. Очистка таймаутов (Memory Leak)
-**Где:** `ENTRY/signal_engine.py` (Словари `_signal_timeouts`, `_pattern_first_seen`, `_spread_first_seen`).
-Вы удаляете ключи из словарей (`keys_to_pop`), когда сигнал пропадает. Это отлично!
-Однако в `CORE/bot.py` в `_signal_timeouts` ключи добавляются (`self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec`), но **никогда не удаляются**. Если бот проработает пару месяцев и переберет сотни щиткоинов, этот словарь разрастется.
-✅ **Как исправить:**
-Периодически чистить словарь, либо в `_orchestrate_market_tick` делать проверку:
-```python
-# Очистка устаревших таймаутов (вызывать раз в X минут, либо так):
-if pos_key in self._signal_timeouts and time.time() > self._signal_timeouts[pos_key]:
-    del self._signal_timeouts[pos_key]
-```
-
-#### 7
-Много мест с тихим проглатыванием ошибок
-Есть несколько except: pass / except Exception: pass.
-Для HFT/бота это опасно: система может молча деградировать, а вы увидите уже следствие, а не причину.
-
-### 8
-Конфиг и runtime сильно связаны, но схема валидации слабая. -- добавить валидатор.
-
-### 9
-Есть слишком много фоновых create_task(...) без централизованного реестра и наблюдения. Проверить эту теорию. если есть проблема -- то предложить архитетктурное решение и внедрить.
-
-### 10
-перенести импорт AdminTgBot внутрь if tg_enabled:;
-сделать так, чтобы бот мог стартовать без aiogram, если TG выключен.
-
-### 11
-нужно сделать тестовый енд-ту-енд прогон.
+### [CLOSED] Race condition: cancel-event старого TP-ордера обнулял PENDING_HTTP нового экстрим-ордера
+**Симптом:** Экстрим ставил ордер (PENDING_HTTP), во время `await place_limit_order` прилетал WS-cancel от отменённого старого Average-TP через hedge-fallback. Он перезаписывал `close_order_id = old_TP_id`, затем Canceled → `None`. HTTP-ответ нового ордера уже не мог сохранить ID (PENDING_HTTP не было). Экстрим-ордер висел в рынке без ID; следующий retry ставил второй ордер поверх первого.
+**Фикс:** `ws_handler.py _process_close` — при `close_order_id == "PENDING_HTTP"` и терминальном статусе (Canceled/Rejected/Deactivated) делаем ранний `return`. Cancel-event чужого ордера игнорируется; PENDING_HTTP дождётся HTTP-ответа нового ордера.

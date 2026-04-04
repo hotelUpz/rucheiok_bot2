@@ -1,21 +1,21 @@
 {
     "positions": {
-        "VETUSDT_LONG": {
-            "symbol": "VETUSDT",
+        "CRCLUSDT_LONG": {
+            "symbol": "CRCLUSDT",
             "side": "LONG",
-            "entry_price": 0.00674,
-            "qty": 0.0,
-            "init_qty": 7418.397626112759,
-            "init_ask1": 0.00674,
-            "init_bid1": 0.00673,
-            "base_target_price_100": 0.00675,
-            "opened_at": 1775174438.5828748,
+            "entry_price": 90.66,
+            "qty": 0.55,
+            "init_qty": 0.5515111405250386,
+            "init_ask1": 90.66,
+            "init_bid1": 90.65,
+            "base_target_price_100": 90.76,
+            "opened_at": 1775260115.8308325,
             "current_target_rate": 1.0,
             "current_close_price": 0.0,
             "close_order_id": null,
             "is_average_stabilized": false,
             "last_shift_ts": 0.0,
-            "last_negative_check_ts": 1775174438.5828917,
+            "last_negative_check_ts": 1775260115.3086076,
             "negative_duration_sec": 0.0,
             "in_breakeven_mode": false,
             "breakeven_start_ts": 0.0,
@@ -25,7 +25,7 @@
             "entry_cancel_requested": false,
             "interference_cancel_requested": false,
             "close_cancel_requested": false,
-            "entry_finalized": false,
+            "entry_finalized": true,
             "interf_bought_qty": 0.0,
             "interference_disabled": false,
             "failed_interference_prices": {},
@@ -38,12 +38,19 @@
         "BANANAUSDT": 1,
         "BSBUSDT": 0,
         "PRLUSDT": 1,
-        "GMTUSDT": 1
+        "GMTUSDT": 1,
+        "PIPPINUSDT": 1,
+        "ARKMUSDT": 0,
+        "SKLUSDT": 1,
+        "ARPAUSDT": 1
     },
     "quarantine": {
         "NIGHTUSDT": Infinity,
         "PRLUSDT": Infinity,
         "BANANAUSDT": Infinity,
-        "GMTUSDT": Infinity
+        "GMTUSDT": Infinity,
+        "PIPPINUSDT": Infinity,
+        "SKLUSDT": Infinity,
+        "ARPAUSDT": Infinity
     }
 }

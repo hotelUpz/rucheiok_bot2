@@ -83,3 +83,14 @@ class PhemexPrivateClient:
 
     async def get_active_positions(self) -> Dict[str, Any]:
         return await self._request("GET", "/g-accounts/accountPositions", query_no_q="currency=USDT")
+
+    async def switch_position_mode(self, currency: str = "USDT", mode: str = "Hedged") -> Dict[str, Any]:
+        """
+        Переключает режим позиции аккаунта.
+        Phemex /g-positions/switch-pos-mode-sync:
+          mode = "Hedged"  → posSide Long/Short доступны для /g-orders
+          mode = "OneWay"  → posSide Merged
+        Не переключает, если есть открытые позиции (биржа вернёт ошибку).
+        """
+        body = {"currency": currency, "targetPosMode": mode}
+        return await self._request("PUT", "/g-positions/switch-pos-mode-sync", body=body)

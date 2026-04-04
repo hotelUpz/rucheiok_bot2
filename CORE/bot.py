@@ -44,6 +44,11 @@ class TradingBot:
         self.quota_asset = self.cfg.get("quota_asset", "USDT")
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.5)
+        self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
+        self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", 5.0)     
+        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
+        api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
+        api_secret = os.getenv("API_SECRET") or self.cfg["credentials"].get("api_secret", "")   
 
         self.bl_manager = BlackListManager(CFG_PATH, self.quota_asset)        
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
@@ -60,13 +65,8 @@ class TradingBot:
         self.phemex_ticker_api = PhemexTickerAPI()
         self.phemex_funding_api = PhemexFunding()
         self.session = aiohttp.ClientSession()
-        
-        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
+
         self.price_manager = PriceCacheManager(self.binance_ticker_api, self.phemex_ticker_api, upd_sec)
-
-        api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
-        api_secret = os.getenv("API_SECRET") or self.cfg["credentials"].get("api_secret", "")
-
         self.private_client = PhemexPrivateClient(api_key, api_secret, self.session)
         self.private_ws = PhemexPrivateWS(api_key, api_secret)
 
@@ -87,10 +87,7 @@ class TradingBot:
         
         # Словарь для блокировки спама дублирующими сигналами на вход
         self._signal_timeouts: Dict[str, float] = {}
-
         self.cfg_manager = ConfigManager(CFG_PATH, self)
-        self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", 5.0)
 
     # ==========================================
     # ХЕЛПЕРЫ
@@ -299,6 +296,14 @@ class TradingBot:
 
         symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
+
+        # Гарантируем Hedged position mode на Phemex — без него posSide=Long/Short отклоняется с [20004].
+        # Если есть открытые позиции, переключить нельзя, но режим уже должен быть Hedged.
+        try:
+            await self.private_client.switch_position_mode(currency=self.quota_asset, mode="Hedged")
+            logger.info("✅ Position mode: Hedged (подтверждён)")
+        except Exception as e:
+            logger.warning(f"⚠️ switch_position_mode: {e} — режим уже установлен или есть открытые позиции")
 
         await self._recover_state()
 

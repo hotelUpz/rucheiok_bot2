@@ -178,10 +178,27 @@ class OrderExecutor:
             # 3. Физический удар по стакану (Снайпер или Экстрим)
             if act in ("PLACE_EXTRIME_LIMIT", "PLACE_DYNAMIC_CLOSE"):
                 target_price: float = round_step(action["price"], spec.tick_size)
-                if target_price <= 0: 
+                if target_price <= 0:
                     return
 
-                if pos.close_order_id:
+                # ИНВАРИАНТ Extrime: гарантируем смену цены минимум на 1 тик за каждый retry_ttl.
+                # Проблема: increase_fraction (5% спреда) при спреде = 1 тик даёт shift = 0.05 тика →
+                # после round_step новая цена = старой → idempotency вернёт None → ордер не переставится.
+                # Решение: если в extrime-режиме новая цена совпадает с текущей — двигаем на 1 тик.
+                if (
+                    act == "PLACE_EXTRIME_LIMIT"
+                    and pos.close_order_id
+                    and pos.close_order_id != "PENDING_HTTP"
+                    and pos.current_close_price > 0
+                    and abs(pos.current_close_price - target_price) < max(spec.tick_size, 1e-12)
+                ):
+                    tick = spec.tick_size
+                    if pos.side == "LONG":
+                        target_price = round_step(pos.current_close_price - tick, tick)
+                    else:
+                        target_price = round_step(pos.current_close_price + tick, tick)
+
+                if pos.close_order_id and pos.close_order_id != "PENDING_HTTP":
                     if pos.current_close_price > 0 and abs(pos.current_close_price - target_price) < max(spec.tick_size, 1e-12):
                         return
                     else:
@@ -193,8 +210,12 @@ class OrderExecutor:
 
                 pos.current_close_price = target_price
 
-                # ⏱ ВЗВОД ТАЙМЕРА ОХОТЫ
-                pos.hunting_active_until = time.time() + self.hunting_timeout_sec
+                # ⏱ ВЗВОД ТАЙМЕРА ОХОТЫ (только для Average/Dynamic close)
+                # Для Extrime — ордер висит до следующего retry_ttl, ExtrimeClose сам управляет
+                if act == "PLACE_DYNAMIC_CLOSE":
+                    pos.hunting_active_until = time.time() + self.hunting_timeout_sec
+                else:
+                    pos.hunting_active_until = 0.0
 
                 # Блокируем стейт от гонок с вебсокетом (фикс #2 TECH_DEBT)
                 pos.close_order_id = "PENDING_HTTP"
@@ -212,7 +233,8 @@ class OrderExecutor:
                         pos.close_cancel_requested = False
 
                         reason: str = action.get("reason", "")
-                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | Охота: {self.hunting_timeout_sec}с")
+                        hunt_info = f"Охота: {self.hunting_timeout_sec}с" if act == "PLACE_DYNAMIC_CLOSE" else "Extrime"
+                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | {hunt_info}")
                         await self.tb.state.save()
                     else:
                         pos.hunting_active_until = 0.0
@@ -278,15 +300,24 @@ class OrderExecutor:
                     await self._handle_order_fail(symbol, pos_key, pos)
 
 
+    async def _entry_timeout_guard(self, symbol: str, pos_key: str, order_id: str, pos_side: str) -> None:
+        """Инвариант: открывающий ордер не может висеть дольше entry_timeout_sec.
+        Запускается сразу после постановки — закрывает случай когда ордер висит
+        в New без единого исполнения (PartiallyFilled не приходит)."""
+        await asyncio.sleep(self.entry_timeout_sec)
+        if self.tb.state.pending_entry_orders.get(pos_key) == order_id:
+            logger.info(f"⏰ [{pos_key}] entry_timeout_sec истёк — снимаем открывающий ордер #{order_id[:8]}")
+            await self.cancel_order_via_ws(symbol, order_id, pos_side)
+
     async def execute_entry(self, symbol: str, pos_key: str, signal: Dict[str, Any], depth: DepthTop) -> None:
         """Расчет объема и постановка открывающей лимитной заявки по сигналу."""
         spec = self.tb.symbol_specs.get(symbol)
-        if not spec: 
+        if not spec:
             return
 
         try:
             price: float = round_step(signal['price'], spec.tick_size)
-            if price <= 0: 
+            if price <= 0:
                 return
 
             risk_cfg = self.tb.cfg.get("risk", {})
@@ -299,11 +330,11 @@ class OrderExecutor:
                 base_vol_usdt: float = float(margin_size_cfg) * leverage_val
 
             target_vol_usdt: float = min(
-                base_vol_usdt * (1 + risk_cfg.get("margin_over_size_pct", 1) / 100), 
+                base_vol_usdt * (1 + risk_cfg.get("margin_over_size_pct", 1) / 100),
                 risk_cfg.get("notional_limit", 5000)
             )
             qty: float = round_step(target_vol_usdt / price, spec.lot_size)
-            if qty <= 0: 
+            if qty <= 0:
                 return
 
             base_target: float = signal.get("base_target_price_100") or (price * (1 + (signal.get("spr2_pct", 0) / 100)) if signal["side"] == "LONG" else price * (1 - (signal.get("spr2_pct", 0) / 100)))
@@ -315,18 +346,22 @@ class OrderExecutor:
             )
             self.tb.exit_engine.initialize_position_state(pos)
             self.tb.state.active_positions[pos_key] = pos
-            
-            # Блокируем стейт от гонок с вебсокетом
-            self.tb.state.pending_entry_orders[pos_key] = "PENDING_HTTP" 
 
+            # Блокируем стейт от гонок с вебсокетом
+            self.tb.state.pending_entry_orders[pos_key] = "PENDING_HTTP"
+
+            pos_side_str: str = "Long" if signal["side"] == "LONG" else "Short"
             resp = await self.tb.private_client.place_limit_order(
-                symbol=symbol, side=("Buy" if signal["side"] == "LONG" else "Sell"), qty=qty, price=price, pos_side=("Long" if signal["side"] == "LONG" else "Short")
+                symbol=symbol, side=("Buy" if signal["side"] == "LONG" else "Sell"), qty=qty, price=price, pos_side=pos_side_str
             )
             order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
 
             if order_id:
                 if self.tb.state.pending_entry_orders.get(pos_key) == "PENDING_HTTP":
                     self.tb.state.pending_entry_orders[pos_key] = order_id
+                # Инвариант: entry-ордер не может висеть вечно — сносим через entry_timeout_sec
+                # (покрывает случай New без PartiallyFilled, т.е. когда ордер вообще не исполнялся)
+                asyncio.create_task(self._entry_timeout_guard(symbol, pos_key, order_id, pos_side_str))
                 await self.tb.state.save()
                 semantic: str = "ОТКРЫТЬ ЛОНГ" if signal["side"] == "LONG" else "ОТКРЫТЬ ШОРТ"
                 logger.info(f"🚀 [{pos_key}] {semantic} ОТПРАВЛЕН: по {price} (Плановый объем: {qty})")
@@ -342,8 +377,19 @@ class OrderExecutor:
         except Exception as e:
             pos_check: ActivePosition | None = self.tb.state.active_positions.get(pos_key)
             if pos_check and pos_check.qty > 0:
-                self.tb.state.pending_entry_orders.pop(pos_key, None) 
+                self.tb.state.pending_entry_orders.pop(pos_key, None)
             else:
                 self.tb.state.active_positions.pop(pos_key, None)
                 self.tb.state.pending_entry_orders.pop(pos_key, None)
-                logger.error(f"[{pos_key}] ❌ Ошибка выставления открывающего ордера: {e}")
+                if "20004" in str(e):
+                    # [20004] TE_ERR_INCONSISTENT_POS_MODE при hedge-аккаунте означает что
+                    # контракт данного символа зафиксирован в One-Way mode на уровне биржи.
+                    # Торговать его через hedge API невозможно — добавляем в blacklist навсегда.
+                    logger.error(f"[{pos_key}] ⛔ [20004] Контракт несовместим с Hedge mode. Blacklist.")
+                    self.tb.set_blacklist(list(self.tb.black_list) + [symbol])
+                    if self.tb.tg:
+                        asyncio.create_task(self.tb.tg.send_message(
+                            f"⛔ <b>Blacklist [20004]</b>\n#{symbol}\nКонтракт не поддерживает Hedge mode API"
+                        ))
+                else:
+                    logger.error(f"[{pos_key}] ❌ Ошибка выставления открывающего ордера: {e}")
