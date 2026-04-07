@@ -16,9 +16,10 @@ class SymbolInfo:
     symbol: str
     status: str
     quote: str
-    tick_size: float
-    lot_size: float
-    max_leverage: float  # <--- Сохранили парсинг плеча
+    tick_size: Optional[float]
+    lot_size: Optional[float]
+    max_leverage: Optional[float]
+    # min_qty_notional (либо в долларах) -- если отдают -- берем.
 
 class PhemexSymbols:
     BASE_URL = "https://api.phemex.com"
@@ -77,6 +78,13 @@ class PhemexSymbols:
         return (str(v) if v is not None else "").upper().strip()
 
     @staticmethod
+    def _to_float(v: Any, default: float = 0.0) -> float:
+        try:
+            return float(v)
+        except (ValueError, TypeError):
+            return default
+
+    @staticmethod
     def _is_active_status(status: str) -> bool:
         s = str(status or "").strip().lower()
         if not s:
@@ -84,31 +92,38 @@ class PhemexSymbols:
         banned = ("delist", "suspend", "pause", "settle", "close", "expired")
         return not any(word in s for word in banned)
 
-    @staticmethod
-    def _to_float(v: Any, default: float = 0.0) -> float:
-        try:
-            return float(v)
-        except (ValueError, TypeError):
-            return default
-
     def _parse_perp(self, obj: Dict[str, Any], quote: str = "USDT") -> Optional[SymbolInfo]:
         sym = obj.get("symbol")
-        if not sym: return None
+        if not sym:
+            return None
 
         q = self._norm_quote(obj.get("quoteCurrency") or obj.get("settleCurrency") or "")
-        if q != self._norm_quote(quote): return None
+        if q != self._norm_quote(quote):
+            return None
 
         sym_s = str(sym).strip()
-        if sym_s.startswith("s"): return None
+        if sym_s.startswith("s"):
+            return None
 
         status = str(obj.get("status") or obj.get("state") or obj.get("symbolStatus") or "Listed")
-        tick_size = self._to_float(obj.get("tickSize") or obj.get("priceScale"), 0.0001)
-        lot_size = self._to_float(obj.get("lotSize") or obj.get("ratioScale"), 1.0)
-        max_lvg = self._to_float(obj.get("limitOrderMaxLeverage") or obj.get("maxLeverage"), 100.0)
+
+        # ВАЖНО:
+        # Не подменяем tickSize через priceScale и lotSize через ratioScale.
+        # Это разные сущности.
+        tick_size = self._to_float(obj.get("tickSize"))
+        lot_size = self._to_float(obj.get("qtyStepSize"))
+        max_lvg = self._to_float(
+            obj.get("limitOrderMaxLeverage") or obj.get("maxLeverage"),
+            20,
+        )
 
         return SymbolInfo(
-            symbol=sym_s.upper(), status=status, quote=q, 
-            tick_size=tick_size, lot_size=lot_size, max_leverage=max_lvg
+            symbol=sym_s.upper(),
+            status=status,
+            quote=q,
+            tick_size=tick_size,
+            lot_size=lot_size,
+            max_leverage=max_lvg,
         )
 
     async def get_all(self, quote: str = "USDT", only_active: bool = True) -> List[SymbolInfo]:

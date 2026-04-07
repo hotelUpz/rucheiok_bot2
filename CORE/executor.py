@@ -1,395 +1,189 @@
 # ============================================================
 # FILE: CORE/executor.py
-# ROLE: Отправка ордеров на биржу, защита от гонок потоков и управление финалом цикла
+# ROLE: Шаблоны отправки ордеров на биржу, защита от гонок потоков...
 # ============================================================
 from __future__ import annotations
 
-import asyncio
-import time
-from typing import Dict, Any, TYPE_CHECKING
+# import asyncio
+# import time
+import pytz
+from typing import Dict, Any, TYPE_CHECKING, Optional
 from c_log import UnifiedLogger
-from CORE.models import ActivePosition
-from CORE.bot_utils import Reporters
-from utils import round_step
+from decimal import Decimal, ROUND_DOWN
+from consts import TIME_ZONE
 
-if TYPE_CHECKING:
-    from CORE.bot import TradingBot
-    from API.PHEMEX.stakan import DepthTop
 
 logger = UnifiedLogger("bot")
 
+from dotenv import load_dotenv    
+
+load_dotenv()
+
+
+logger = UnifiedLogger(name="bot")
+TZ = pytz.timezone(TIME_ZONE)
+
+
+def round_step(value: float, step: float) -> float:
+    if not step or step <= 0:
+        return value
+    val_d = Decimal(str(value))
+    step_d = Decimal(str(step))
+    rounded = (val_d / step_d).quantize(Decimal("1"), rounding=ROUND_DOWN) * step_d
+    return float(rounded)
+
+
 class OrderExecutor:
     """
-    Единственная точка отправки ордеров на биржу.
-
-    Ключевые инварианты:
-    - get_lock(pos_key): один AsyncLock на pos_key предотвращает гонки потоков.
-    - execute_entry: блокирует pos_key через PENDING_HTTP до получения order_id.
-    - handle_exit_action:
-        * CANCEL_CLOSE       — отмена физического ордера, сброс close_order_id
-        * UPDATE_TARGET      — смена виртуальной цели (pos.current_close_price)
-        * PLACE_DYNAMIC_CLOSE/PLACE_EXTRIME_LIMIT — cancel+place с идемпотентной проверкой цены
-        * BUY_OUT_INTERFERENCE — доливка к позиции (не закрытие!)
-    - pos.current_close_price = цена последнего размещённого ордера (только Executor пишет).
-    - finalize_position_cycle: зачистка, карантин, сохранение — вызывается из ws_handler.
-    - _transition_to_extrime вызывается через self.tb.exit_engine (единая точка с TG).
+    Прокладка между оркестратором и сетевым адаптером. Содержит шаблоны рутинных операций перед финальной отправкой запросов.
     """
-    
-    def __init__(self, tb: 'TradingBot') -> None:
-        self.tb = tb
-        self.locks: Dict[str, asyncio.Lock] = {}
-        
-        # Инвариант: таймауты устояния ордеров перед срезанием остатка
-        self.hunting_timeout_sec = float(self.tb.cfg.get("exit", {}).get("hunting_timeout_sec", 1.0))
-        self.entry_timeout_sec = float(self.tb.cfg.get("entry", {}).get("entry_timeout_sec", 0.5))
 
-    def get_lock(self, pos_key: str) -> asyncio.Lock:
-        if pos_key not in self.locks:
-            self.locks[pos_key] = asyncio.Lock()
-        return self.locks[pos_key]
+    async def execute_cancel(symbol, pos_key, order_id) -> bool:
+        """
+        Роль: некая промежуточная прокладка между сетевым адаптером и инициирующей стороной.
+        Ошибку неудачи отмены логируем (можно поднимать в тг, потом закоментирую если будет мулять)                
+        """
 
-    async def cancel_order_via_ws(self, symbol: str, order_id: str, pos_side: str) -> None:
-        """Инвариант: мгновенная отмена остатка ордера."""
-        try:
-            await self.tb.private_client.cancel_order(symbol, order_id, pos_side)
-            logger.info(f"🧹 Запрошена отмена остатка ордера #{order_id[:8]}...")
-        except Exception as e:
-            logger.debug(f"Ошибка отмены остатка #{order_id[:8]}: {e}")
+    async def interf_bought(symbol, pos_key, qty, order_price) -> Optional[float]:
+        """
+        Роль: скупка маленьких ордеров.
+        Неудачи логируем. Допустимые остатки для скупки переосмысливаются в оркестраторе.    
+        Возврат -- фактически исполненное количество ордера float (чекаем после некой минимальной паузы sleep -- interference.interference_timeout_sec) | None     
+        """
 
-    async def finalize_dust_position(self, symbol: str, pos_key: str, pos: ActivePosition) -> None:
-        """Сброс стейта, если остаток позиции (огрызок) меньше 5 USDT."""
-        logger.info(f"🧹 [{pos_key}] Огрызок позиции < 5 USDT. Сбрасываем стейт.")
-        self.tb.state.pending_entry_orders.pop(pos_key, None)
-        self.tb.state.pending_interference_orders.pop(pos_key, None)
-        self.tb.state.active_positions.pop(pos_key, None)
-        await self.tb.state.save()
+    async def execute_entry(symbol, pos_key, signal) -> bool: # можно добавить горячую ссылку на ActivePosition стату. (читать через локер) (либо прокинуть в класс через __init__)
+        """
+        1. Расчитывает количество ордера и цену постатовки лимитного ордера, согласно рискам и спецификации биржи.
+        2. Ставит ордер через await. Дожидается ответа в течение entry_timeout_sec (тупо через asyncio.sleep)
+        3. Интерпретируем Лимитный ордер.
+            Если успех то А.):
+                - Логирует результат, поднимает событие для отправки в тг.
+                - (Не мутирует ActivePosition, это прерогатива ws_interpreter.py)
+                - читаем данные из ActivePosition, если там поднят флаг частичного исполнения то отменяем остаток. Если нет, то нет.
+                - после успешного ответа постановки лимитного ордера и выдержки sleep(entry_timeout_sec), отменяем остаток позиции по ордер id через await (да, именно так!).
+                - Возвращаем True.
+            Если неуспех Б.):
+                - Ошибку логируем и поднимаем в тг (просто номер ошибки, можно и текст.). Саму монету заносим в отдельный карантин -- см настройки: entry.quarantine.
+                - делаем ретрай повторную попытку постановки лимитного ордера в количестве entry.max_place_order_retries раз. (на практике будет всего одна попытка). (если max_place_order_retries = 1 то это на все попытки, включая первую, основную).
+                - Возвращаем False.
+                
+        """
 
-    def finalize_position_cycle(self, symbol: str, pos_key: str, close_price: float) -> None:
-        """Конец жизненного цикла: зачистка хвостов, расчет карантина, удаление из стейта."""
-        pos = self.tb.state.active_positions.get(pos_key)
-        if not pos: return
-        
-        pos_side = "Long" if pos.side == "LONG" else "Short"
-        
-        # 1. Убиваем зависшие лимитки (помехи и входы)
-        interf_id = self.tb.state.pending_interference_orders.get(pos_key)
-        if interf_id and interf_id != "PENDING_HTTP":
-            asyncio.create_task(self.tb.private_client.cancel_order(symbol, interf_id, pos_side))
+    async def execute_exit(symbol, pos_key, order_price, timeout_sec) -> bool: # можно добавить горячую ссылку на ActivePosition стату. (читать через локер) (либо прокинуть в класс через __init__)
+        """
+        1. Берет количество ордера. Цена постатовки лимитного ордера - order_price (детерминируем выше). Все округляем согласно спецификациям биржи.
+        2. Ставит ордер через await. Дожидается ответа в течение timeout_sec (параметр детерминируем в орке) (тупо через asyncio.sleep)
+        3. Интерпретируем Лимитный ордер.
+            Если успех то А.):
+                - Логирует результат, поднимает событие для отправки в тг.
+                - (Не мутирует ActivePosition, это прерогатива ws_interpreter.py)
+                - читаем данные из ActivePosition, если там поднят флаг частичного исполнения то отменяем остаток. Если нет, то нет.
+                - после успешного ответа постановки лимитного ордера и выдержки sleep(entry_timeout_sec), отменяем остаток позиции по ордер id через await (да, именно так!).
+                - Возвращаем True.
+            Если неуспех Б.):
+                - Ошибку логируем и поднимаем в тг (просто номер ошибки, можно и текст.).
+                - делаем ретрай повторную попытку постановки лимитного ордера в количестве entry.max_place_order_retries раз. (на практике будет 1-2 попытки). (если max_place_order_retries = 1 то это на все попытки, включая первую, основную).
+                - Возвращаем False.
+                
+        """
+# как видишь, все стало просто как в автомате Калашникова.
+# Смотри некий пример постановки ордеров из другого бота:
+
+# def round_step(value: float, step: float) -> float:
+#     if not step or step <= 0:
+#         return value
+#     val_d = Decimal(str(value))
+#     step_d = Decimal(str(step))
+#     rounded = (val_d / step_d).quantize(Decimal("1"), rounding=ROUND_DOWN) * step_d
+#     return float(rounded)
+
+
+# class OpenInterestDefender:
+#     def __init__(self, config: dict):
+#         self.config = config
+
+#         self.pos_mode = "hedged"
+#         self.api_key = os.getenv("api_key") or ""
+#         self.api_secret = os.getenv("api_secret") or ""
+
+#         self.pos_side = self.config.get("pos_side", "").upper() or "LONG"
+#         self.leverage = self.config.get("leverage", 10)
+#         self.margin_amount = self.config.get("margin_amount", 3.5)
+#         self.indentation_pct = self.config.get("order_indentation_pct", 25)
+
+#         self.client = PhemexPrivateClient(self.api_key, self.api_secret)
+
+#     async def is_oil(self, symbol: str, price: float, sym_info: "SymbolInfo"):
+#         if not price:
+#             logger.warning(f"[{symbol}] Пропуск: нет цены.")
+#             return "ERR_NO_PRICE"
+
+#         tick_size = sym_info.tick_size
+#         lot_size = sym_info.lot_size
+
+#         if tick_size is None or lot_size is None:
+#             logger.warning(
+#                 f"[{symbol}] Пропуск: отсутствует спецификация "
+#                 f"tick_size={tick_size}, lot_size={lot_size}"
+#             )
+#             return "ERR_NO_SPEC"
+
+#         if self.pos_side == "LONG":
+#             order_price = price * (1 - self.indentation_pct / 100.0)
+#             side = "Buy"
+#         else:
+#             order_price = price * (1 + self.indentation_pct / 100.0)
+#             side = "Sell"
             
-        entry_id = self.tb.state.pending_entry_orders.get(pos_key)
-        if entry_id and entry_id != "PENDING_HTTP":
-            asyncio.create_task(self.tb.private_client.cancel_order(symbol, entry_id, pos_side))
+#         phemex_pos_side = self.pos_side.capitalize()
+#         order_price = round_step(order_price, tick_size)
 
-        # 2. Логика карантина (Risk Management)
-        is_loss = False
-        if close_price > 0:
-            if pos.side == "LONG" and close_price < pos.entry_price: is_loss = True
-            if pos.side == "SHORT" and close_price > pos.entry_price: is_loss = True
+#         if order_price <= 0:
+#             logger.warning(f"[{symbol}] Пропуск: некорректная цена ордера {order_price}")
+#             return "ERR_BAD_PRICE"
 
-        if is_loss:
-            self.tb.state.consecutive_fails[symbol] = self.tb.state.consecutive_fails.get(symbol, 0) + 1
-            q_cfg = self.tb.cfg.get("risk", {}).get("quarantine", {})
-            max_fails = q_cfg.get("max_consecutive_fails")
-            
-            if max_fails is not None and self.tb.state.consecutive_fails[symbol] >= max_fails:
-                q_hours = q_cfg.get("quarantine_hours", 24)
-                if str(q_hours).lower() == "inf":
-                    self.tb.state.quarantine_until[symbol] = float("inf")
-                    self.tb.set_blacklist(list(self.tb.black_list) + [symbol])
-                    q_msg = "Навсегда (BlackList)"
-                else:
-                    self.tb.state.quarantine_until[symbol] = time.time() + float(q_hours) * 3600
-                    q_msg = f"на {q_hours} ч."
-                    
-                logger.warning(f"🚨 КАРАНТИН #{symbol}: {q_msg} (Failures: {self.tb.state.consecutive_fails[symbol]})")
-                if self.tb.tg: 
-                    asyncio.create_task(self.tb.tg.send_message(f"☣️ <b>Карантин</b>\nМонета: #{symbol}\nСрок: {q_msg}"))
-        else:
-            self.tb.state.consecutive_fails[symbol] = 0
+#         notional_value = self.margin_amount * self.leverage
+#         actual_notional = max(6.0, notional_value)
 
-        # 3. Финальный сброс стейта
-        self.tb.state.pending_entry_orders.pop(pos_key, None)
-        self.tb.state.pending_interference_orders.pop(pos_key, None)
-        self.tb.state.active_positions.pop(pos_key, None)
-        asyncio.create_task(self.tb.state.save())
-        logger.info(f"✅ Цикл #{pos_key} успешно завершен. Сторона свободна.")
+#         qty = max(lot_size, actual_notional / order_price)
+#         qty = round_step(qty, lot_size)
 
-    async def _handle_order_fail(self, symbol: str, pos_key: str, pos: ActivePosition) -> None:
-        """Централизованный диспетчер аварий API."""
-        max_fails: int = self.tb.cfg.get("app", {}).get("max_place_order_retries", 5)
-        
-        if pos.place_order_fails >= max_fails:
-            if pos.qty > 0:
-                if not pos.in_extrime_mode:
-                    # Делаем переход через единственную точку входа (TG + сброс счётчиков)
-                    logger.error(f"[{pos_key}] ⚠️ Лимит ошибок API исчерпан! Перевод в EXTRIME MODE.")
-                    self.tb.exit_engine._transition_to_extrime(pos, "Лимит ошибок API исчерпан")
-                    pos.place_order_fails = 0
-                else:
-                    logger.error(f"[{pos_key}] 🚨 КРИТИЧЕСКИЙ ОТКАЗ! Экстрим-ордера отклоняются биржей. Ручное вмешательство! Позиция ({pos.qty} шт) СОХРАНЕНА.")
-                    if self.tb.tg:
-                        asyncio.create_task(self.tb.tg.send_message(
-                            Reporters.extrime_alert(symbol, f"Позиция {pos.qty} шт. Требуется ручное вмешательство!")
-                        ))
-            else:
-                logger.error(f"[{pos_key}] 🗑 Ошибки API до открытия позиции. Сбрасываем стейт.")
-                self.tb.state.active_positions.pop(pos_key, None)
-                
-        await self.tb.state.save()
+#         if qty <= 0:
+#             logger.warning(f"[{symbol}] Пропуск: некорректный qty {qty}")
+#             return "ERR_BAD_QTY"
 
-    async def handle_exit_action(self, symbol: str, pos_key: str, action: Dict[str, Any]) -> None:
-        """Выполнение предписанных сценариями выхода (Exit Engine) действий."""
-        async with self.get_lock(pos_key):
-            pos: ActivePosition | None = self.tb.state.active_positions.get(pos_key)
-            spec = self.tb.symbol_specs.get(symbol)
-            if not pos or not spec or pos.qty <= 0: 
-                return
+#         logger.debug(f"[{symbol}] OIL Подготовка ордера: side={side}, pos_side={phemex_pos_side}, qty={qty}, price={order_price}")
 
-            act: str = action["action"]
-            pos_side: str = "Long" if pos.side == "LONG" else "Short"
-            close_side: str = "Sell" if pos.side == "LONG" else "Buy"
+#         try:
+#             resp = await self.client.place_order(symbol, side, qty, order_price, phemex_pos_side)
+#             code = resp.get("code", -1)
 
-            # 1. Отмена физического ордера
-            if act == "CANCEL_CLOSE":
-                if pos.close_order_id:
-                    try: 
-                        await self.tb.private_client.cancel_order(symbol, pos.close_order_id, pos_side)
-                    except Exception: 
-                        pass
-                    pos.close_order_id = None
-                return
+#             if code == 0:
+#                 data_dict = resp.get("data") or {}
+#                 order_id = data_dict.get("orderID") or data_dict.get("orderId")
 
-            # 2. Обновление виртуальной цели
-            if act == "UPDATE_TARGET":
-                if "price" in action: 
-                    target_price = action["price"]
-                elif pos.side == "LONG": 
-                    target_price = pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * action["new_rate"]
-                else: 
-                    target_price = pos.entry_price - (pos.entry_price - pos.base_target_price_100) * action["new_rate"]
+#                 if order_id:
+#                     cancel_resp = await self.client.cancel_order(symbol, order_id, phemex_pos_side)
+#                     if cancel_resp.get("code", -1) == 0:
+#                         logger.info(f"[{symbol}] 🗑️ Ордер {order_id} моментально отменен.")
+#                     else:
+#                         logger.error(f"[{symbol}] ❌ ОШИБКА ОТМЕНЫ ОРДЕРА! {cancel_resp}")
+#                 else:
+#                     logger.error(f"[{symbol}] code=0, но order_id не найден в ответе: {resp}")
 
-                target_price = round_step(target_price, spec.tick_size)
-                if target_price > 0:
-                    pos.current_close_price = target_price
-                    await self.tb.state.save()
-                    logger.info(f"🎯 [{pos_key}] ВИРТУАЛЬНАЯ ЦЕЛЬ ИЗМЕНЕНА: {pos.current_close_price}")
-                return
+#                 logger.info(f"[{symbol}] OIL: False.")
+#                 return False
 
-            # 3. Физический удар по стакану (Снайпер или Экстрим)
-            if act in ("PLACE_EXTRIME_LIMIT", "PLACE_DYNAMIC_CLOSE"):
-                target_price: float = round_step(action["price"], spec.tick_size)
-                if target_price <= 0:
-                    return
+#             if code == 11150:
+#                 logger.info(f"[{symbol}] OIL: True.")
+#                 return True
 
-                # ИНВАРИАНТ Extrime: гарантируем смену цены минимум на 1 тик за каждый retry_ttl.
-                # Проблема: increase_fraction (5% спреда) при спреде = 1 тик даёт shift = 0.05 тика →
-                # после round_step новая цена = старой → idempotency вернёт None → ордер не переставится.
-                # Решение: если в extrime-режиме новая цена совпадает с текущей — двигаем на 1 тик.
-                if (
-                    act == "PLACE_EXTRIME_LIMIT"
-                    and pos.close_order_id
-                    and pos.close_order_id != "PENDING_HTTP"
-                    and pos.current_close_price > 0
-                    and abs(pos.current_close_price - target_price) < max(spec.tick_size, 1e-12)
-                ):
-                    tick = spec.tick_size
-                    if pos.side == "LONG":
-                        target_price = round_step(pos.current_close_price - tick, tick)
-                    else:
-                        target_price = round_step(pos.current_close_price + tick, tick)
+#             return f"ERR_{code}"
 
-                if pos.close_order_id and pos.close_order_id != "PENDING_HTTP":
-                    if pos.current_close_price > 0 and abs(pos.current_close_price - target_price) < max(spec.tick_size, 1e-12):
-                        return
-                    else:
-                        try:
-                            await self.tb.private_client.cancel_order(symbol, pos.close_order_id, pos_side)
-                        except Exception:
-                            pass
-                        pos.close_order_id = None
+#         except asyncio.TimeoutError:
+#             logger.warning(f"[{symbol}] Таймаут ожидания ответа от биржи!")
+#             return "ERR_TIMEOUT"
 
-                pos.current_close_price = target_price
-
-                # ⏱ ВЗВОД ТАЙМЕРА ОХОТЫ (только для Average/Dynamic close)
-                # Для Extrime — ордер висит до следующего retry_ttl, ExtrimeClose сам управляет
-                if act == "PLACE_DYNAMIC_CLOSE":
-                    pos.hunting_active_until = time.time() + self.hunting_timeout_sec
-                else:
-                    pos.hunting_active_until = 0.0
-
-                # Блокируем стейт от гонок с вебсокетом (фикс #2 TECH_DEBT)
-                pos.close_order_id = "PENDING_HTTP"
-
-                try:
-                    resp: Dict[str, Any] = await self.tb.private_client.place_limit_order(
-                        symbol=symbol, side=close_side, qty=pos.qty, price=target_price, pos_side=pos_side
-                    )
-                    order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-
-                    if order_id:
-                        if pos.close_order_id == "PENDING_HTTP":
-                            pos.close_order_id = order_id
-                        pos.place_order_fails = 0
-                        pos.close_cancel_requested = False
-
-                        reason: str = action.get("reason", "")
-                        hunt_info = f"Охота: {self.hunting_timeout_sec}с" if act == "PLACE_DYNAMIC_CLOSE" else "Extrime"
-                        logger.info(f"⚡ [{pos_key}] ФИЗИЧЕСКИЙ ВЫСТРЕЛ: {reason} | Объем: {pos.qty} | Цена: {target_price} | {hunt_info}")
-                        await self.tb.state.save()
-                    else:
-                        pos.hunting_active_until = 0.0
-                        pos.close_order_id = None
-                        
-                except Exception as e:
-                    pos.hunting_active_until = 0.0
-                    pos.close_order_id = None
-                    logger.error(f"[{pos_key}] ❌ Ошибка выстрела ТП: {e}")
-                    pos.place_order_fails += 1
-                    await self._handle_order_fail(symbol, pos_key, pos)
-
-            # 4. Интерференция (Скупка помех)
-            elif act == "BUY_OUT_INTERFERENCE":
-                if pos_key in self.tb.state.pending_interference_orders: 
-                    return
-                
-                current_notional: float = pos.qty * pos.entry_price
-                notional_limit: float = self.tb.cfg.get("risk", {}).get("notional_limit", 5000)
-                available: float = notional_limit - current_notional
-                if available <= 0: 
-                    return
-
-                interf_price: float = round_step(action['price'], spec.tick_size)
-                if interf_price <= 0: 
-                    return
-
-                interf_qty: float = round_step(min(action['qty'], available / interf_price), spec.lot_size)
-                order_value_usdt: float = interf_qty * interf_price
-
-                if interf_qty <= 0 or order_value_usdt < self.tb.min_exchange_notional:
-                    pos.interference_disabled = True
-                    await self.tb.state.save()
-                    return
-
-                # Блокируем стейт от гонок с вебсокетом (фикс #1 TECH_DEBT)
-                self.tb.state.pending_interference_orders[pos_key] = "PENDING_HTTP"
-
-                try:
-                    resp = await self.tb.private_client.place_limit_order(
-                        symbol=symbol, side=("Buy" if pos.side == "LONG" else "Sell"), qty=interf_qty, price=interf_price, pos_side=pos_side
-                    )
-                    order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-                    if order_id:
-                        if self.tb.state.pending_interference_orders.get(pos_key) == "PENDING_HTTP":
-                            self.tb.state.pending_interference_orders[pos_key] = order_id
-                        pos.interference_cancel_requested = False
-                        pos.place_order_fails = 0
-                        logger.info(f"🛒 [{pos_key}] СКУПКА ПОМЕХИ: Отправлен ордер {interf_qty} шт. по {interf_price}")
-                        await self.tb.state.save()
-                    else:
-                        self.tb.state.pending_interference_orders.pop(pos_key, None)
-                except Exception as e:
-                    self.tb.state.pending_interference_orders.pop(pos_key, None)
-                    if "TE_NO_ENOUGH_AVAILABLE_BALANCE" in str(e):
-                        pos.interference_disabled = True
-                        logger.warning(f"[{pos_key}] ⛔ Скупка помех отключена: недостаточно баланса.")
-                    else:
-                        logger.error(f"[{pos_key}] ❌ Ошибка скупки помехи: {e}")
-                        pos.failed_interference_prices[str(interf_price)] = pos.failed_interference_prices.get(str(interf_price), 0) + 1
-
-                    pos.place_order_fails += 1
-                    await self._handle_order_fail(symbol, pos_key, pos)
-
-
-    async def _entry_timeout_guard(self, symbol: str, pos_key: str, order_id: str, pos_side: str) -> None:
-        """Инвариант: открывающий ордер не может висеть дольше entry_timeout_sec.
-        Запускается сразу после постановки — закрывает случай когда ордер висит
-        в New без единого исполнения (PartiallyFilled не приходит)."""
-        await asyncio.sleep(self.entry_timeout_sec)
-        if self.tb.state.pending_entry_orders.get(pos_key) == order_id:
-            logger.info(f"⏰ [{pos_key}] entry_timeout_sec истёк — снимаем открывающий ордер #{order_id[:8]}")
-            await self.cancel_order_via_ws(symbol, order_id, pos_side)
-
-    async def execute_entry(self, symbol: str, pos_key: str, signal: Dict[str, Any], depth: DepthTop) -> None:
-        """Расчет объема и постановка открывающей лимитной заявки по сигналу."""
-        spec = self.tb.symbol_specs.get(symbol)
-        if not spec:
-            return
-
-        try:
-            price: float = round_step(signal['price'], spec.tick_size)
-            if price <= 0:
-                return
-
-            risk_cfg = self.tb.cfg.get("risk", {})
-            margin_size_cfg = risk_cfg.get("margin_size", "row")
-            leverage_val = float(risk_cfg.get("leverage", {}).get("val", 1.0))
-
-            if str(margin_size_cfg).lower() == "row":
-                base_vol_usdt: float = float(signal.get("row_vol_usdt", price * signal.get("row_vol_asset", 0)))
-            else:
-                base_vol_usdt: float = float(margin_size_cfg) * leverage_val
-
-            target_vol_usdt: float = min(
-                base_vol_usdt * (1 + risk_cfg.get("margin_over_size_pct", 1) / 100),
-                risk_cfg.get("notional_limit", 5000)
-            )
-            qty: float = round_step(target_vol_usdt / price, spec.lot_size)
-            if qty <= 0:
-                return
-
-            base_target: float = signal.get("base_target_price_100") or (price * (1 + (signal.get("spr2_pct", 0) / 100)) if signal["side"] == "LONG" else price * (1 - (signal.get("spr2_pct", 0) / 100)))
-
-            ask1, bid1 = depth.asks[0][0], depth.bids[0][0]
-            pos = ActivePosition(
-                symbol=symbol, side=signal["side"], entry_price=price, qty=0.0, init_qty=qty,
-                init_ask1=ask1, init_bid1=bid1, base_target_price_100=base_target,
-            )
-            self.tb.exit_engine.initialize_position_state(pos)
-            self.tb.state.active_positions[pos_key] = pos
-
-            # Блокируем стейт от гонок с вебсокетом
-            self.tb.state.pending_entry_orders[pos_key] = "PENDING_HTTP"
-
-            pos_side_str: str = "Long" if signal["side"] == "LONG" else "Short"
-            resp = await self.tb.private_client.place_limit_order(
-                symbol=symbol, side=("Buy" if signal["side"] == "LONG" else "Sell"), qty=qty, price=price, pos_side=pos_side_str
-            )
-            order_id: str = str(resp.get("data", {}).get("orderID") or resp.get("result", {}).get("orderId", ""))
-
-            if order_id:
-                if self.tb.state.pending_entry_orders.get(pos_key) == "PENDING_HTTP":
-                    self.tb.state.pending_entry_orders[pos_key] = order_id
-                # Инвариант: entry-ордер не может висеть вечно — сносим через entry_timeout_sec
-                # (покрывает случай New без PartiallyFilled, т.е. когда ордер вообще не исполнялся)
-                asyncio.create_task(self._entry_timeout_guard(symbol, pos_key, order_id, pos_side_str))
-                await self.tb.state.save()
-                semantic: str = "ОТКРЫТЬ ЛОНГ" if signal["side"] == "LONG" else "ОТКРЫТЬ ШОРТ"
-                logger.info(f"🚀 [{pos_key}] {semantic} ОТПРАВЛЕН: по {price} (Плановый объем: {qty})")
-                if self.tb.tg:
-                    b_price, p_price = self.tb.price_manager.get_prices(symbol)
-                    asyncio.create_task(self.tb.tg.send_message(
-                        Reporters.entry_signal(symbol, signal, b_price, p_price)
-                    ))
-            else:
-                self.tb.state.active_positions.pop(pos_key, None)
-                self.tb.state.pending_entry_orders.pop(pos_key, None)
-                
-        except Exception as e:
-            pos_check: ActivePosition | None = self.tb.state.active_positions.get(pos_key)
-            if pos_check and pos_check.qty > 0:
-                self.tb.state.pending_entry_orders.pop(pos_key, None)
-            else:
-                self.tb.state.active_positions.pop(pos_key, None)
-                self.tb.state.pending_entry_orders.pop(pos_key, None)
-                if "20004" in str(e):
-                    # [20004] TE_ERR_INCONSISTENT_POS_MODE при hedge-аккаунте означает что
-                    # контракт данного символа зафиксирован в One-Way mode на уровне биржи.
-                    # Торговать его через hedge API невозможно — добавляем в blacklist навсегда.
-                    logger.error(f"[{pos_key}] ⛔ [20004] Контракт несовместим с Hedge mode. Blacklist.")
-                    self.tb.set_blacklist(list(self.tb.black_list) + [symbol])
-                    if self.tb.tg:
-                        asyncio.create_task(self.tb.tg.send_message(
-                            f"⛔ <b>Blacklist [20004]</b>\n#{symbol}\nКонтракт не поддерживает Hedge mode API"
-                        ))
-                else:
-                    logger.error(f"[{pos_key}] ❌ Ошибка выставления открывающего ордера: {e}")
+#         except Exception as e:
+#             logger.error(f"[{symbol}] Исключение при отправке/отмене: {e}")
+#             return "ERR_EXCEPTION"

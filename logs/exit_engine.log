@@ -1,7 +1,0 @@
-2026-04-04 00:53:56 | INFO | exit_engine | 🔄 [EXIT] #PIPPINUSDT_LONG Переход в EXTRIME CLOSE. Причина: Average исчерпал лимиты уступок
-2026-04-04 02:04:38 | INFO | exit_engine | ⌛ [EXIT] #ARKMUSDT_LONG Average исчерпал лимиты (29.3с). Цель → БУ: 0.0957
-2026-04-04 02:05:11 | INFO | exit_engine | 🔄 [EXIT] #ARKMUSDT_LONG Переход в EXTRIME CLOSE. Причина: БУ-лимитка по TTL не сработала
-2026-04-04 02:06:00 | INFO | exit_engine | ⌛ [EXIT] #SKLUSDT_LONG Average исчерпал лимиты (35.4с). Цель → БУ: 0.00662
-2026-04-04 02:06:26 | INFO | exit_engine | 🔄 [EXIT] #SKLUSDT_LONG Переход в EXTRIME CLOSE. Причина: БУ-лимитка по TTL не сработала
-2026-04-04 02:47:41 | INFO | exit_engine | ⌛ [EXIT] #ARPAUSDT_LONG Average исчерпал лимиты (39.4с). Цель → БУ: 0.00914
-2026-04-04 02:47:59 | INFO | exit_engine | 🔄 [EXIT] #ARPAUSDT_LONG Переход в EXTRIME CLOSE. Причина: БУ-лимитка по TTL не сработала

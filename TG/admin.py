@@ -20,7 +20,7 @@ from utils import get_config_summary
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from CORE.bot import TradingBot
+    from CORE.orchestrator import TradingBot
 
 CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.json"
 TEMP_CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.tmp.json"

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from EXIT.utils import check_is_negative
 
 if TYPE_CHECKING:
-    from CORE.models import ActivePosition
+    from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
 class Interference:

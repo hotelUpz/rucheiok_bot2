@@ -13,7 +13,9 @@ from EXIT.engine import ExitEngine
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
-    from CORE.bot import TradingBot
+    from CORE.orchestrator import Orch
+    from API.PHEMEX.ticker import PhemexTickerAPI
+    from API.BINANCE.ticker import BinanceTickerAPI
 
 logger = UnifiedLogger("bot")
 
@@ -35,10 +37,10 @@ class BlackListManager:
             if full_sym not in new_bl:
                 new_bl.append(full_sym)
                 
-            if "OG" in full_sym:
-                new_bl.append(full_sym.replace("OG", "0G"))
-            if "0G" in full_sym:
-                new_bl.append(full_sym.replace("0G", "OG"))
+            # if "OG" in full_sym:
+            #     new_bl.append(full_sym.replace("OG", "0G"))
+            # if "0G" in full_sym:
+            #     new_bl.append(full_sym.replace("0G", "OG"))
                 
         self.symbols = new_bl
         return self.symbols
@@ -64,7 +66,7 @@ class BlackListManager:
 
 class PriceCacheManager:
     """Асинхронный кэш цен тикеров Binance/Phemex, обновляемый в фоне."""
-    def __init__(self, binance_api, phemex_api, upd_sec: float = 3.0):
+    def __init__(self, binance_api: 'BinanceTickerAPI', phemex_api: 'PhemexTickerAPI', upd_sec: float = 3.0):
         self.binance_api = binance_api
         self.phemex_api = phemex_api
         self.upd_sec = upd_sec
@@ -100,7 +102,7 @@ class PriceCacheManager:
 
 
 class ConfigManager:
-    def __init__(self, cfg_path: Path | str, tb: "TradingBot"):
+    def __init__(self, cfg_path: Path | str, tb: "Orch"):
         self.cfg_path = cfg_path
         self.tb = tb
 

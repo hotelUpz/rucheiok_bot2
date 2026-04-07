@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from EXIT.utils import check_is_negative
 
 if TYPE_CHECKING:
-    from CORE.models import ActivePosition
+    from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
 class NegativeScenario:
@@ -31,7 +31,7 @@ class NegativeScenario:
             pos.negative_duration_sec += delta
             
             if pos.negative_duration_sec >= self.negative_ttl:
-                return {"action": "TRIGGER_EXTRIME", "reason": "NEGATIVE_SCENARIO"}
+                return "NEGATIVE_SCENARIO"
         else:
             pos.negative_duration_sec = 0.0
 

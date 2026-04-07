@@ -28,36 +28,7 @@
 5. **Extrime Close:** Механизм экстренного выхода. Рассчитывает справедливую ось `mid = (ask1 + bid1) / 2` и ставит лимитку с прогрессирующим смещением (пробивая стакан), гарантируя исполнение.
 
 
+## CRITICAL
 
----
-## РЕШЁННЫЕ ПРОБЛЕМЫ (2026-04-04)
-
-### [CLOSED] Позиция зависала после Average breakeven
-**Симптом:** Average устанавливал breakeven в t=30с (position_ttl=60с). TTL проверял `now - opened_at >= 60` — условие не выполнялось ещё 30 секунд. Позиция висела в limbo.
-**Корень:** `PositionTTLClose.analyze()` проверял `in_breakeven_mode` только внутри блока `now - opened_at >= position_ttl`. Если breakeven установлен Average раньше — TTL его не видел.
-**Фикс:** `position_ttl_close.py` — проверка `in_breakeven_mode` вынесена ПЕРВОЙ, независимо от TTL. Как только breakeven активен (кем угодно), ждём `breakeven_wait_sec` и → Extrime.
-
-### [CLOSED] Average спамил TRIGGER_EXTRIME после breakeven
-**Симптом:** После первого TRIGGER_EXTRIME engine ставил `pos.current_target_rate = 0.0` но не обновлял `last_shift_ts`. Каждый тик: shift-чек срабатывал, rate=0.0 <= 0.8 → 20+ логов/сек.
-**Фикс 1:** `average.py` — ранний выход `if pos.in_breakeven_mode or pos.in_extrime_mode: return None`.
-**Фикс 2:** `average.py` — при TRIGGER_EXTRIME теперь обновляем `pos.last_shift_ts = now` (защита от дублей до установки in_breakeven_mode).
-
-### [CLOSED] Misleading "Охота: 0.5с" в логе Extrime ордеров
-**Фикс:** `executor.py` — лог теперь показывает "Extrime" вместо hunting_timeout_sec для PLACE_EXTRIME_LIMIT.
-
----
-## РЕШЁННЫЕ ПРОБЛЕМЫ (2026-04-04, сессия 2)
-
-### [CLOSED] Extrime не стрелял после BU-окна (огромная задержка вместо 2с)
-**Симптом:** После `TRIGGER_BREAKEVEN` экстрим-ордер появлялся через 20–35с вместо breakeven_wait_sec+retry_ttl = 5с. Логи: ARKMUSDT +33с, SKLUSDT +26с.
-**Корень:** `UPDATE_TARGET` записывал `pos.current_close_price = breakeven_price`. `_transition_to_extrime` этот сброс не делал. Первый extrime вычислял `target = mid ≈ breakeven_price` → idempotency-проверка executor-а `abs(breakeven - mid) < tick_size` → `True` → return без выстрела. Разблокировалось только когда рынок уходил от точки безубытка дальше чем на tick_size.
-**Фикс:** `engine.py _transition_to_extrime` — добавлен `pos.current_close_price = 0.0`. Теперь idempotency всегда пропускает первый выстрел (abs(0 − mid) >> tick_size). Антипаттерн проверен во всех точках вызова `_transition_to_extrime`.
-
-### [CLOSED] Смена лимитки каждый retry_ttl не работала для монет с малым спредом
-**Симптом:** Ордер не переставлялся при каждом retry_ttl. SKLUSDT закрывался 3+ минуты. Для монет с tick_size = spread эффективное смещение = 0 после round_step.
-**Корень:** `increase_fraction = 5%` от спреда при спреде = 1 тик → shift = 0.05 тика → round_step → та же цена → idempotency → return. Нужно было 20 retries = 60с для реального сдвига.
-**Фикс:** `executor.py PLACE_EXTRIME_LIMIT` — если новая цена (после round_step) совпадает с текущей, принудительно сдвигаем на 1 тик в сторону рынка (LONG: вниз, SHORT: вверх). Гарантирует смену ордера каждые `retry_ttl` секунд независимо от размера спреда и increase_fraction.
-
-### [CLOSED] Race condition: cancel-event старого TP-ордера обнулял PENDING_HTTP нового экстрим-ордера
-**Симптом:** Экстрим ставил ордер (PENDING_HTTP), во время `await place_limit_order` прилетал WS-cancel от отменённого старого Average-TP через hedge-fallback. Он перезаписывал `close_order_id = old_TP_id`, затем Canceled → `None`. HTTP-ответ нового ордера уже не мог сохранить ID (PENDING_HTTP не было). Экстрим-ордер висел в рынке без ID; следующий retry ставил второй ордер поверх первого.
-**Фикс:** `ws_handler.py _process_close` — при `close_order_id == "PENDING_HTTP"` и терминальном статусе (Canceled/Rejected/Deactivated) делаем ранний `return`. Cancel-event чужого ордера игнорируется; PENDING_HTTP дождётся HTTP-ответа нового ордера.
+1. Делаем глубокий рефакт проекта: CORE/ и все вытекающие из него... (нужно подключить и настроить как минимум 2 файла -- executor.py & models_fsm.py)
+   

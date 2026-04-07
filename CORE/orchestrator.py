@@ -19,17 +19,15 @@ from API.PHEMEX.ticker import PhemexTickerAPI
 from API.PHEMEX.funding import PhemexFunding
 
 from ENTRY.signal_engine import SignalEngine
-from EXIT.engine import ExitEngine
-from CORE.models import BotState
+from CORE.restorator import BotState
 from CORE.executor import OrderExecutor
-from CORE.ws_handler import PrivateWSHandler
-from CORE.bot_utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
+from CORE.models_fsm import WsInterpreter
+from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
 from c_log import UnifiedLogger
 from TG.tg_sender import TelegramSender
 from utils import get_config_summary
 
 if TYPE_CHECKING:
-    from CORE.models import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
 logger = UnifiedLogger("bot")
@@ -37,13 +35,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
 
-class TradingBot:
+class Orch:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
         self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
         self.quota_asset = self.cfg.get("quota_asset", "USDT")
         
-        self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.5)
+        self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
         self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", 5.0)     
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
@@ -57,7 +55,7 @@ class TradingBot:
         self.state.load()
 
         self.executor = OrderExecutor(self)
-        self.ws_handler = PrivateWSHandler(self)
+        self.ws_handler = WsInterpreter(self)
         self._is_running = False
 
         self.phemex_sym_api = PhemexSymbols()
@@ -77,17 +75,21 @@ class TradingBot:
         ) if tg_cfg.get("enable") else None
 
         self.signal_engine = SignalEngine(cfg["entry"], self.phemex_funding_api)
-        self.exit_engine = ExitEngine(cfg["exit"], self)
 
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
-        self._latest_depth: Dict[str, DepthTop] = {}
-        self._depth_workers: Dict[str, asyncio.Task] = {}
-        self._depth_events: Dict[str, asyncio.Event] = {}
+        
+        # Хранилище последних рыночных данных и активных задач для контроля нагрузки
+        self._latest_market_data: Dict[str, DepthTop] = {}
+        self._market_processors: Dict[str, asyncio.Task] = {}
         
         # Словарь для блокировки спама дублирующими сигналами на вход
         self._signal_timeouts: Dict[str, float] = {}
         self.cfg_manager = ConfigManager(CFG_PATH, self)
+        
+        scenarios = self.cfg.get("exit", {}).get("scenarios", {}).get("breakeven_ttl_close", {})
+        self.breakeven_mode_timeout_sec = scenarios.get("breakeven_mode_timeout_sec", 0.1)
+        self.breakeven_wait_sec = scenarios.get("breakeven_wait_sec", 2.0)
 
     # ==========================================
     # ХЕЛПЕРЫ
@@ -119,6 +121,7 @@ class TradingBot:
         return True
     
     async def _recover_state(self):
+        """пусть будет мягкий концепт: (корректировка сайза и оставшихся таймеров)"""
         try:
             self.state.load()
             resp = await self.private_client.get_active_positions()
@@ -136,61 +139,16 @@ class TradingBot:
                     pos_key = f"{symbol}_{pos_side}"
                     exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
 
-            old_positions = dict(self.state.active_positions)
             self.state.active_positions.clear()
 
-            for pos_key, pos in old_positions.items():
-                if pos_key in exchange_positions:
-                    exch_data = exchange_positions[pos_key]
-                    if pos.side != exch_data["side"]: continue
-                        
-                    try: await self.private_client.cancel_all_orders(pos.symbol)
-                    except Exception: pass
-
-                    pos.qty = exch_data["size"]
-                    pos.close_order_id = None
-                    pos.entry_finalized = pos.qty > 0
-                    pos.entry_cancel_requested = False
-                    pos.interference_cancel_requested = False
-
-                    self.state.active_positions[pos_key] = pos
-                    logger.info(f"🔄 [RECOVERY] Восстановлена позиция: {pos_key}. Объем: {pos.qty}, Вход: {pos.entry_price}")
-                else:
-                    logger.info(f"🗑 [RECOVERY] Позиция {pos_key} закрыта извне. Удаляем из кэша.")
-
+            # в старой логике была логика отмены ордеров. Не уверен что это уместно.
             await self.state.save()
         except Exception as e:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
     # ==========================================
-    # ИНВАРИАНТЫ ПАЙПЛАЙНА
-    # ==========================================    
-    async def _manage_position_lifecycle(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
-        """Инвариант 1: Контроль жизни текущих позиций (Огрызки, TTL, Экстрим, Охота)."""
-        _, p_price = self.price_manager.get_prices(symbol)
-        
-        for pos_key in (long_key, short_key):
-            pos = self.state.active_positions.get(pos_key)
-            if not pos: continue
-
-            # 1.1 Зачистка огрызков (< 5 USDT)
-            notional = pos.qty * p_price
-            if 0 < notional < self.min_exchange_notional and pos.entry_finalized:
-                if self.tg: asyncio.create_task(self.tg.send_message(Reporters.dust_close(symbol, pos_key, p_price)))
-                async with self.executor.get_lock(pos_key):
-                    await self.executor.finalize_dust_position(symbol, pos_key, pos)
-                continue
-
-            # 1.2 Ожидание налива
-            if pos_key in self.state.pending_entry_orders and pos.qty <= 0: 
-                continue
-
-            # 1.3 Оценка стратегий выхода и скупки помех (Инварианты поручены ExitEngine)
-            action = self.exit_engine.evaluate_pipeline(snap, pos)
-            if action: 
-                # Передаем действие в Экзекьютер
-                await self.executor.handle_exit_action(symbol, pos_key, action)
-
+    # ТОРГОВАЯ ЛОГИКА
+    # ==========================================
     def _check_risk_limits(self, symbol: str, long_key: str, short_key: str) -> bool:
         """Инвариант 2: Проверка квот (Слоты и Hedge Mode)."""
         has_long = long_key in self.state.active_positions or long_key in self.state.pending_entry_orders
@@ -206,6 +164,11 @@ class TradingBot:
             return False
 
         return True
+    
+    async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
+        """Инвариант 1: Контроль жизни текущих позиций (Огрызки, TTL, Экстрим, Охота)."""
+        # _, p_price = self.price_manager.get_prices(symbol)
+        pass
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         """Инвариант 3: Оценка сигнала на вход."""
@@ -227,12 +190,13 @@ class TradingBot:
 
         try:
             signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-            await self.executor.execute_entry(symbol, pos_key, signal, snap)
+            """Не забыть добавить к объему процент risk.margin_over_size_pct"""
+            await self.executor.execute_entry(symbol, pos_key, signal)
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
 
     # ==========================================
-    # ВОРКЕРЫ СТАКАНА
+    # ОБРАБОТКА РЫНОЧНЫХ ДАННЫХ
     # ==========================================
     async def _orchestrate_market_tick(self, snap: DepthTop):
         """Главный дирижер тиков. Пошаговый пайплайн."""
@@ -250,7 +214,7 @@ class TradingBot:
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             
             # ШАГ 1: Контроль жизни (Скупка помех, Выходы, Огрызки)
-            await self._manage_position_lifecycle(snap, symbol, pos_long_key, pos_short_key)
+            await self._evaluate_exit_scenarios(snap, symbol, pos_long_key, pos_short_key)
             
             # ШАГ 2: Контроль лимитов
             if not self._check_risk_limits(symbol, pos_long_key, pos_short_key):
@@ -260,26 +224,27 @@ class TradingBot:
             await self._evaluate_entry_signal(snap, symbol)
                     
         except Exception as e:
-            logger.debug(f"Scan error: {e}")
+            logger.debug(f"Scan error for {symbol}: {e}")
         finally:
             self._processing.discard(symbol)
 
-    async def _depth_worker_loop(self, symbol: str):
-        event = self._depth_events[symbol]
-        while self._is_running:
-            await event.wait()
-            event.clear()
-            snap = self._latest_depth.pop(symbol, None)
-            if snap is not None:
-                await self._orchestrate_market_tick(snap)
-
-    async def _on_depth_received(self, snap: DepthTop):
+    async def _on_market_tick(self, snap: DepthTop):
+        """Единая точка входа для данных потока стакана."""
         if not self._is_running: return
-        self._latest_depth[snap.symbol] = snap
-        if snap.symbol not in self._depth_events:
-            self._depth_events[snap.symbol] = asyncio.Event()
-            self._depth_workers[snap.symbol] = asyncio.create_task(self._depth_worker_loop(snap.symbol))
-        self._depth_events[snap.symbol].set()
+
+        symbol = snap.symbol
+        self._latest_market_data[symbol] = snap
+
+        # Паттерн Throttling: если предыдущая обработка тика еще не завершена, 
+        # новая задача не создается. Она сама заберет свежайший стейт при старте.
+        proc = self._market_processors.get(symbol)
+        if proc is None or proc.done():
+            async def _worker():
+                data = self._latest_market_data.pop(symbol, None)
+                if data:
+                    await self._orchestrate_market_tick(data)
+            
+            self._market_processors[symbol] = asyncio.create_task(_worker())
 
     # ==========================================
     # ТОЧКИ ЗАПУСКА
@@ -297,8 +262,7 @@ class TradingBot:
         symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
 
-        # Гарантируем Hedged position mode на Phemex — без него posSide=Long/Short отклоняется с [20004].
-        # Если есть открытые позиции, переключить нельзя, но режим уже должен быть Hedged.
+        # Гарантируем Hedged position mode на Phemex
         try:
             await self.private_client.switch_position_mode(currency=self.quota_asset, mode="Hedged")
             logger.info("✅ Position mode: Hedged (подтверждён)")
@@ -316,7 +280,7 @@ class TradingBot:
 
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
-        self._stream_task = asyncio.create_task(self._stream.run(self._on_depth_received))
+        self._stream_task = asyncio.create_task(self._stream.run(self._on_market_tick))
 
     async def aclose(self):
         await self.stop()
@@ -327,15 +291,14 @@ class TradingBot:
         await self.binance_ticker_api.aclose()
         await self.phemex_ticker_api.aclose()
         await self.phemex_funding_api.aclose()
-        if self.tg:
-            await self.tg.aclose()
-        if self.session and not self.session.closed:
-            await self.session.close()
+        if self.tg: await self.tg.aclose()
+        if self.session and not self.session.closed: await self.session.close()
 
     async def stop(self):
         if not getattr(self, '_is_running', False): return
         self._is_running = False
         logger.info("⏹ Остановка процессов...")
+        
         if self.tg: await self.tg.send_message("⏹ Остановка процессов...")
 
         self.price_manager.stop()
@@ -348,12 +311,12 @@ class TradingBot:
         await self._await_task(getattr(self, '_private_ws_task', None))
         await self._await_task(getattr(self, '_stream_task', None))
         
-        for task in list(self._depth_workers.values()):
+        # Завершаем разовые задачи-воркеры
+        for task in list(self._market_processors.values()):
             await self._await_task(task)
             
-        self._depth_workers.clear()
-        self._latest_depth.clear()
-        self._depth_events.clear()
+        self._market_processors.clear()
+        self._latest_market_data.clear()
         self._processing.clear()
         self._signal_timeouts.clear()
 

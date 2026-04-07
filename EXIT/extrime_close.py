@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from CORE.models import ActivePosition
+    from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
 class ExtrimeClose:

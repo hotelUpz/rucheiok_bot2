@@ -5,15 +5,15 @@ import aiohttp
 from typing import List, Dict, Optional, Any, TYPE_CHECKING
 from pathlib import Path
 
-from API.PHEMEX.symbol import PhemexSymbols, SymbolInfo
+from API.PHEMEX.symbol import PhemexSymbols
 from API.PHEMEX.order import PhemexPrivateClient
 from utils import load_json, save_json_safe
 from c_log import UnifiedLogger
 
-if TYPE_CHECKING:
-    from API.PHEMEX.symbol import SymbolInfo
-
 logger = UnifiedLogger("setup")
+
+
+"""Утилитарная сущность. По идее ей не место в ядре. Но для совместимости можно оставить. Еще. Надо сохранять кеш (и читать) на папку выше корня проекта."""
 
 class GlobalLeverageSetter:
     def __init__(self, api_key: str, api_secret: str, leverage_val: Optional[float], 

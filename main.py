@@ -6,8 +6,8 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-from CORE.bot import TradingBot
-from CORE.leverage_setter import GlobalLeverageSetter
+from CORE.orchestrator import TradingBot
+from CORE.lvg_setter import GlobalLeverageSetter
 from TG.admin import AdminTgBot
 from c_log import UnifiedLogger
 from utils import load_json
