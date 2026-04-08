@@ -12,7 +12,7 @@ from ENTRY.signal_engine import SignalEngine
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
-    from CORE.orchestrator import Orch
+    from CORE.orchestrator import TradingBot
     from API.PHEMEX.ticker import PhemexTickerAPI
     from API.BINANCE.ticker import BinanceTickerAPI
 
@@ -36,7 +36,7 @@ class BlackListManager:
             if full_sym not in new_bl:
                 new_bl.append(full_sym)
                 
-            # if "OG" in full_sym:
+            # if "OG" in full_sym: # -- так и оставить закомент.
             #     new_bl.append(full_sym.replace("OG", "0G"))
             # if "0G" in full_sym:
             #     new_bl.append(full_sym.replace("0G", "OG"))
@@ -101,7 +101,8 @@ class PriceCacheManager:
 
 
 class ConfigManager:
-    def __init__(self, cfg_path: Path | str, tb: "Orch"):
+    # Нужно согласовать с новыми настройками.
+    def __init__(self, cfg_path: Path | str, tb: "TradingBot"):
         self.cfg_path = cfg_path
         self.tb = tb
 
@@ -122,7 +123,6 @@ class ConfigManager:
             if old_ff: old_ff.stop()
 
             self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
-            self.tb.exit_engine = ExitEngine(self.tb.cfg["exit"], self.tb)
 
             if getattr(self.tb, '_is_running', False):
                 old_task = getattr(self.tb, '_funding_task', None)
@@ -138,6 +138,7 @@ class ConfigManager:
 
 class Reporters:
     """Централизованный шаблонизатор отчетов для Телеграма и Логов."""
+    # Нужно адаптировать под новый пейплайн бота, покрывая все ключевые моменты информатирования в ТГ во время торговой итерации.
     
     @staticmethod
     def entry_signal(symbol: str, signal: dict, b_price: float, p_price: float) -> str:

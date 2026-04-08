@@ -13,6 +13,8 @@ class NegativeScenario:
         self.stab_neg = cfg.get("stabilization_ttl", 1.5)
         self.negative_spread_pct = cfg.get("negative_spread_pct", 0)
         self.negative_ttl = cfg.get("negative_ttl", 60)
+
+    # и get_top_bid_ask и check_is_negative можно и нужно вынести во внешнюю утилиту ибо используются в разных модулях.
     
     @staticmethod
     def get_top_bid_ask(depth: DepthTop) -> tuple[float, float]:
@@ -35,7 +37,9 @@ class NegativeScenario:
             return spread <= negative_spread_pct
 
     def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> str | None:
-        if not self.enable: 
+        if not self.enable: return None
+
+        if pos.in_breakeven_mode or pos.in_extrime_mode:
             return None
         
         # Во время стабилизации мы "в безопасности", поэтому тащим якорь за собой

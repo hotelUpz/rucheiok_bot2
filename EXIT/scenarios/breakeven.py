@@ -12,7 +12,7 @@ class PositionTTLClose:
     Инвариант (двухэтапный):
     1. После position_ttl секунд → TRIGGER_BREAKEVEN (ExitEngine переводит цель в БУ).
     2. Если БУ-лимитка не закрыла позицию за breakeven_wait_sec → TRIGGER_EXTRIME.
-    Оба шага происходят ровно по одному разу благодаря флагу pos.in_negative_mode.
+    Оба шага происходят ровно по одному разу благодаря флагу pos.in_breakeven_mode.
     """
     def __init__(self, cfg: dict, active_positions_locker):
         self.cfg = cfg
@@ -22,7 +22,7 @@ class PositionTTLClose:
         self.breakeven_wait_sec = float(cfg.get("breakeven_wait_sec", 0.0))
         self.active_positions_locker = active_positions_locker # стата тут может мутироваться. Норм.
 
-    def build_target_price(self, pos: ActivePosition) -> float:
+    def build_target_price(self, pos: ActivePosition) -> float: # вызовем на внешней стороне во время детерминации цены закрытия.
         orient_pct = self.to_entry_orientation
         if orient_pct == 0.0: return pos.entry_price # либо даже pos.avg_price
         if pos.side == "LONG":
@@ -31,17 +31,20 @@ class PositionTTLClose:
 
     async def analyze(self, pos: ActivePosition, now: float) -> str | None: # нужно все маркеры времени по контролю состояния позиций привести к единому формату. скорее всего тип будет int то есть формат секунд.
         if self.position_ttl in ("inf", None): return None
+
+        if pos.in_extrime_mode: return None
         
-        if not pos.in_negative_mode and (now - pos.opened_at) >= self.position_ttl: # 
+        if not pos.in_breakeven_mode and (now - pos.opened_at) >= self.position_ttl: # 
             # async with self.active_positions_locker...: #(по ключам извлекаем нужный локер)
             pos.breakeven_start_ts = now
-            pos.in_negative_mode = True
+            pos.in_breakeven_mode = True
 
             return "BREAKEVEN_TIMEOUT"
 
         # Если Breakeven уже активен
         # Ждём breakeven_wait_sec и переводим в Extrime — независимо от position_ttl.
-        if pos.in_negative_mode:
-            if now - pos.breakeven_start_ts >= self.breakeven_wait_sec:                
+        if pos.in_breakeven_mode:
+            if pos.current_qty > 0 and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:  # pos.current_qty > 0 поменять на pos.current_qty > min_noyional
+                pos.in_breakeven_mode = False  
                 return "EXTRIME_SCENARIO"
             return None

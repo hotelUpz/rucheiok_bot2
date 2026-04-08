@@ -1,20 +1,16 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
+logger = UnifiedLogger("exit")
+
 class ExtrimeClose:
     """
     Аварийный выход из позиции методом нарастающего давления.
-
-    Инвариант:
-    - Активируется только через _transition_to_extrime (ExitEngine).
-    - Каждые retry_ttl секунд вычисляет новую цену, сдвигая её в сторону рынка
-      на increase_fraction * spread * retries_count (нарастающее ухудшение).
-    - При retry_num="inf" не прекращается никогда (позиция будет закрыта).
-    - PLACE_EXTRIME_LIMIT — единственное возможное действие этого сценария.
     """
     def __init__(self, cfg: dict):
         self.cfg = cfg
@@ -25,14 +21,18 @@ class ExtrimeClose:
         # increase_fraction -- % от (ask1 - bid1). В конфиге 2.5 = 2.5% = 0.025
         self.increase_fraction = cfg.get("increase_fraction", 2.5) / 100
 
-    def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> dict | None:
-        if not self.enable or not pos.in_extrime_mode: 
+    def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> float | None:
+        if not self.enable: 
+            return None
+        
+        if pos.current_qty <= 0.0: # возможно избыточно. есть смысл делать на внейней стороне.
             return None
         
         # 1. Каждые retry_ttl секунд вычисляется новая exit-цена.
         if now - pos.last_extrime_try_ts < self.retry_ttl: 
             return None
-            
+        
+        # мсожно получить при помощи get_top_bid_ask -- см в других модулях.
         ask1 = depth.asks[0][0] if depth.asks else 0.0
         bid1 = depth.bids[0][0] if depth.bids else 0.0
         if not ask1 or not bid1: 
@@ -40,6 +40,8 @@ class ExtrimeClose:
 
         # 3. Если число попыток ограничено и лимит исчерпан: действие не ожидается. Молимся Богу.
         if str(self.retry_num).lower() != "inf" and pos.extrime_retries_count >= int(self.retry_num):
+            logger.warning(f"Осторожно! extrime_retries_count >= retry_num, но позиция {pos.symbol} не закрыта!")
+            """TODO: можно вызывать некий глобальный флаг ВНИМАНИЯ и слать алерт в телеграм. Однако, на практике retry_num будет inf"""
             return None
 
         # 2. Цена рассчитывается:
@@ -62,8 +64,4 @@ class ExtrimeClose:
         pos.extrime_retries_count += 1
         pos.last_extrime_try_ts = now
         
-        return {
-            "action": "PLACE_EXTRIME_LIMIT", 
-            "price": target_price, 
-            "reason": f"EXTRIME_RETRY_{pos.extrime_retries_count}"
-        }
+        return target_price

@@ -93,6 +93,10 @@ class TradingBot:
         self.executor = OrderExecutor() # Если нужно передать self, добавь в init экзекутора
         self.PositionTTLClose = PositionTTLClose(
             cfg=self.cfg.get("exit", {}), active_positions_locker=self.active_positions_locker) # надо привести все к единой семантике. Либо breakeven либо position_ttl -- и имя класса и переменных.
+        
+        """TODO: нужно добавить все зависимости из EXIT и граматно пробросить в _evaluate_exit_scenarios,
+          организовывая логику выхода. Львиную долю инварианта выпоняют сами методы EXIT модулей."""
+
 
     # ==========================================
     # ХЕЛПЕРЫ

@@ -4,27 +4,27 @@
 # ============================================================
 from __future__ import annotations
 
-# import asyncio
-# import time
+import asyncio
+import time
 import pytz
 from typing import Dict, Any, TYPE_CHECKING, Optional
-from c_log import UnifiedLogger
 from decimal import Decimal, ROUND_DOWN
-from consts import TIME_ZONE
-
-
-logger = UnifiedLogger("bot")
-
 from dotenv import load_dotenv    
 
+from c_log import UnifiedLogger
+from consts import TIME_ZONE
+from CORE._utils import Reporters
+
+if TYPE_CHECKING:
+    from CORE.orchestrator import TradingBot
+
 load_dotenv()
-
-
 logger = UnifiedLogger(name="bot")
 TZ = pytz.timezone(TIME_ZONE)
 
 
 def round_step(value: float, step: float) -> float:
+    """Округление до шага цены или лота."""
     if not step or step <= 0:
         return value
     val_d = Decimal(str(value))
@@ -35,155 +35,227 @@ def round_step(value: float, step: float) -> float:
 
 class OrderExecutor:
     """
-    Прокладка между оркестратором и сетевым адаптером. Содержит шаблоны рутинных операций перед финальной отправкой запросов.
+    Прокладка между оркестратором и сетевым адаптером. 
+    Содержит шаблоны рутинных операций (Place -> Wait -> Cancel -> Evaluate).
     """
+    def __init__(self, tb: "TradingBot"):
+        self.tb = tb
+        self.client = tb.private_client
+        self.cfg = tb.cfg
+        
+        # Тайминги
+        self.entry_timeout = self.cfg.get("entry", {}).get("entry_timeout_sec", 0.5)
+        self.exit_timeout = self.cfg.get("exit", {}).get("exit_timeout_sec", 0.5)
+        self.interf_timeout = self.cfg.get("exit", {}).get("interference", {}).get("interference_timeout_sec", 0.1)
+        
+        # Ретраи
+        self.max_entry_retries = self.cfg.get("entry", {}).get("max_place_order_retries", 1)
+        self.max_exit_retries = self.cfg.get("exit", {}).get("max_place_order_retries", 1)
+        
+        # Риски
+        risk = self.cfg.get("risk", {})
+        self.notional_limit = risk.get("notional_limit", 25.0)
+        self.min_exchange_notional = risk.get("min_exchange_notional", 5.0)
+        self.margin_over_size_pct = risk.get("margin_over_size_pct", 1.0)
+        self.leverage = risk.get("leverage", {}).get("val", 10)
 
-    async def execute_cancel(symbol, pos_key, order_id) -> bool:
-        """
-        Роль: некая промежуточная прокладка между сетевым адаптером и инициирующей стороной.
-        Ошибку неудачи отмены логируем (можно поднимать в тг, потом закоментирую если будет мулять)                
-        """
+    def _get_lock(self, pos_key: str) -> asyncio.Lock:
+        """Получает или создает лок для конкретной позиции из оркестратора."""
+        if pos_key not in self.tb.active_positions_locker:
+            self.tb.active_positions_locker[pos_key] = asyncio.Lock()
+        return self.tb.active_positions_locker[pos_key]
 
-    async def interf_bought(symbol, pos_key, qty, order_price) -> Optional[float]:
-        """
-        Роль: скупка маленьких ордеров.
-        Неудачи логируем. Допустимые остатки для скупки переосмысливаются в оркестраторе.    
-        Возврат -- фактически исполненное количество ордера float (чекаем после некой минимальной паузы sleep -- interference.interference_timeout_sec) | None     
-        """
+    async def cancel_all_orders(self, symbol: str) -> bool:
+        """Тотальная отмена всех ордеров по монете (Panic Button)."""
+        try:
+            resp = await self.client.cancel_all_orders(symbol)
+            if resp.get("code") == 0:
+                logger.info(f"[{symbol}] 🗑 Тотальная отмена ордеров выполнена.")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"[{symbol}] Ошибка тотальной отмены: {e}")
+            return False
 
-    async def execute_entry(symbol, pos_key, signal) -> bool: # можно добавить горячую ссылку на ActivePosition стату. (читать через локер) (либо прокинуть в класс через __init__)
-        """
-        1. Расчитывает количество ордера и цену постатовки лимитного ордера, согласно рискам и спецификации биржи.
-        2. Ставит ордер через await. Дожидается ответа в течение entry_timeout_sec (тупо через asyncio.sleep)
-        3. Интерпретируем Лимитный ордер.
-            Если успех то А.):
-                - Логирует результат, поднимает событие для отправки в тг.
-                - (Не мутирует ActivePosition, это прерогатива ws_interpreter.py)
-                - читаем данные из ActivePosition, если там поднят флаг частичного исполнения то отменяем остаток. Если нет, то нет.
-                - после успешного ответа постановки лимитного ордера и выдержки sleep(entry_timeout_sec), отменяем остаток позиции по ордер id через await (да, именно так!).
-                - Возвращаем True.
-            Если неуспех Б.):
-                - Ошибку логируем и поднимаем в тг (просто номер ошибки, можно и текст.). Саму монету заносим в отдельный карантин -- см настройки: entry.quarantine.
-                - делаем ретрай повторную попытку постановки лимитного ордера в количестве entry.max_place_order_retries раз. (на практике будет всего одна попытка). (если max_place_order_retries = 1 то это на все попытки, включая первую, основную).
-                - Возвращаем False.
-                
-        """
-
-    async def execute_exit(symbol, pos_key, order_price, timeout_sec) -> bool: # можно добавить горячую ссылку на ActivePosition стату. (читать через локер) (либо прокинуть в класс через __init__)
-        """
-        1. Берет количество ордера. Цена постатовки лимитного ордера - order_price (детерминируем выше). Все округляем согласно спецификациям биржи.
-        2. Ставит ордер через await. Дожидается ответа в течение timeout_sec (параметр детерминируем в орке) (тупо через asyncio.sleep)
-        3. Интерпретируем Лимитный ордер.
-            Если успех то А.):
-                - Логирует результат, поднимает событие для отправки в тг.
-                - (Не мутирует ActivePosition, это прерогатива ws_interpreter.py)
-                - читаем данные из ActivePosition, если там поднят флаг частичного исполнения то отменяем остаток. Если нет, то нет.
-                - после успешного ответа постановки лимитного ордера и выдержки sleep(entry_timeout_sec), отменяем остаток позиции по ордер id через await (да, именно так!).
-                - Возвращаем True.
-            Если неуспех Б.):
-                - Ошибку логируем и поднимаем в тг (просто номер ошибки, можно и текст.).
-                - делаем ретрай повторную попытку постановки лимитного ордера в количестве entry.max_place_order_retries раз. (на практике будет 1-2 попытки). (если max_place_order_retries = 1 то это на все попытки, включая первую, основную).
-                - Возвращаем False.
-                
-        """
-# как видишь, все стало просто как в автомате Калашникова.
-# Смотри некий пример постановки ордеров из другого бота:
-
-# def round_step(value: float, step: float) -> float:
-#     if not step or step <= 0:
-#         return value
-#     val_d = Decimal(str(value))
-#     step_d = Decimal(str(step))
-#     rounded = (val_d / step_d).quantize(Decimal("1"), rounding=ROUND_DOWN) * step_d
-#     return float(rounded)
-
-
-# class OpenInterestDefender:
-#     def __init__(self, config: dict):
-#         self.config = config
-
-#         self.pos_mode = "hedged"
-#         self.api_key = os.getenv("api_key") or ""
-#         self.api_secret = os.getenv("api_secret") or ""
-
-#         self.pos_side = self.config.get("pos_side", "").upper() or "LONG"
-#         self.leverage = self.config.get("leverage", 10)
-#         self.margin_amount = self.config.get("margin_amount", 3.5)
-#         self.indentation_pct = self.config.get("order_indentation_pct", 25)
-
-#         self.client = PhemexPrivateClient(self.api_key, self.api_secret)
-
-#     async def is_oil(self, symbol: str, price: float, sym_info: "SymbolInfo"):
-#         if not price:
-#             logger.warning(f"[{symbol}] Пропуск: нет цены.")
-#             return "ERR_NO_PRICE"
-
-#         tick_size = sym_info.tick_size
-#         lot_size = sym_info.lot_size
-
-#         if tick_size is None or lot_size is None:
-#             logger.warning(
-#                 f"[{symbol}] Пропуск: отсутствует спецификация "
-#                 f"tick_size={tick_size}, lot_size={lot_size}"
-#             )
-#             return "ERR_NO_SPEC"
-
-#         if self.pos_side == "LONG":
-#             order_price = price * (1 - self.indentation_pct / 100.0)
-#             side = "Buy"
-#         else:
-#             order_price = price * (1 + self.indentation_pct / 100.0)
-#             side = "Sell"
+    async def execute_cancel(self, symbol: str, pos_side: str, order_id: str) -> bool:
+        """Прокладка отмены ордера."""
+        if not order_id: return False
+        try:
+            resp = await self.client.cancel_order(symbol, order_id, pos_side)
+            if resp.get("code") == 0:
+                return True
             
-#         phemex_pos_side = self.pos_side.capitalize()
-#         order_price = round_step(order_price, tick_size)
+            # Если ордер уже исполнился, биржа вернет ошибку, это нормально для HFT.
+            err_msg = str(resp.get("msg", "")).lower()
+            if "filled" not in err_msg and "not found" not in err_msg:
+                logger.debug(f"[{symbol}] Не удалось отменить {order_id}: {resp}")
+            return False
+            
+        except Exception as e:
+            logger.debug(f"[{symbol}] Exception при отмене {order_id}: {e}")
+            return False
 
-#         if order_price <= 0:
-#             logger.warning(f"[{symbol}] Пропуск: некорректная цена ордера {order_price}")
-#             return "ERR_BAD_PRICE"
+    async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float) -> Optional[float]:
+        """Скупка мелких помех в стакане."""
+        spec = self.tb.symbol_specs.get(symbol)
+        if not spec: return None
 
-#         notional_value = self.margin_amount * self.leverage
-#         actual_notional = max(6.0, notional_value)
+        price = round_step(order_price, spec.tick_size)
+        req_qty = round_step(qty, spec.lot_size)
+        if req_qty <= 0: return None
 
-#         qty = max(lot_size, actual_notional / order_price)
-#         qty = round_step(qty, lot_size)
+        # Запоминаем объемы до выстрела
+        async with self._get_lock(pos_key):
+            pos = self.tb.state.active_positions.get(pos_key)
+            if not pos: return None
+            pos_side_raw = pos.side
+            old_qty = pos.current_qty
 
-#         if qty <= 0:
-#             logger.warning(f"[{symbol}] Пропуск: некорректный qty {qty}")
-#             return "ERR_BAD_QTY"
+        side = "Buy" if pos_side_raw == "LONG" else "Sell"
+        phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
 
-#         logger.debug(f"[{symbol}] OIL Подготовка ордера: side={side}, pos_side={phemex_pos_side}, qty={qty}, price={order_price}")
+        try:
+            resp = await self.client.place_limit_order(symbol, side, req_qty, price, phemex_pos_side)
+            if resp.get("code") == 0:
+                order_id = resp.get("data", {}).get("orderID")
+                
+                await asyncio.sleep(self.interf_timeout)
+                
+                if order_id:
+                    await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                
+                # Проверяем, сколько налило
+                async with self._get_lock(pos_key):
+                    if pos:
+                        new_qty = pos.current_qty
+                        filled = max(0.0, new_qty - old_qty)
+                        if filled > 0:
+                            pos.interf_comulative_qty += filled
+                            logger.info(f"[{pos_key}] 🧹 Скуплена помеха: {filled} лотов по {price}")
+                        return filled
+            else:
+                logger.debug(f"[{pos_key}] Отказ при скупке помехи: {resp}")
+        except Exception as e:
+            logger.debug(f"[{pos_key}] Ошибка скупки помех: {e}")
+            
+        return None
 
-#         try:
-#             resp = await self.client.place_order(symbol, side, qty, order_price, phemex_pos_side)
-#             code = resp.get("code", -1)
+    async def execute_entry(self, symbol: str, pos_key: str, signal: dict) -> bool:
+        """Комплексная постановка лимитки на вход с учетом рисков."""
+        spec = self.tb.symbol_specs.get(symbol)
+        if not spec: return False
 
-#             if code == 0:
-#                 data_dict = resp.get("data") or {}
-#                 order_id = data_dict.get("orderID") or data_dict.get("orderId")
+        price = round_step(signal["price"], spec.tick_size)
+        
+        # 1. Расчет QTY
+        row_vol_asset = signal.get("row_vol_asset", 0.0)
+        target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
+        
+        max_notional = self.notional_limit * self.leverage
+        target_usdt = min(target_usdt, max_notional)
+        target_usdt = max(target_usdt, self.min_exchange_notional)
+        
+        qty = round_step(target_usdt / price, spec.lot_size)
+        if qty <= 0: return False
 
-#                 if order_id:
-#                     cancel_resp = await self.client.cancel_order(symbol, order_id, phemex_pos_side)
-#                     if cancel_resp.get("code", -1) == 0:
-#                         logger.info(f"[{symbol}] 🗑️ Ордер {order_id} моментально отменен.")
-#                     else:
-#                         logger.error(f"[{symbol}] ❌ ОШИБКА ОТМЕНЫ ОРДЕРА! {cancel_resp}")
-#                 else:
-#                     logger.error(f"[{symbol}] code=0, но order_id не найден в ответе: {resp}")
+        side = "Buy" if signal["side"] == "LONG" else "Sell"
+        phemex_pos_side = "Long" if signal["side"] == "LONG" else "Short"
 
-#                 logger.info(f"[{symbol}] OIL: False.")
-#                 return False
+        # 2. Итерации попыток
+        for attempt in range(max(1, self.max_entry_retries)):
+            try:
+                resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
+                if resp.get("code") == 0:
+                    order_id = resp.get("data", {}).get("orderID")
+                    
+                    # 3. Выдержка таймаута и отмена
+                    await asyncio.sleep(self.entry_timeout)
+                    
+                    if order_id:
+                        await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                    
+                    # 4. Проверка стейта (налило ли хоть что-то)
+                    async with self._get_lock(pos_key):
+                        pos = self.tb.state.active_positions.get(pos_key)
+                        if pos and (pos.in_position or pos.current_qty > 0):
+                            logger.info(f"[{pos_key}] ✅ Вход выполнен. Цена: {price}, Итоговый объем: {pos.current_qty}")
+                            
+                            # Отправка в ТГ
+                            if self.tb.tg:
+                                msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
+                                asyncio.create_task(self.tb.tg.send_message(msg))
+                                
+                            return True
+                        else:
+                            logger.warning(f"[{pos_key}] ⚠️ Ордер не налило за {self.entry_timeout}с.")
+                            return False
+                            
+                else:
+                    logger.warning(f"[{pos_key}] ❌ Ошибка постановки входа: {resp}")
+            except Exception as e:
+                logger.error(f"[{pos_key}] Исключение при execute_entry: {e}")
+            
+            await asyncio.sleep(0.2) # Небольшая пауза перед ретраем
+            
+        # 5. Если дошли сюда, все попытки провалились. Карантин.
+        quarantine_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
+        if str(quarantine_hours).lower() != "inf":
+            self.tb.state.quarantine_until[symbol] = time.time() + (float(quarantine_hours) * 3600)
+            logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {quarantine_hours}ч.")
+            
+        return False
 
-#             if code == 11150:
-#                 logger.info(f"[{symbol}] OIL: True.")
-#                 return True
+    async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
+        """Постановка лимитки на выход (Average, Extrime, Breakeven)."""
+        spec = self.tb.symbol_specs.get(symbol)
+        if not spec: return False
 
-#             return f"ERR_{code}"
+        # Читаем актуальное количество позиции
+        async with self._get_lock(pos_key):
+            pos = self.tb.state.active_positions.get(pos_key)
+            if not pos or pos.current_qty <= 0:
+                return False
+            qty = pos.current_qty
+            pos_side_raw = pos.side
 
-#         except asyncio.TimeoutError:
-#             logger.warning(f"[{symbol}] Таймаут ожидания ответа от биржи!")
-#             return "ERR_TIMEOUT"
+        price = round_step(order_price, spec.tick_size)
+        qty = round_step(qty, spec.lot_size)
+        if qty <= 0: return False
 
-#         except Exception as e:
-#             logger.error(f"[{symbol}] Исключение при отправке/отмене: {e}")
-#             return "ERR_EXCEPTION"
+        side = "Sell" if pos_side_raw == "LONG" else "Buy"
+        phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
+
+        for attempt in range(max(1, self.max_exit_retries)):
+            try:
+                resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
+                if resp.get("code") == 0:
+                    order_id = resp.get("data", {}).get("orderID")
+                    
+                    # Фиксируем параметры ордера для идемпотентности сценариев
+                    async with self._get_lock(pos_key):
+                        if pos:
+                            pos.close_order_id = order_id
+                            # pos.current_close_price = price не вижу ни логики ни связи.
+
+                    # Ждем
+                    await asyncio.sleep(timeout_sec)
+                    
+                    # Отменяем
+                    if order_id:
+                        await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                        
+                    # Зачищаем следы ордера в стейте, если позиция еще жива
+                    async with self._get_lock(pos_key):
+                        if pos:
+                            pos.close_order_id = ""
+                            # pos.current_close_price = 0.0 не вижу ни логики ни связи.
+
+                    return True
+                else:
+                    logger.warning(f"[{pos_key}] ❌ Ошибка выхода: {resp}")
+            except Exception as e:
+                logger.error(f"[{pos_key}] Исключение execute_exit: {e}")
+            
+            await asyncio.sleep(0.2)
+            
+        return False
