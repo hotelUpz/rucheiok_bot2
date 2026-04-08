@@ -21,41 +21,38 @@ logger = UnifiedLogger("ws")
 class ActivePosition:
     """
     ROLE: Data structures for trading state.
-    Хранит абсолютно все маркеры, необходимые для сценариев выхода и оркестратора.
+    Экземпляры строго изолированы по композитным ключам (SYMBOL_SIDE).
     """
-    # все таки лучше разделить по ключам LONG | SHORT. ActivePosition можно использовать как шаблон конкретной позиции. Но во всем остальном коде помнить, когда обращаться к данным по типу pos.base_target_price_100 (очевидно в режиме хедж режима это будут разные переменные)
-    symbol: str             # Symbol в формате BTCUSDT
-    side: str               # LONG | SHORT
+    symbol: str             
+    side: str               
     
-    # --- State Flags (Флаги состояний) ---
-    in_signal: bool = False
-    in_pending: bool = False             # Пытаемся поставить лимитку
-    in_position: bool = False            # Фактически в рынке (current_qty > 0)
-    in_base_mode: bool = False           # Пройдена стабилизация, запущен Base Scenario
-    in_breakeven_mode: bool = False      # Регистрация флага перехода в режим закрытия позиции по истечение тотального таймаута позиции.
-    in_extrime_mode: bool = False        # Аварийный выход активен
-    interference_disabled: bool = False  # Лимит на скупку помех превышен
+    # --- State Flags ---
+    in_pending: bool = False             
+    in_position: bool = False            
+    in_base_mode: bool = False           
+    in_breakeven_mode: bool = False      
+    in_extrime_mode: bool = False        
+    interference_disabled: bool = False  
     
-    # --- Pricing (Ценовые маркеры) ---
-    entry_price: float = 0.0             # Цена первого фила (фактический вход)
-    pending_price: float = 0.0           # Расчетная цена лимитки на вход
-    avg_price: float = 0.0               # Средняя цена с учетом доборов
-    # current_close_price: float = 0.0     # Физическая цена стоящего ордера на выход (Идемпотентность)
+    # --- Pricing ---
+    entry_price: float = 0.0             
+    pending_price: float = 0.0           
+    avg_price: float = 0.0               
+    current_close_price: float = 0.0     # КРИТИЧНО: Текущая цена стоящего лимитного ордера на выход
     
-    # --- Quantities (Объемы) ---
-    pending_qty: float = 0.0             # Расчетный объем открывающего ордера
-    current_qty: float = 0.0             # Фактический объем позиции (источник: WS positions)
+    # --- Quantities ---
+    pending_qty: float = 0.0             
+    current_qty: float = 0.0             
     interf_comulative_qty: float = 0.0 
     
-    # --- Signal Initialization (Данные из первоначального паттерна) ---
+    # --- Signal Initialization ---
     init_ask1: float = 0.0
     init_bid1: float = 0.0
-    base_target_price_100: float = 0.0   # Цель из паттерна стакана
+    base_target_price_100: float = 0.0   
     
     # --- Tracking & Hunting ---
-    current_target_rate: float = 1.0     # Множитель цели (падает при shift_demotion)
-    close_order_id: str = ""             # ID текущей лимитки на закрытие
-    failed_interference_prices: Dict[str, int] = field(default_factory=dict)
+    current_target_rate: float = 1.0     
+    close_order_id: str = ""             
     
     # --- Timestamps ---
     opened_at: float = field(default_factory=time.time)
@@ -66,6 +63,10 @@ class ActivePosition:
     
     # --- Counters ---
     extrime_retries_count: int = 0
+    
+    # --- ЗАКОММЕНТИРОВАННЫЙ МУСОР (DEPRECATED) ---
+    # in_signal: bool = False
+    # failed_interference_prices: Dict[str, int] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return self.__dict__
@@ -78,26 +79,20 @@ class ActivePosition:
 
 
 class WsInterpreter:
-    """
-    РОЛЬ: Асинхронно перехватывает сырые данные из WS, безопасно лочит конкретную
-    пару/сторону и мутирует ActivePosition в глобальном стейте (BotState).
-    """
-    def __init__(self, state: BotState):
+    def __init__(self, state: BotState, active_positions_locker: Dict[str, asyncio.Lock]):
         self.state = state
-        self._locks: Dict[str, asyncio.Lock] = {}
+        # Используем глобальный локер оркестратора
+        self._locks = active_positions_locker
 
     def _get_lock(self, pos_key: str) -> asyncio.Lock:
-        """Гранулярный лок на каждую позицию."""
         if pos_key not in self._locks:
             self._locks[pos_key] = asyncio.Lock()
         return self._locks[pos_key]
 
     @staticmethod
     def _safe_float(val: Any, default: float = 0.0) -> float:
-        try:
-            return float(val) if val is not None else default
-        except (ValueError, TypeError):
-            return default
+        try: return float(val) if val is not None else default
+        except (ValueError, TypeError): return default
 
     async def process_phemex_message(self, event_data: Dict[str, Any]):
         orders = event_data.get("orders") or event_data.get("order_p") or []
@@ -105,7 +100,6 @@ class WsInterpreter:
         
         for order in orders:
             await self._handle_order_update(order)
-            
         for pos in positions:
             await self._handle_position_update(pos)
 
@@ -113,8 +107,7 @@ class WsInterpreter:
         symbol = o.get("symbol")
         pos_side_raw = o.get("posSide", o.get("side", ""))
         
-        if not symbol or not pos_side_raw: 
-            return
+        if not symbol or not pos_side_raw: return
             
         pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
         pos_key = f"{symbol}_{pos_side}"
@@ -122,12 +115,10 @@ class WsInterpreter:
         
         async with self._get_lock(pos_key):
             pos: ActivePosition = self.state.active_positions.get(pos_key)
-            if not pos: 
-                return
+            if not pos: return
 
             if ord_status in ("NEW", "UNTRIGGERED"):
                 pos.in_pending = True
-                
             elif ord_status in ("FILLED", "PARTIALLYFILLED"):
                 if not pos.in_position:
                     pos.opened_at = time.time()
@@ -136,7 +127,6 @@ class WsInterpreter:
                 pos.in_position = True
                 if ord_status == "FILLED":
                     pos.in_pending = False
-                    
             elif ord_status in ("CANCELED", "REJECTED"):
                 pos.in_pending = False
 
@@ -144,16 +134,14 @@ class WsInterpreter:
         symbol = p.get("symbol")
         pos_side_raw = p.get("posSide", p.get("side", ""))
         
-        if not symbol or not pos_side_raw: 
-            return
+        if not symbol or not pos_side_raw: return
             
         pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
         pos_key = f"{symbol}_{pos_side}"
         
         async with self._get_lock(pos_key):
             pos: ActivePosition = self.state.active_positions.get(pos_key)
-            if not pos: 
-                return
+            if not pos: return
                 
             size = self._safe_float(p.get("sizeRq", p.get("size")))
             avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
@@ -164,6 +152,7 @@ class WsInterpreter:
                     pos.avg_price = avg_price
                 pos.in_position = True
             else:
-                """TODO: не уверен что можно и нужно так жестко сбрасываать позицию. если и так, нужен будет минимальный слепок для отчетности в тг и логи. Удалять жестко не стоит, возможно ресетить, прогоняя через начальный bootstrap"""                
-                # logger.info(f"[{pos_key}] 🛑 Позиция закрыта (WS Payload). Стейт очищен.")
-                # self.state.active_positions.pop(pos_key, None)
+                # В HFT оставлять призраки позиций опасно. Жесткое удаление — самый надежный способ.
+                logger.info(f"[{pos_key}] 🛑 Позиция закрыта. Стейт очищен.")
+                self.state.active_positions.pop(pos_key, None)
+                # """TODO: не уверен что можно и нужно так жестко сбрасываать позицию. если и так, нужен будет минимальный слепок для отчетности в тг и логи. Удалять жестко не стоит, возможно ресетить, прогоняя через начальный bootstrap. В противном случае непонятно как контролровать логику отправки."""

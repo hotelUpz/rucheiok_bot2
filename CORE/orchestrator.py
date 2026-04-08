@@ -22,8 +22,14 @@ from ENTRY.signal_engine import SignalEngine
 from CORE.restorator import BotState
 from CORE.executor import OrderExecutor
 from CORE.models_fsm import WsInterpreter
-from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
+from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager
+
+# Импорт сценариев выхода
+from EXIT.scenarios.base import AverageScenario
+from EXIT.scenarios.negative import NegativeScenario
 from EXIT.scenarios.breakeven import PositionTTLClose
+from EXIT.interference import Interference
+from EXIT.extrime_close import ExtrimeClose
 
 from c_log import UnifiedLogger
 from utils import get_config_summary
@@ -46,6 +52,7 @@ class TradingBot:
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
         self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", 5.0)     
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
+        
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
         api_secret = os.getenv("API_SECRET") or self.cfg["credentials"].get("api_secret", "")   
 
@@ -53,7 +60,6 @@ class TradingBot:
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
         
         self.state = BotState(black_list=self.black_list)       
-
         self._is_running = False
 
         self.phemex_sym_api = PhemexSymbols()
@@ -77,29 +83,29 @@ class TradingBot:
 
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
-        
-        # ИСТОЧНИК ИСТИНЫ ДЛЯ СТАКАНА (DATA SINK)
         self._latest_market_data: Dict[str, DepthTop] = {}
-        
         self._signal_timeouts: Dict[str, float] = {}
         self.cfg_manager = ConfigManager(CFG_PATH, self)
         
-        scenarios = self.cfg.get("exit", {}).get("scenarios", {}).get("breakeven_ttl_close", {})
-        self.breakeven_mode_timeout_sec = scenarios.get("breakeven_mode_timeout_sec", 0.1)
+        # Общий словарь локов для FSM и Оркестратора
+        self.active_positions_locker: Dict[str, asyncio.Lock] = {} 
 
-        self.active_positions_locker: Dict[str, str[Dict[asyncio.Lock]]] = {} # его ставим тут, на верхнем уровне, возможно даже как елемент ActivePosition, так как будем пользоваться в разных контекстах
-        # Передаем ссылку на себя в WsInterpreter, чтобы он мог мутировать стейт
-        self.ws_handler = WsInterpreter(active_positions_locker=self.active_positions_locker) 
-        self.executor = OrderExecutor() # Если нужно передать self, добавь в init экзекутора
-        self.PositionTTLClose = PositionTTLClose(
-            cfg=self.cfg.get("exit", {}), active_positions_locker=self.active_positions_locker) # надо привести все к единой семантике. Либо breakeven либо position_ttl -- и имя класса и переменных.
+        # Инициализация FSM и Экзекьютора
+        self.ws_handler = WsInterpreter(state=self.state, active_positions_locker=self.active_positions_locker) 
+        self.executor = OrderExecutor(self)
         
-        """TODO: нужно добавить все зависимости из EXIT и граматно пробросить в _evaluate_exit_scenarios,
-          организовывая логику выхода. Львиную долю инварианта выпоняют сами методы EXIT модулей."""
-
+        # --- ИНИЦИАЛИЗАЦИЯ СЦЕНАРИЕВ ВЫХОДА ---
+        exit_cfg = self.cfg.get("exit", {})
+        scen_cfg = exit_cfg.get("scenarios", {})
+        
+        self.scen_base = AverageScenario(scen_cfg.get("base", {}))
+        self.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
+        self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
+        self.scen_interf = Interference(exit_cfg.get("interference", {}), self.min_exchange_notional)
+        self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
 
     # ==========================================
-    # ХЕЛПЕРЫ
+    # ХЕЛПЕРЫ (Без изменений)
     # ==========================================
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
@@ -151,6 +157,11 @@ class TradingBot:
         except Exception as e:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
+    def _get_lock(self, pos_key: str) -> asyncio.Lock:
+        if pos_key not in self.active_positions_locker:
+            self.active_positions_locker[pos_key] = asyncio.Lock()
+        return self.active_positions_locker[pos_key]
+
     # ==========================================
     # ТОРГОВАЯ ЛОГИКА (ПАЙПЛАЙН)
     # ==========================================
@@ -171,10 +182,58 @@ class TradingBot:
     
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         """Инвариант 1: Контроль жизни текущих позиций."""
-        pass
+        now = time.time()
+        
+        for pos_key in (long_key, short_key):
+            # Блокируем чтение/запись стейта на время оценки
+            async with self._get_lock(pos_key):
+                pos = self.state.active_positions.get(pos_key)
+                if not pos or pos.current_qty <= 0:
+                    continue
+
+                # 1. Проверка негативного сценария (Просадка)
+                neg_res = self.scen_neg.analyze(snap, pos, now)
+                if neg_res == "NEGATIVE_TIMEOUT":
+                    pos.in_extrime_mode = True
+
+                # 2. Проверка глобального TTL / БУ
+                ttl_res = await self.scen_ttl.analyze(pos, now)
+                if ttl_res == "EXTRIME_SCENARIO":
+                    pos.in_extrime_mode = True
+
+                # 3. Аварийный выход (EXTRIME MODE)
+                if pos.in_extrime_mode:
+                    ext_price = self.scen_extrime.analyze(snap, pos, now)
+                    if ext_price and pos.current_close_price != ext_price:
+                        asyncio.create_task(self.executor.execute_exit(
+                            symbol, pos_key, ext_price, self.cfg["exit"]["extrime_close"].get("extrime_timeout_sec", 0.1)
+                        ))
+                    continue # В экстрим режиме базовый хантинг отключается
+
+                # 4. Режим Безубытка (BREAKEVEN MODE)
+                if pos.in_breakeven_mode:
+                    be_price = self.scen_ttl.build_target_price(pos)
+                    if pos.current_close_price != be_price:
+                        asyncio.create_task(self.executor.execute_exit(
+                            symbol, pos_key, be_price, self.cfg["exit"].get("hunting_timeout_sec", 0.1)
+                        ))
+                    continue # Базовый хантинг отключается
+
+                # 5. Обычный хантинг (BASE SCENARIO)
+                base_price = self.scen_base.analyze(snap, pos, now)
+                if base_price and pos.current_close_price != base_price:
+                    asyncio.create_task(self.executor.execute_exit(
+                        symbol, pos_key, base_price, self.cfg["exit"].get("hunting_timeout_sec", 0.1)
+                    ))
+
+                # 6. Скупка помех (INTERFERENCE)
+                interf_res = self.scen_interf.analyze(snap, pos, now)
+                if interf_res:
+                    i_price, i_qty = interf_res
+                    asyncio.create_task(self.executor.interf_bought(symbol, pos_key, i_qty, i_price))
+
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
-        """Инвариант 3: Оценка сигнала на вход."""
         b_price, p_price = self.price_manager.get_prices(symbol)
         signal = self.signal_engine.analyze(snap, b_price, p_price)
         
@@ -189,7 +248,8 @@ class TradingBot:
 
         try:
             signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-            # await self.executor.execute_entry(symbol, pos_key, signal)
+            # Запускаем в бэкграунде, чтобы не лочить Game Loop
+            asyncio.create_task(self.executor.execute_entry(symbol, pos_key, signal))
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
 
@@ -227,31 +287,18 @@ class TradingBot:
     # ИСТОЧНИКИ ДАННЫХ И ЖИВОЛУПА (DATA SINKS & GAME LOOP)
     # ==========================================
     async def _stakan_data_sink(self, snap: DepthTop):
-        """
-        Исключительно источник данных (насос). 
-        Только пишет в словарь, никаких блокировок или бизнес-логики.
-        """
         self._latest_market_data[snap.symbol] = snap
 
     async def _main_trading_loop(self):
-        """
-        ГЛАВНАЯ ЖИВОЛУПА ТОРГОВОЙ ЛОГИКИ.
-        Вращается в фоне, собирает актуальные стейты и последовательно прогоняет стек.
-        """
         logger.info("🎮 Главная торговая живолупа (Game Loop) запущена.")
         while self._is_running:
-            # Берем актуальный срез стаканов (чтобы словарь не мутировал во время итерации)
             current_snaps = list(self._latest_market_data.values())
-            
             if not current_snaps:
                 await asyncio.sleep(0.01)
                 continue
 
-            # Прогоняем стек асинхронно для всех доступных символов в текущем тике
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
             await asyncio.gather(*tasks, return_exceptions=True)
-
-            # Yield control — даем дышать Event Loop'у (1ms)
             await asyncio.sleep(0.001)
 
     # ==========================================
@@ -276,28 +323,22 @@ class TradingBot:
         except Exception as e:
             logger.warning(f"⚠️ switch_position_mode: {e} — режим уже установлен или есть открытые позиции")
 
-        # 1. Запуск рекавери
         await self._recover_state()
 
-        # 2. Запуск сигнальной группы (Парсер цен и Фандинг)
         logger.info("🔄 Прогрев кэша цен и фандинга...")
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
         self._funding_task = asyncio.create_task(self.signal_engine.funding_filter.run())
         
-        # 3. Запуск Private Stream (позиции)
-        # Убедись, что ws_event_listener готов принимать данные (закомментил/раскомментил нужное в FSM)
-        if hasattr(self.ws_handler, 'ws_event_listener'):
-            self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.ws_event_listener))
-        else:
-            logger.warning("⚠️ Метод ws_event_listener не найден в WsInterpreter!")
+        # Запуск Private Stream
+        self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
-        # 4. Запуск Public Stream (стакан) -> пишет ТОЛЬКО в Data Sink
+        # Запуск Public Stream (стакан)
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
         self._stream_task = asyncio.create_task(self._stream.run(self._stakan_data_sink))
 
-        # 5. ЗАПУСК ГЛАВНОЙ ЖИВОЛУПЫ
+        # ЗАПУСК ГЛАВНОЙ ЖИВОЛУПЫ
         self._game_loop_task = asyncio.create_task(self._main_trading_loop())
 
     async def aclose(self):

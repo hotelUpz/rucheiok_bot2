@@ -231,24 +231,24 @@ class OrderExecutor:
                 if resp.get("code") == 0:
                     order_id = resp.get("data", {}).get("orderID")
                     
-                    # Фиксируем параметры ордера для идемпотентности сценариев
+                    # ИДЕМПОТЕНТНОСТЬ: Фиксируем цену, чтобы Game Loop не спамил эту же команду
                     async with self._get_lock(pos_key):
                         if pos:
                             pos.close_order_id = order_id
-                            # pos.current_close_price = price не вижу ни логики ни связи.
+                            pos.current_close_price = price 
 
-                    # Ждем
+                    # Ждем таймаут (hunting_timeout_sec)
                     await asyncio.sleep(timeout_sec)
                     
-                    # Отменяем
+                    # Отменяем непролитый остаток, чтобы переставить на следующем тике
                     if order_id:
                         await self.execute_cancel(symbol, phemex_pos_side, order_id)
                         
-                    # Зачищаем следы ордера в стейте, если позиция еще жива
+                    # Зачищаем следы ордера в стейте, открывая шлюз для Game Loop
                     async with self._get_lock(pos_key):
                         if pos:
                             pos.close_order_id = ""
-                            # pos.current_close_price = 0.0 не вижу ни логики ни связи.
+                            pos.current_close_price = 0.0
 
                     return True
                 else:
