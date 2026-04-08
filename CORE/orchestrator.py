@@ -1,6 +1,6 @@
 # ============================================================
-# FILE: CORE/bot.py
-# ROLE: Главный оркестратор торговых процессов
+# FILE: CORE/orchestrator.py
+# ROLE: Главный оркестратор торговых процессов (Game Loop Pattern)
 # ============================================================
 from __future__ import annotations
 import asyncio
@@ -23,8 +23,9 @@ from CORE.restorator import BotState
 from CORE.executor import OrderExecutor
 from CORE.models_fsm import WsInterpreter
 from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
+from EXIT.scenarios.breakeven import PositionTTLClose
+
 from c_log import UnifiedLogger
-from TG.tg_sender import TelegramSender
 from utils import get_config_summary
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
 
-class Orch:
+class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
         self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
@@ -51,11 +52,8 @@ class Orch:
         self.bl_manager = BlackListManager(CFG_PATH, self.quota_asset)        
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
         
-        self.state = BotState(black_list=self.black_list)
-        self.state.load()
+        self.state = BotState(black_list=self.black_list)       
 
-        self.executor = OrderExecutor(self)
-        self.ws_handler = WsInterpreter(self)
         self._is_running = False
 
         self.phemex_sym_api = PhemexSymbols()
@@ -69,6 +67,7 @@ class Orch:
         self.private_ws = PhemexPrivateWS(api_key, api_secret)
 
         tg_cfg = self.cfg.get("tg", {})
+        from TG.tg_sender import TelegramSender
         self.tg = TelegramSender(
             os.getenv("TELEGRAM_TOKEN") or tg_cfg.get("token", ""),
             os.getenv("TELEGRAM_CHAT_ID") or tg_cfg.get("chat_id", ""),
@@ -79,17 +78,21 @@ class Orch:
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
         
-        # Хранилище последних рыночных данных и активных задач для контроля нагрузки
+        # ИСТОЧНИК ИСТИНЫ ДЛЯ СТАКАНА (DATA SINK)
         self._latest_market_data: Dict[str, DepthTop] = {}
-        self._market_processors: Dict[str, asyncio.Task] = {}
         
-        # Словарь для блокировки спама дублирующими сигналами на вход
         self._signal_timeouts: Dict[str, float] = {}
         self.cfg_manager = ConfigManager(CFG_PATH, self)
         
         scenarios = self.cfg.get("exit", {}).get("scenarios", {}).get("breakeven_ttl_close", {})
         self.breakeven_mode_timeout_sec = scenarios.get("breakeven_mode_timeout_sec", 0.1)
-        self.breakeven_wait_sec = scenarios.get("breakeven_wait_sec", 2.0)
+
+        self.active_positions_locker: Dict[str, str[Dict[asyncio.Lock]]] = {} # его ставим тут, на верхнем уровне, возможно даже как елемент ActivePosition, так как будем пользоваться в разных контекстах
+        # Передаем ссылку на себя в WsInterpreter, чтобы он мог мутировать стейт
+        self.ws_handler = WsInterpreter(active_positions_locker=self.active_positions_locker) 
+        self.executor = OrderExecutor() # Если нужно передать self, добавь в init экзекутора
+        self.PositionTTLClose = PositionTTLClose(
+            cfg=self.cfg.get("exit", {}), active_positions_locker=self.active_positions_locker) # надо привести все к единой семантике. Либо breakeven либо position_ttl -- и имя класса и переменных.
 
     # ==========================================
     # ХЕЛПЕРЫ
@@ -121,7 +124,6 @@ class Orch:
         return True
     
     async def _recover_state(self):
-        """пусть будет мягкий концепт: (корректировка сайза и оставшихся таймеров)"""
         try:
             self.state.load()
             resp = await self.private_client.get_active_positions()
@@ -140,17 +142,15 @@ class Orch:
                     exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
 
             self.state.active_positions.clear()
-
-            # в старой логике была логика отмены ордеров. Не уверен что это уместно.
             await self.state.save()
+            logger.info("✅ Стейт успешно восстановлен.")
         except Exception as e:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
     # ==========================================
-    # ТОРГОВАЯ ЛОГИКА
+    # ТОРГОВАЯ ЛОГИКА (ПАЙПЛАЙН)
     # ==========================================
     def _check_risk_limits(self, symbol: str, long_key: str, short_key: str) -> bool:
-        """Инвариант 2: Проверка квот (Слоты и Hedge Mode)."""
         has_long = long_key in self.state.active_positions or long_key in self.state.pending_entry_orders
         has_short = short_key in self.state.active_positions or short_key in self.state.pending_entry_orders
 
@@ -166,8 +166,7 @@ class Orch:
         return True
     
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
-        """Инвариант 1: Контроль жизни текущих позиций (Огрызки, TTL, Экстрим, Охота)."""
-        # _, p_price = self.price_manager.get_prices(symbol)
+        """Инвариант 1: Контроль жизни текущих позиций."""
         pass
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
@@ -178,39 +177,31 @@ class Orch:
         if not signal: return
 
         pos_key = f"{symbol}_{signal['side']}"
-        
         if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: 
             return 
 
-        # Защита от спама дублирующими сигналами (signal_timeout_sec)
-        if self._signal_timeouts.get(pos_key, 0) > time.time():
-            return
-
+        if self._signal_timeouts.get(pos_key, 0) > time.time(): return
         self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
 
         try:
             signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-            """Не забыть добавить к объему процент risk.margin_over_size_pct"""
-            await self.executor.execute_entry(symbol, pos_key, signal)
+            # await self.executor.execute_entry(symbol, pos_key, signal)
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
 
-    # ==========================================
-    # ОБРАБОТКА РЫНОЧНЫХ ДАННЫХ
-    # ==========================================
-    async def _orchestrate_market_tick(self, snap: DepthTop):
-        """Главный дирижер тиков. Пошаговый пайплайн."""
-        if not self._is_running: return
-
+    async def _process_symbol_pipeline(self, snap: DepthTop):
+        """Стек обработки конкретной монеты."""
         symbol = snap.symbol
-        if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
         if symbol in self._processing: return
-        
-        # quarantine_util оставим как есть, если он корректно работает
-        if hasattr(self, 'quarantine_util') and not await self.quarantine_util(symbol): return
-
         self._processing.add(symbol)
+        
         try:
+            if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions):
+                return
+            
+            if hasattr(self, 'quarantine_util') and not await self.quarantine_util(symbol):
+                return
+
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             
             # ШАГ 1: Контроль жизни (Скупка помех, Выходы, Огрызки)
@@ -224,35 +215,48 @@ class Orch:
             await self._evaluate_entry_signal(snap, symbol)
                     
         except Exception as e:
-            logger.debug(f"Scan error for {symbol}: {e}")
+            logger.debug(f"Pipeline error for {symbol}: {e}")
         finally:
             self._processing.discard(symbol)
 
-    async def _on_market_tick(self, snap: DepthTop):
-        """Единая точка входа для данных потока стакана."""
-        if not self._is_running: return
+    # ==========================================
+    # ИСТОЧНИКИ ДАННЫХ И ЖИВОЛУПА (DATA SINKS & GAME LOOP)
+    # ==========================================
+    async def _stakan_data_sink(self, snap: DepthTop):
+        """
+        Исключительно источник данных (насос). 
+        Только пишет в словарь, никаких блокировок или бизнес-логики.
+        """
+        self._latest_market_data[snap.symbol] = snap
 
-        symbol = snap.symbol
-        self._latest_market_data[symbol] = snap
-
-        # Паттерн Throttling: если предыдущая обработка тика еще не завершена, 
-        # новая задача не создается. Она сама заберет свежайший стейт при старте.
-        proc = self._market_processors.get(symbol)
-        if proc is None or proc.done():
-            async def _worker():
-                data = self._latest_market_data.pop(symbol, None)
-                if data:
-                    await self._orchestrate_market_tick(data)
+    async def _main_trading_loop(self):
+        """
+        ГЛАВНАЯ ЖИВОЛУПА ТОРГОВОЙ ЛОГИКИ.
+        Вращается в фоне, собирает актуальные стейты и последовательно прогоняет стек.
+        """
+        logger.info("🎮 Главная торговая живолупа (Game Loop) запущена.")
+        while self._is_running:
+            # Берем актуальный срез стаканов (чтобы словарь не мутировал во время итерации)
+            current_snaps = list(self._latest_market_data.values())
             
-            self._market_processors[symbol] = asyncio.create_task(_worker())
+            if not current_snaps:
+                await asyncio.sleep(0.01)
+                continue
+
+            # Прогоняем стек асинхронно для всех доступных символов в текущем тике
+            tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+            # Yield control — даем дышать Event Loop'у (1ms)
+            await asyncio.sleep(0.001)
 
     # ==========================================
-    # ТОЧКИ ЗАПУСКА
+    # ТОЧКИ ЗАПУСКА / ОСТАНОВКИ
     # ==========================================
     async def start(self):
         if getattr(self, '_is_running', False): return
         self._is_running = True
-        logger.info("▶️ Запуск торговых процессов...")
+        logger.info("▶️ Инициализация систем...")
 
         summary = get_config_summary(self.cfg)
         logger.info(f"⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ\n{summary}")
@@ -262,25 +266,35 @@ class Orch:
         symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
 
-        # Гарантируем Hedged position mode на Phemex
         try:
             await self.private_client.switch_position_mode(currency=self.quota_asset, mode="Hedged")
             logger.info("✅ Position mode: Hedged (подтверждён)")
         except Exception as e:
             logger.warning(f"⚠️ switch_position_mode: {e} — режим уже установлен или есть открытые позиции")
 
+        # 1. Запуск рекавери
         await self._recover_state()
 
-        logger.info("🔄 Прогрев кэша цен (Binance/Phemex)...")
+        # 2. Запуск сигнальной группы (Парсер цен и Фандинг)
+        logger.info("🔄 Прогрев кэша цен и фандинга...")
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
-        
         self._funding_task = asyncio.create_task(self.signal_engine.funding_filter.run())
-        self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
+        
+        # 3. Запуск Private Stream (позиции)
+        # Убедись, что ws_event_listener готов принимать данные (закомментил/раскомментил нужное в FSM)
+        if hasattr(self.ws_handler, 'ws_event_listener'):
+            self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.ws_event_listener))
+        else:
+            logger.warning("⚠️ Метод ws_event_listener не найден в WsInterpreter!")
 
+        # 4. Запуск Public Stream (стакан) -> пишет ТОЛЬКО в Data Sink
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
-        self._stream_task = asyncio.create_task(self._stream.run(self._on_market_tick))
+        self._stream_task = asyncio.create_task(self._stream.run(self._stakan_data_sink))
+
+        # 5. ЗАПУСК ГЛАВНОЙ ЖИВОЛУПЫ
+        self._game_loop_task = asyncio.create_task(self._main_trading_loop())
 
     async def aclose(self):
         await self.stop()
@@ -310,12 +324,8 @@ class Orch:
         await self._await_task(getattr(self, '_funding_task', None))
         await self._await_task(getattr(self, '_private_ws_task', None))
         await self._await_task(getattr(self, '_stream_task', None))
-        
-        # Завершаем разовые задачи-воркеры
-        for task in list(self._market_processors.values()):
-            await self._await_task(task)
+        await self._await_task(getattr(self, '_game_loop_task', None))
             
-        self._market_processors.clear()
         self._latest_market_data.clear()
         self._processing.clear()
         self._signal_timeouts.clear()

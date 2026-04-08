@@ -106,7 +106,6 @@
         "max_place_order_retries": 1,
         "scenarios": {
             "base": {
-                "enable": true,
                 "stabilization_ttl": 0,
                 "target_rate": 1.0,
                 "shift_demotion": 0.2,
@@ -120,7 +119,6 @@
                 "negative_ttl": 40
             },
             "breakeven_ttl_close": {
-                "enable": true,
                 "breakeven_mode_timeout_sec": 0.1,
                 "position_ttl": 60,
                 "breakeven_wait_sec": 2,
@@ -128,7 +126,7 @@
             }
         },
         "interference": {
-            "enable": false,
+            "enable": true,
             "interference_timeout_sec": 0.1,
             "average_vol_pct_to_init_size": 3,
             "max_vol_pct_to_init_size": 9,

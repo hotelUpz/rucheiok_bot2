@@ -9,7 +9,6 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple, TYPE_CHECKING
 from ENTRY.signal_engine import SignalEngine
-from EXIT.engine import ExitEngine
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:

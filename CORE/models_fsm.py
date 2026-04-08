@@ -33,19 +33,24 @@ class ActivePosition:
     init_ask1: float   # значение первого аска из в момент сигнала (берем из сигнала)
     init_bid1: float   # значение первого бида из в момент сигнала (берем из сигнала)
     base_target_price_100: float  # значение второго аска|бида для лонгового|Шортового сигнала в момент сигнала (берем из сигнала)
+    in_base_mode: bool # флаг фиксации что основной режим охоты запущен.
+    current_target_rate: float # текущее значение exit.scenarios.base.target_rate c учетом прогресса смещений shift_demotion
+    last_shift_ts: int # время последнего сдвига current_target_rate
     opened_at: float = field(default_factory=time.time) # время первого фила (получаем из живолупы ws в models_fsm.py)
     
     last_negative_check_ts: float = field(default_factory=time.time) # фиксируем после вызова await execute_entry + wait stabilization_ttl
     negative_duration_sec: float = 0.0 # как разница между (time.time() - last_negative_check_ts) и для проверки negative.negative_ttl
     
-    in_breakeven_mode: bool = False # регистрируем запуск закрывающего сценария breakeven_ttl_close. (Лимитка физическая)
+    in_negative_mode: bool = False # регистрируем запуск закрывающего сценария breakeven_ttl_close. (Лимитка физическая)
     breakeven_start_ts: float = 0.0 # время начала запуска сценария breakeven_ttl_close
     
     in_extrime_mode: bool = False # регистрируем запуск закрывающего сценария extrime_close
     extrime_retries_count: int = 0 # счетчик перемещений закрывающей лимитки при очередном несрабатывании. (Лимитка физическая)
     last_extrime_try_ts: float = 0.0
+
+    interference_disabled: bool # превышен лимит на скупку помех
     
-    # interf_current_bought_qty: float = 0.0 # фактически берем весь объем уровня, так как мы его целиком скупаем с целью разгрузки стакана в нашу пользу. Возможно нет смысла заводить отдельное поле.
+    interf_current_bought_qty: float = 0.0 # фактически берем весь объем уровня, так как мы его целиком скупаем с целью разгрузки стакана в нашу пользу. Возможно нет смысла заводить отдельное поле.
     # interf_left_bought_qty: float = 0.0 # можно не заводить как отдельное поле потому что перед действие все равно будем перевычислять, ориентируясь на текущий current_qty. (Только не забываем Доллары согласовать с количеством-контрактами.)
 
     # Возможно ниже понадобятся некие утилиты преобразования елементов структуры в читаемо-записываемый формат для json.
@@ -55,9 +60,9 @@ class WsInterpreter:
     """
     Роль: получаеет живой снапшот от ws_private.py, на основании которого мутирует стату ActivePosition.
     """
-    def __init__(self):
+    def __init__(self, active_positions_locker): # типы указываем конкретные -- маст хев. везде и всегда.
         self.active_positions: Dict[str, str[Dict[ActivePosition]]] = {} # или как-то по другому.
-        self.active_positions_locker: Dict[str, str[Dict[asyncio.Lock]]] = {}
+        self.active_positions_locker = active_positions_locker
     
 
     async def ws_event_listener(self, event): # (возможно создать под него датакласс и указать тип. То есть внутри API/PHEMEX/ws_private.py и импортировать сюда)
