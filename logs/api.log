@@ -1,0 +1,38 @@
+2026-04-09 18:28:50 | ERROR | api | API Request Failed (PUT /g-positions/switch-pos-mode-sync): Phemex Error [10500]: API Signature verification failed.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 25 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 18:28:58 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-09 18:28:58 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-09 18:29:02 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:09 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:10 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:11 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:11 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:19 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:21 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:27 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-09 18:29:45 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:29:56 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-09 18:30:06 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:08 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-09 18:30:10 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:18 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:21 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:22 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:30 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:34 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-09 18:30:38 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:41 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE
+2026-04-09 18:30:44 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11001]: TE_NO_ENOUGH_AVAILABLE_BALANCE

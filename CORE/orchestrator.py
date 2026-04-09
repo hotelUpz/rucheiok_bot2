@@ -96,7 +96,7 @@ class TradingBot:
         self.scen_base = AverageScenario(scen_cfg.get("base", {}))
         self.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
-        self.scen_interf = Interference(exit_cfg.get("interference", {}), self.min_exchange_notional)
+        self.scen_interf = Interference(exit_cfg.get("interference", {}))
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
 
     # ==========================================
