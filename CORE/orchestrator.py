@@ -49,8 +49,6 @@ class TradingBot:
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        # min_exchange_notional ПОЛНОСТЬЮ УДАЛЕН отсюда
-        
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
@@ -120,7 +118,7 @@ class TradingBot:
         if symbol in self.state.quarantine_until:
             q_val = self.state.quarantine_until[symbol]
             
-            # ФИКС КРАША: Безопасное приведение к float (переварит и строку "inf", и числа)
+            # БЕЗОПАСНАЯ БЕСКОНЕЧНОСТЬ: перевариваем JSON-строку "inf" во float
             try:
                 limit_time = float(q_val)
             except (ValueError, TypeError):
@@ -129,22 +127,43 @@ class TradingBot:
             if time.time() > limit_time:
                 del self.state.quarantine_until[symbol]
                 self.state.consecutive_fails[symbol] = 0
-                await self.state.save()
+                asyncio.create_task(self.state.save()) # Фоновое сохранение стейта
                 return True            
             elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
                 return False
         return True
         
     def apply_entry_quarantine(self, symbol: str):
+        """Карантин для неудачных ВХОДОВ"""
         q_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
         if str(q_hours).lower() == "inf":
-            self.state.quarantine_until[symbol] = float('inf')
+            self.state.quarantine_until[symbol] = "inf" # Строка безопасна для JSON RFC 8259
             logger.warning(f"[{symbol}] 🚫 Помещен в бессрочный карантин (вход не удался).")
         elif float(q_hours) > 0:
             self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
             logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {q_hours}ч (вход не удался).")
+        
+        asyncio.create_task(self.state.save())
+
+    def apply_loss_quarantine(self, symbol: str):
+        """Карантин для ПРОИГРАВШИХ символов"""
+        q_cfg = self.cfg.get("risk", {}).get("quarantine", {})
+        max_fails = q_cfg.get("max_consecutive_fails", 1)
+        q_hours = q_cfg.get("quarantine_hours", "inf")
+
+        self.state.consecutive_fails[symbol] = self.state.consecutive_fails.get(symbol, 0) + 1
+        
+        if self.state.consecutive_fails[symbol] >= max_fails:
+            if str(q_hours).lower() == "inf":
+                self.state.quarantine_until[symbol] = "inf" # Строка безопасна для JSON
+            else:
+                self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
+            logger.warning(f"[{symbol}] 💀 Карантин ПОТЕРЬ: {self.state.consecutive_fails[symbol]} фейлов. Блокировка на {q_hours}ч.")
+        
+        asyncio.create_task(self.state.save())
 
     async def _recover_state(self):
+        """Интеллектуальная синхронизация стейта с биржей (Ремонт амнезии)"""
         try:
             self.state.load()
             resp = await self.private_client.get_active_positions()
@@ -162,9 +181,22 @@ class TradingBot:
                     pos_key = f"{symbol}_{pos_side}"
                     exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
 
-            self.state.active_positions.clear()
+            # 1. Удаляем из памяти позы, которые были закрыты, пока бот был оффлайн
+            keys_to_remove = [k for k in list(self.state.active_positions.keys()) if k not in exchange_positions]
+            for k in keys_to_remove:
+                logger.info(f"[{k}] 🧹 Удалена из стейта (закрыта на бирже пока бот был оффлайн).")
+                self.state.active_positions.pop(k, None)
+
+            # 2. Обновляем живые позы
+            for pos_key, ex_data in exchange_positions.items():
+                if pos_key in self.state.active_positions:
+                    self.state.active_positions[pos_key].current_qty = ex_data["size"]
+                else:
+                    # Поза есть на бирже, но нет в JSON (ручная или потеряна)
+                    logger.warning(f"[{pos_key}] ⚠️ Найдена НЕУЧТЕННАЯ позиция! Бот не имеет данных о паттерне входа. Рекомендуется закрыть вручную.")
+
             await self.state.save()
-            logger.info("✅ Стейт успешно восстановлен.")
+            logger.info(f"✅ Стейт синхронизирован. В памяти {len(self.state.active_positions)} активных позиций.")
         except Exception as e:
             logger.error(f"❌ Ошибка Recovery: {e}")
 
@@ -173,19 +205,19 @@ class TradingBot:
             self.active_positions_locker[pos_key] = asyncio.Lock()
         return self.active_positions_locker[pos_key]
 
-    def _check_risk_limits(self, symbol: str, long_key: str, short_key: str) -> bool:
-        has_long = long_key in self.state.active_positions or long_key in self.state.pending_entry_orders
-        has_short = short_key in self.state.active_positions or short_key in self.state.pending_entry_orders
+    def _check_risk_limits(self, symbol: str) -> bool:
+        """Инвариант 2: Проверка квот (Слоты). Срабатывает ДО анализа сигнала."""
+        active_keys = set(self.state.active_positions.keys())
+        pending_keys = set(self.state.pending_entry_orders.keys())
+        
+        long_key, short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
+        if long_key in active_keys or short_key in active_keys or long_key in pending_keys or short_key in pending_keys:
+            return True
 
-        if not self.hedge_mode and (has_long or has_short): return False
-
-        active_symbols = set(p.symbol for p in self.state.active_positions.values())
-        pending_symbols = set(k.split("_")[0] for k in self.state.pending_entry_orders)
-        used_slots = len(active_symbols | pending_symbols)
-
-        if used_slots >= self.max_active_positions and symbol not in active_symbols and symbol not in pending_symbols:
+        working_symbols = {k.split('_')[0] for k in (active_keys | pending_keys)}
+        if len(working_symbols) >= self.max_active_positions:
             return False
-
+            
         return True
     
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
@@ -260,14 +292,19 @@ class TradingBot:
         if symbol in self._processing: return
         self._processing.add(symbol)
         try:
-            if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
+            if symbol in self.black_list: return
             if hasattr(self, 'quarantine_util') and not await self.quarantine_util(symbol): return
+            
+            # 1. Выходы (обрабатываем живые позы)
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             await self._evaluate_exit_scenarios(snap, symbol, pos_long_key, pos_short_key)
-            if not self._check_risk_limits(symbol, pos_long_key, pos_short_key): return
+            
+            # 2. Проверка лимита слотов перед тратой времени на сигналы
+            if not self._check_risk_limits(symbol): return
+            
+            # 3. Вход
             await self._evaluate_entry_signal(snap, symbol)
         except Exception as e:
-            # ФИКС ЛОГИРОВАНИЯ: Больше никаких скрытых трейсбеков! Выводим полную трассу ошибки.
             err_tb = traceback.format_exc()
             logger.error(f"Pipeline error for {symbol}: {e}\n{err_tb}")
         finally:
@@ -297,6 +334,9 @@ class TradingBot:
 
                         logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
                         self.state.active_positions.pop(pos_key, None)
+                        
+                        # Сохраняем стейт на диск после закрытия позиции (Асинхронно!)
+                        asyncio.create_task(self.state.save())
 
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:

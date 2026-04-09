@@ -161,6 +161,7 @@ class OrderExecutor:
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 
                                 self.tb.state.consecutive_fails[symbol] = 0
+                                asyncio.create_task(self.tb.state.save()) # Сохраняем успешный вход на диск
                                 return True
                     else:
                         logger.warning(f"[{pos_key}] ❌ Ошибка входа: {resp}")
