@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
 
 load_dotenv()
-logger = UnifiedLogger(name="core")
+logger = UnifiedLogger(name="bot")
 TZ = pytz.timezone(TIME_ZONE)
 
 
@@ -38,21 +38,18 @@ class OrderExecutor:
         self.client = tb.private_client
         self.cfg = tb.cfg
         
-        # --- ТАЙМИНГИ ИСПОЛНЕНИЯ И ЗАЩИТЫ ОТ ГОНОК ПОТОКОВ ---
         self.entry_timeout = self.cfg.get("entry", {}).get("entry_timeout_sec", 0.5)
         self.exit_timeout = self.cfg.get("exit", {}).get("exit_timeout_sec", 0.5)
         self.interf_timeout = self.cfg.get("exit", {}).get("interference", {}).get("interference_timeout_sec", 0.1)
         
-        # Внутренние константы HFT-прокладок (в секундах)
-        self.RETRY_PAUSE_SEC = 0.01    # 50мс пауза перед повторной отправкой ордера при фейле
-        self.WS_SYNC_PAUSE_SEC = 0.01  # 50мс люфт после отмены лимитки, чтобы WS успел обновить стейт
+        self.RETRY_PAUSE_SEC = 0.05    
+        self.WS_SYNC_PAUSE_SEC = 0.05  
         
         self.max_entry_retries = self.cfg.get("entry", {}).get("max_place_order_retries", 1)
         self.max_exit_retries = self.cfg.get("exit", {}).get("max_place_order_retries", 1)
         
         risk = self.cfg.get("risk", {})
         self.notional_limit = float(risk.get("notional_limit", 25.0))
-        self.min_exchange_notional = float(risk.get("min_exchange_notional", 5.0))
         self.margin_over_size_pct = float(risk.get("margin_over_size_pct", 1.0))
         self.leverage = risk.get("leverage", {}).get("val", 10)
 
@@ -87,7 +84,7 @@ class OrderExecutor:
 
             price = round_step(order_price, spec.tick_size)
             req_qty = round_step(qty, spec.lot_size)
-            if req_qty <= 0: return None
+            if req_qty < spec.lot_size: return None
 
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
@@ -123,13 +120,12 @@ class OrderExecutor:
             
             target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
             target_usdt = min(target_usdt, self.notional_limit)
-            target_usdt = max(target_usdt, self.min_exchange_notional)
             
             qty = round_step(target_usdt / price, spec.lot_size)
-            min_notional_asset = max(spec.lot_size, self.min_exchange_notional / price)
             
-            if qty < min_notional_asset: 
-                logger.warning(f"[{pos_key}] Qty {qty} меньше биржевого минимума {min_notional_asset}. Пропуск.")
+            # ТОТАЛЬНАЯ ПРИВЯЗКА К ФИЗИКЕ: Ордер не может быть меньше минимального лота биржи
+            if qty < spec.lot_size: 
+                logger.warning(f"[{pos_key}] Qty {qty} меньше биржевого шага лота {spec.lot_size}. Пропуск.")
                 return False
 
             async with self.tb._get_lock(pos_key):
@@ -154,7 +150,6 @@ class OrderExecutor:
                         
                         if order_id: 
                             await self.execute_cancel(symbol, phemex_pos_side, order_id)
-                            # Даем микро-люфт для синхронизации стейта по вебсокету перед финальным решением
                             await asyncio.sleep(self.WS_SYNC_PAUSE_SEC)
                         
                         async with self.tb._get_lock(pos_key):
@@ -165,7 +160,6 @@ class OrderExecutor:
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 
-                                # Сброс карантина по фейлам (успешный сетап)
                                 self.tb.state.consecutive_fails[symbol] = 0
                                 return True
                     else:
@@ -175,13 +169,12 @@ class OrderExecutor:
                 
                 await asyncio.sleep(self.RETRY_PAUSE_SEC)
                 
-            # Делегируем карантин в Оркестратор
             self.tb.apply_entry_quarantine(symbol)
                 
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos and pos.current_qty <= 0:
-                    pos.is_closed_by_exchange = True # В мусоросборщик
+                    pos.is_closed_by_exchange = True 
 
             return False
             
@@ -201,7 +194,7 @@ class OrderExecutor:
 
             price = round_step(order_price, spec.tick_size)
             qty = round_step(qty, spec.lot_size)
-            if qty <= 0: return False
+            if qty < spec.lot_size: return False
 
             side = "Sell" if pos_side_raw == "LONG" else "Buy"
             phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"

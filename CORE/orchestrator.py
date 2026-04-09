@@ -5,6 +5,7 @@
 from __future__ import annotations
 import asyncio
 import time
+import traceback
 from typing import Dict, Any, Set, TYPE_CHECKING
 import os
 import aiohttp
@@ -36,7 +37,7 @@ from utils import get_config_summary
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("core")
+logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
@@ -48,7 +49,8 @@ class TradingBot:
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        # self.min_exchange_notional = float(self.cfg.get("risk", {}).get("min_exchange_notional", 5.0))
+        # min_exchange_notional ПОЛНОСТЬЮ УДАЛЕН отсюда
+        
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
@@ -116,7 +118,15 @@ class TradingBot:
 
     async def quarantine_util(self, symbol) -> bool:        
         if symbol in self.state.quarantine_until:
-            if time.time() > self.state.quarantine_until[symbol]:
+            q_val = self.state.quarantine_until[symbol]
+            
+            # ФИКС КРАША: Безопасное приведение к float (переварит и строку "inf", и числа)
+            try:
+                limit_time = float(q_val)
+            except (ValueError, TypeError):
+                limit_time = 0.0
+
+            if time.time() > limit_time:
                 del self.state.quarantine_until[symbol]
                 self.state.consecutive_fails[symbol] = 0
                 await self.state.save()
@@ -126,7 +136,6 @@ class TradingBot:
         return True
         
     def apply_entry_quarantine(self, symbol: str):
-        """Утилитный метод для применения карантина после неудачной серии входов."""
         q_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
         if str(q_hours).lower() == "inf":
             self.state.quarantine_until[symbol] = float('inf')
@@ -258,7 +267,9 @@ class TradingBot:
             if not self._check_risk_limits(symbol, pos_long_key, pos_short_key): return
             await self._evaluate_entry_signal(snap, symbol)
         except Exception as e:
-            logger.debug(f"Pipeline error for {symbol}: {e}")
+            # ФИКС ЛОГИРОВАНИЯ: Больше никаких скрытых трейсбеков! Выводим полную трассу ошибки.
+            err_tb = traceback.format_exc()
+            logger.error(f"Pipeline error for {symbol}: {e}\n{err_tb}")
         finally:
             self._processing.discard(symbol)
 
