@@ -24,7 +24,8 @@ class ExtrimeClose:
         if not self.enable: return None
         
         # ЗАМЕНА на min_notional
-        if pos.current_qty < pos.min_notional_asset: return None
+        # if pos.current_qty < pos.min_notional_asset: return None
+        if pos.current_qty == 0.0: return None
         
         if now - pos.last_extrime_try_ts < self.retry_ttl: return None
         

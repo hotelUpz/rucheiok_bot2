@@ -23,14 +23,12 @@ load_dotenv()
 logger = UnifiedLogger(name="bot")
 TZ = pytz.timezone(TIME_ZONE)
 
-
 def round_step(value: float, step: float) -> float:
     if not step or step <= 0: return value
     val_d = Decimal(str(value))
     step_d = Decimal(str(step))
     rounded = (val_d / step_d).quantize(Decimal("1"), rounding=ROUND_DOWN) * step_d
     return float(rounded)
-
 
 class OrderExecutor:
     def __init__(self, tb: "TradingBot"):
@@ -51,8 +49,6 @@ class OrderExecutor:
         self.margin_over_size_pct = risk.get("margin_over_size_pct", 1.0)
         self.leverage = risk.get("leverage", {}).get("val", 10)
 
-    # _get_lock удален. Используем self.tb._get_lock(pos_key)
-
     async def cancel_all_orders(self, symbol: str) -> bool:
         try:
             resp = await self.client.cancel_all_orders(symbol)
@@ -69,7 +65,6 @@ class OrderExecutor:
         try:
             resp = await self.client.cancel_order(symbol, order_id, pos_side)
             if resp.get("code") == 0: return True
-            
             err_msg = str(resp.get("msg", "")).lower()
             if "filled" not in err_msg and "not found" not in err_msg:
                 logger.debug(f"[{symbol}] Не удалось отменить {order_id}: {resp}")
@@ -106,7 +101,6 @@ class OrderExecutor:
         except Exception as e:
             logger.debug(f"[{pos_key}] Ошибка скупки помех: {e}")
         finally:
-            # ОЧИСТКА ЯКОРЯ ИДЕМПОТЕНТНОСТИ ПОМЕХ
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos: pos.interf_in_flight = False
@@ -119,9 +113,10 @@ class OrderExecutor:
 
             price = round_step(signal["price"], spec.tick_size)
             row_vol_asset = signal.get("row_vol_asset", 0.0)
-            target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
             
-            max_notional = self.notional_limit * self.leverage
+            # ФИКС 1: Жесткий расчет маржи без безумного умножения на плечо
+            target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
+            max_notional = float(self.notional_limit) 
             target_usdt = min(target_usdt, max_notional)
             target_usdt = max(target_usdt, self.min_exchange_notional)
             
@@ -165,21 +160,21 @@ class OrderExecutor:
                 
                 await asyncio.sleep(0.2)
                 
-            # Если дошли сюда — ордер не исполнился
+            # ФИКС 2: Корректный карантин для "inf"
             quarantine_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
-            if str(quarantine_hours).lower() != "inf":
+            if str(quarantine_hours).lower() == "inf":
+                self.tb.state.quarantine_until[symbol] = float('inf')
+            elif float(quarantine_hours) > 0:
                 self.tb.state.quarantine_until[symbol] = time.time() + (float(quarantine_hours) * 3600)
                 
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos and pos.current_qty <= 0:
-                    pos.is_closed_by_exchange = True # Отправляем в мусоросборщик
+                    pos.is_closed_by_exchange = True
 
             return False
             
         finally:
-            # ОЧИСТКА ЯКОРЯ ВХОДА! 
-            # Выполнится гарантированно: при успехе (return True), при фейле (return False) и при краше.
             self.tb.state.pending_entry_orders.pop(pos_key, None)
 
     async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
@@ -205,7 +200,6 @@ class OrderExecutor:
                     resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
                     if resp.get("code") == 0:
                         order_id = resp.get("data", {}).get("orderID")
-                        
                         async with self.tb._get_lock(pos_key):
                             if pos: pos.close_order_id = order_id
                             
@@ -222,7 +216,6 @@ class OrderExecutor:
             return False
             
         finally:
-            # ОЧИСТКА ЯКОРЯ ВЫХОДА!
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos:

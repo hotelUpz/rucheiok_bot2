@@ -50,7 +50,13 @@ class PositionTTLClose:
         # Если Breakeven уже активен
         # Ждём breakeven_wait_sec и переводим в Extrime — независимо от position_ttl.
         if pos.in_breakeven_mode:
-            if pos.current_qty > pos.min_notional_asset and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
+            if pos.current_qty > 0.0 and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
                 pos.in_breakeven_mode = False  
                 return "EXTRIME_SCENARIO"
             return None
+        
+        # if pos.in_breakeven_mode:
+        #     if pos.current_qty > pos.min_notional_asset and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
+        #         pos.in_breakeven_mode = False  
+        #         return "EXTRIME_SCENARIO"
+        #     return None

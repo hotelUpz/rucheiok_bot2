@@ -24,7 +24,8 @@ from CORE.executor import OrderExecutor
 from CORE.models_fsm import WsInterpreter
 from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
 
-from EXIT.scenarios.base import AverageScenario
+# ИМПОРТ ИСПРАВЛЕН
+from EXIT.scenarios.base import BaseScenario
 from EXIT.scenarios.negative import NegativeScenario
 from EXIT.scenarios.breakeven import PositionTTLClose
 from EXIT.interference import Interference
@@ -93,15 +94,13 @@ class TradingBot:
         exit_cfg = self.cfg.get("exit", {})
         scen_cfg = exit_cfg.get("scenarios", {})
         
-        self.scen_base = AverageScenario(scen_cfg.get("base", {}))
+        # ИСПОЛЬЗУЕМ BaseScenario
+        self.scen_base = BaseScenario(scen_cfg.get("base", {}))
         self.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
-        self.scen_interf = Interference(exit_cfg.get("interference", {}))
+        self.scen_interf = Interference(exit_cfg.get("interference", {}), self.min_exchange_notional)
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
 
-    # ==========================================
-    # ХЕЛПЕРЫ
-    # ==========================================
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
         task.cancel()
@@ -157,9 +156,6 @@ class TradingBot:
             self.active_positions_locker[pos_key] = asyncio.Lock()
         return self.active_positions_locker[pos_key]
 
-    # ==========================================
-    # ТОРГОВАЯ ЛОГИКА (ПАЙПЛАЙН)
-    # ==========================================
     def _check_risk_limits(self, symbol: str, long_key: str, short_key: str) -> bool:
         has_long = long_key in self.state.active_positions or long_key in self.state.pending_entry_orders
         has_short = short_key in self.state.active_positions or short_key in self.state.pending_entry_orders
@@ -176,9 +172,7 @@ class TradingBot:
         return True
     
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
-        """Инвариант 1: Контроль жизни текущих позиций."""
         now = time.time()
-        
         exit_cfg = self.cfg.get("exit", {})
         timeout_extrime = exit_cfg.get("extrime_close", {}).get("extrime_timeout_sec", 0.1)
         timeout_hunt = exit_cfg.get("hunting_timeout_sec", 0.1)
@@ -189,55 +183,46 @@ class TradingBot:
                 if not pos or pos.current_qty <= 0:
                     continue
 
-                # 1. Проверка негативного сценария
                 neg_res = self.scen_neg.analyze(snap, pos, now)
                 if neg_res == "NEGATIVE_TIMEOUT":
                     pos.in_extrime_mode = True
 
-                # 2. Проверка глобального TTL / БУ
                 ttl_res = await self.scen_ttl.analyze(pos, now)
                 if ttl_res == "EXTRIME_SCENARIO":
                     pos.in_extrime_mode = True
 
-                # 3. Аварийный выход (EXTRIME MODE)
                 if pos.in_extrime_mode:
                     ext_price = self.scen_extrime.analyze(snap, pos, now)
                     if ext_price and pos.current_close_price != ext_price:
-                        pos.current_close_price = ext_price # СИНХРОННЫЙ ЯКОРЬ!
+                        pos.current_close_price = ext_price 
                         asyncio.create_task(self.executor.execute_exit(symbol, pos_key, ext_price, timeout_extrime))
                     continue 
 
-                # 4. Режим Безубытка (BREAKEVEN MODE)
                 if pos.in_breakeven_mode:
                     be_price = self.scen_ttl.build_target_price(pos)
                     if pos.current_close_price != be_price:
-                        pos.current_close_price = be_price # СИНХРОННЫЙ ЯКОРЬ!
+                        pos.current_close_price = be_price 
                         asyncio.create_task(self.executor.execute_exit(symbol, pos_key, be_price, timeout_hunt))
                     continue
 
-                # 5. Обычный хантинг (BASE SCENARIO)
                 base_price = self.scen_base.analyze(snap, pos, now)
                 if base_price and pos.current_close_price != base_price:
-                    pos.current_close_price = base_price # СИНХРОННЫЙ ЯКОРЬ!
+                    pos.current_close_price = base_price 
                     asyncio.create_task(self.executor.execute_exit(symbol, pos_key, base_price, timeout_hunt))
 
-                # 6. Скупка помех (INTERFERENCE)
                 if not pos.interf_in_flight:
                     interf_res = self.scen_interf.analyze(snap, pos, now)
                     if interf_res:
                         i_price, i_qty = interf_res
-                        pos.interf_in_flight = True # СИНХРОННЫЙ ЯКОРЬ!
+                        pos.interf_in_flight = True 
                         asyncio.create_task(self.executor.interf_bought(symbol, pos_key, i_qty, i_price))
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)
         signal = self.signal_engine.analyze(snap, b_price, p_price)
-        
         if not signal: return
 
         pos_key = f"{symbol}_{signal['side']}"
-        
-        # СТРОГАЯ ИДЕМПОТЕНТНОСТЬ ВХОДА!
         if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: 
             return 
 
@@ -249,75 +234,58 @@ class TradingBot:
             signal["init_ask1"] = snap.asks[0][0]
             signal["init_bid1"] = snap.bids[0][0]
             
-            # СИНХРОННЫЙ ЯКОРЬ ВХОДА! 
             self.state.pending_entry_orders[pos_key] = str(time.time())
-            
             asyncio.create_task(self.executor.execute_entry(symbol, pos_key, signal))
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
-            self.state.pending_entry_orders.pop(pos_key, None) # Откат якоря при ошибке
+            self.state.pending_entry_orders.pop(pos_key, None) 
 
     async def _process_symbol_pipeline(self, snap: DepthTop):
         symbol = snap.symbol
         if symbol in self._processing: return
         self._processing.add(symbol)
-        
         try:
-            if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions):
-                return
-            
-            if hasattr(self, 'quarantine_util') and not await self.quarantine_util(symbol):
-                return
-
+            if symbol in self.black_list and not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): return
+            if hasattr(self, 'quarantine_util') and not await self.quarantine_util(symbol): return
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
-            
             await self._evaluate_exit_scenarios(snap, symbol, pos_long_key, pos_short_key)
-            if not self._check_risk_limits(symbol, pos_long_key, pos_short_key):
-                return
+            if not self._check_risk_limits(symbol, pos_long_key, pos_short_key): return
             await self._evaluate_entry_signal(snap, symbol)
-                    
         except Exception as e:
             logger.debug(f"Pipeline error for {symbol}: {e}")
         finally:
             self._processing.discard(symbol)
 
-    # ==========================================
-    # ИСТОЧНИКИ ДАННЫХ И ЖИВОЛУПА (DATA SINKS & GAME LOOP)
-    # ==========================================
     async def _stakan_data_sink(self, snap: DepthTop):
         self._latest_market_data[snap.symbol] = snap
 
     async def _main_trading_loop(self):
         logger.info("🎮 Главная торговая живолупа (Game Loop) запущена.")
         while self._is_running:
-            
-            # --- 1. GARBAGE COLLECTOR & REPORTING ---
             keys_to_check = list(self.state.active_positions.keys())
             for pos_key in keys_to_check:
                 async with self._get_lock(pos_key):
                     pos = self.state.active_positions.get(pos_key)
-                    
                     if pos and getattr(pos, 'is_closed_by_exchange', False):
-                        if self.tg and pos.entry_price > 0.0 and pos.realized_exit_price > 0.0:
+                        # ФИКС: Сообщение в ТГ шлется с подстраховкой цены, если WS не успел её схватить
+                        if self.tg and pos.entry_price > 0.0:
                             if pos.in_extrime_mode: semantic = "⚠️ Аварийный выход (Extrime Mode)"
                             elif pos.in_breakeven_mode: semantic = "🛡 Выход по безубытку (TTL)"
                             else: semantic = "🎯 Тейк-профит (Base Scenario)"
-                                
-                            msg = Reporters.exit_success(pos_key, semantic, pos.realized_exit_price)
+                            
+                            exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
+                            msg = Reporters.exit_success(pos_key, semantic, exit_pr)
                             asyncio.create_task(self.tg.send_message(msg))
-                        
                         elif pos.entry_price == 0.0:
-                            logger.info(f"[{pos_key}] Вход отменен по таймауту.")
+                            logger.info(f"[{pos_key}] Вход отменен.")
 
                         logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
                         self.state.active_positions.pop(pos_key, None)
 
-            # --- 2. ОБРАБОТКА ПОТОКА ---
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:
                 await asyncio.sleep(0.01)
                 continue
-
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
             await asyncio.gather(*tasks, return_exceptions=True)
             await asyncio.sleep(0.001)
@@ -326,20 +294,14 @@ class TradingBot:
         if getattr(self, '_is_running', False): return
         self._is_running = True
         logger.info("▶️ Инициализация систем...")
-
         summary = get_config_summary(self.cfg)
         logger.info(f"⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ\n{summary}")
-
         if self.tg: asyncio.create_task(self.tg.send_message("🟢 <b>ТОРГОВЛЯ НАЧАТА</b>"))
 
         symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
 
-        try:
-            await self.private_client.switch_position_mode(currency=self.quota_asset, mode="Hedged")
-            logger.info("✅ Position mode: Hedged (подтверждён)")
-        except Exception as e:
-            logger.warning(f"⚠️ switch_position_mode: {e} — режим уже установлен или есть открытые позиции")
+        # ВЫРЕЗАН БЕСПОЛЕЗНЫЙ ЗАПРОС К БИРЖЕ НА ТОРГОВЫЙ РЕЖИМ
 
         await self._recover_state()
 
@@ -360,7 +322,6 @@ class TradingBot:
         await self.stop()
         logger.info("💾 Финальное сохранение стейта на диск...")
         await self.state.save()
-
         await self.phemex_sym_api.aclose()
         await self.binance_ticker_api.aclose()
         await self.phemex_ticker_api.aclose()
@@ -373,20 +334,16 @@ class TradingBot:
         self._is_running = False
         logger.info("⏹ Остановка процессов...")
         if self.tg: await self.tg.send_message("⏹ Остановка процессов...")
-
         self.price_manager.stop()
         self.signal_engine.funding_filter.stop()
         if self._stream: self._stream.stop()
         await self.private_ws.aclose()
-        
         await self._await_task(getattr(self, '_price_updater_task', None))
         await self._await_task(getattr(self, '_funding_task', None))
         await self._await_task(getattr(self, '_private_ws_task', None))
         await self._await_task(getattr(self, '_stream_task', None))
         await self._await_task(getattr(self, '_game_loop_task', None))
-            
         self._latest_market_data.clear()
         self._processing.clear()
         self._signal_timeouts.clear()
-
         await self.state.save()

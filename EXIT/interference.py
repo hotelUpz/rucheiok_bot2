@@ -30,7 +30,7 @@ class Interference:
             return None
             
         # ЗАМЕНА на min_notional
-        if pos.current_qty < pos.min_notional_asset or pos.interference_disabled:
+        if pos.current_qty == 0 or pos.interference_disabled:
             return None
 
         if (now - pos.opened_at) < self.stab_ttl: return None
@@ -42,7 +42,7 @@ class Interference:
         allowed_remains = (pos.pending_qty * self.max_vol_pct) - pos.interf_comulative_qty
         
         # ЗАМЕНА проверки лимита на min_notional_asset
-        if allowed_remains < pos.min_notional_asset: 
+        if allowed_remains == 0.0: 
             pos.interference_disabled = True
             return None
 
@@ -53,7 +53,7 @@ class Interference:
             price, _ = target
             buy_qty = min(max_chunk_vol, allowed_remains)
             # Финальная проверка перед выстрелом
-            if buy_qty < pos.min_notional_asset: return None
+            if buy_qty == 0.0: return None
             return price, buy_qty
 
         return None
