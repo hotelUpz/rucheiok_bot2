@@ -14,7 +14,7 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from CORE.restorator import BotState
 
-logger = UnifiedLogger("ws")
+logger = UnifiedLogger("core")
 
 @dataclass
 class ActivePosition:
@@ -125,10 +125,12 @@ class WsInterpreter:
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
                 
-            # ФИКС 4: Защита от левых дельт. Проверяем наличие ключа!
+            # Согласно официальной доке Phemex, "size" приходит при обновлениях. 
+            # Для шортов он может быть отрицательным, берем abs().
             if "size" in p or "sizeRq" in p:
-                size = self._safe_float(p.get("sizeRq", p.get("size"))) or 0.0
-                if size: size = abs(size)
+                raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
+                size = abs(raw_size)
+                
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
                 if size > 0:

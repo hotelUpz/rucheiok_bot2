@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from API.PHEMEX.ticker import PhemexTickerAPI
     from API.BINANCE.ticker import BinanceTickerAPI
 
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("core")
 
 
 class BlackListManager:

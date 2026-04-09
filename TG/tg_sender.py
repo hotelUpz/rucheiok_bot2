@@ -6,7 +6,7 @@ from c_log import UnifiedLogger
 logger = UnifiedLogger("tg")
 
 # Минимальный интервал между сообщениями в секундах
-MIN_SEND_INTERVAL = 0.5
+MIN_SEND_INTERVAL = 0.25
 
 class TelegramSender:
     def __init__(self, token: str, chat_id: str):

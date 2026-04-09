@@ -17,7 +17,7 @@ CFG_PATH = BASE_DIR / "cfg.json"
 CACHE_PATH = BASE_DIR / "leverage_cache.json"
 
 load_dotenv(BASE_DIR / ".env")
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("main")
 
 
 async def polling_supervisor(tg_admin: AdminTgBot):

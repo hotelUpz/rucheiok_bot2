@@ -10,7 +10,7 @@ from utils import load_json, save_json_safe
 from CORE.models_fsm import ActivePosition
 from c_log import UnifiedLogger
 
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("core")
 
 
 class BotState:

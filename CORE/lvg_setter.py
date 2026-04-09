@@ -10,7 +10,7 @@ from API.PHEMEX.order import PhemexPrivateClient
 from utils import load_json, save_json_safe
 from c_log import UnifiedLogger
 
-logger = UnifiedLogger("setup")
+logger = UnifiedLogger("core")
 
 
 """Утилитарная сущность. По идее ей не место в ядре. Но для совместимости можно оставить. Еще. Надо сохранять кеш (и читать) на папку выше корня проекта."""

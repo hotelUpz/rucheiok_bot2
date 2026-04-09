@@ -12,7 +12,7 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from API.PHEMEX.funding import PhemexFunding, FundingInfo
 
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("entry")
 
 class FundingFilter:
     def __init__(self, cfg: dict[str, Any], funding_api: PhemexFunding):

@@ -36,7 +36,7 @@ from utils import get_config_summary
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("core")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
@@ -48,7 +48,7 @@ class TradingBot:
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        self.min_exchange_notional = self.cfg.get("risk", {}).get("min_exchange_notional", 5.0)     
+        self.min_exchange_notional = float(self.cfg.get("risk", {}).get("min_exchange_notional", 5.0))
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
@@ -124,7 +124,17 @@ class TradingBot:
             elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
                 return False
         return True
-    
+        
+    def apply_entry_quarantine(self, symbol: str):
+        """Утилитный метод для применения карантина после неудачной серии входов."""
+        q_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
+        if str(q_hours).lower() == "inf":
+            self.state.quarantine_until[symbol] = float('inf')
+            logger.warning(f"[{symbol}] 🚫 Помещен в бессрочный карантин (вход не удался).")
+        elif float(q_hours) > 0:
+            self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
+            logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {q_hours}ч (вход не удался).")
+
     async def _recover_state(self):
         try:
             self.state.load()
@@ -221,18 +231,16 @@ class TradingBot:
         pos_key = f"{symbol}_{signal['side']}"
         if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: 
             return 
-        
-        now = time.time()
 
-        if self._signal_timeouts.get(pos_key, 0) > now: return
-        self._signal_timeouts[pos_key] = now + self.signal_timeout_sec
+        if self._signal_timeouts.get(pos_key, 0) > time.time(): return
+        self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
 
         try:
             signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
             signal["init_ask1"] = snap.asks[0][0]
             signal["init_bid1"] = snap.bids[0][0]
             
-            self.state.pending_entry_orders[pos_key] = str(now)
+            self.state.pending_entry_orders[pos_key] = str(time.time())
             asyncio.create_task(self.executor.execute_entry(symbol, pos_key, signal))
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
@@ -270,7 +278,6 @@ class TradingBot:
                             elif pos.in_breakeven_mode: semantic = "🛡 Выход по безубытку (TTL)"
                             else: semantic = "🎯 Тейк-профит (Base Scenario)"
                             
-                            # Подстраховка цены для ТГ, если WS не успел перехватить order_p
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                             msg = Reporters.exit_success(pos_key, semantic, exit_pr)
                             asyncio.create_task(self.tg.send_message(msg))

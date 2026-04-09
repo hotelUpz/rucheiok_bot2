@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("base")
+logger = UnifiedLogger("exit")
 
 class BaseScenario:
     def __init__(self, cfg: dict):

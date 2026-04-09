@@ -22,7 +22,7 @@ class PhemexPrivateClient:
         # Инструменты для контроля лимитов
         self._lock = asyncio.Lock()
         self._last_send_time = 0
-        self.MIN_SEND_INTERVAL = 0.025  # 50 миллисекунд
+        self.MIN_SEND_INTERVAL = 0.01  # 50 миллисекунд
 
     def _get_signature(self, path: str, query_no_question: str, expiry: int, body_str: str) -> str:
         message = f"{path}{query_no_question}{expiry}{body_str}"
