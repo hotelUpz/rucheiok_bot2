@@ -23,14 +23,12 @@ load_dotenv()
 logger = UnifiedLogger(name="bot")
 TZ = pytz.timezone(TIME_ZONE)
 
-
 def round_step(value: float, step: float) -> float:
     if not step or step <= 0: return value
     val_d = Decimal(str(value))
     step_d = Decimal(str(step))
     rounded = (val_d / step_d).quantize(Decimal("1"), rounding=ROUND_DOWN) * step_d
     return float(rounded)
-
 
 class OrderExecutor:
     def __init__(self, tb: "TradingBot"):
@@ -121,9 +119,8 @@ class OrderExecutor:
             target_usdt = min(target_usdt, self.notional_limit)
             
             qty = round_step(target_usdt / price, spec.lot_size)
-            
             if qty < spec.lot_size: 
-                logger.warning(f"[{pos_key}] Qty {qty} меньше биржевого шага лота {spec.lot_size}. Пропуск.")
+                logger.warning(f"[{pos_key}] Qty {qty} меньше шага лота {spec.lot_size}. Пропуск.")
                 return False
 
             async with self.tb._get_lock(pos_key):
@@ -143,16 +140,15 @@ class OrderExecutor:
                     resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
                     if resp.get("code") == 0:
                         order_id = resp.get("data", {}).get("orderID")
-                        
                         await asyncio.sleep(self.entry_timeout)
                         
                         if order_id: 
-                            # SMART CHECK: Отменяем только если не налило полностью
+                            # SMART CANCEL: Отменяем только если налило не полностью
                             curr_qty = 0.0
                             async with self.tb._get_lock(pos_key):
                                 pos = self.tb.state.active_positions.get(pos_key)
                                 if pos: curr_qty = pos.current_qty
-                                
+                            
                             if curr_qty < qty:
                                 await self.execute_cancel(symbol, phemex_pos_side, order_id)
                                 await asyncio.sleep(self.WS_SYNC_PAUSE_SEC)
@@ -164,8 +160,6 @@ class OrderExecutor:
                                 if self.tb.tg:
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                     asyncio.create_task(self.tb.tg.send_message(msg))
-                                
-                                self.tb.state.consecutive_fails[symbol] = 0
                                 asyncio.create_task(self.tb.state.save())
                                 return True
                     else:
@@ -179,6 +173,7 @@ class OrderExecutor:
                 
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
+                # Убиваем позу только если в рынок так и не вошли
                 if pos and pos.current_qty <= 0:
                     pos.is_closed_by_exchange = True 
 
@@ -216,7 +211,7 @@ class OrderExecutor:
                         await asyncio.sleep(timeout_sec)
                         
                         if order_id: 
-                            # SMART CHECK: Отменяем только если позиция еще жива
+                            # SMART CANCEL: Отменяем только если позиция еще жива (ордер не пролился до конца)
                             curr_qty = 0.0
                             async with self.tb._get_lock(pos_key):
                                 pos = self.tb.state.active_positions.get(pos_key)
@@ -239,5 +234,8 @@ class OrderExecutor:
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos:
-                    pos.current_close_price = 0.0
                     pos.close_order_id = ""
+                    # ФИКС: Не сбрасываем current_close_price, если поза умерла. 
+                    # Оставляем эту цену для красивого отчета в Telegram!
+                    if not pos.is_closed_by_exchange:
+                        pos.current_close_price = 0.0

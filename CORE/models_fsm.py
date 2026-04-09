@@ -2,7 +2,6 @@
 # FILE: CORE/models_fsm.py
 # ROLE: FSM для ActivePosition. Интерпретатор событий WebSocket.
 # ============================================================
-
 from __future__ import annotations
 
 import asyncio
@@ -14,15 +13,14 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from CORE.restorator import BotState
 
-logger = UnifiedLogger("core")
-
+logger = UnifiedLogger("ws")
 
 @dataclass
 class ActivePosition:
     symbol: str             
     side: str               
     
-    in_position: bool = False            # <--- ОБЯЗАТЕЛЬНО ДОБАВИТЬ ЭТОТ ФЛАГ
+    in_position: bool = False            # ФИКС: Якорь физического присутствия в рынке!
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
@@ -129,17 +127,16 @@ class WsInterpreter:
                 
             if "size" in p or "sizeRq" in p:
                 raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
-                size = abs(raw_size) # Для шортов Phemex может слать минус
-                
+                size = abs(raw_size)
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
                 if size > 0:
                     pos.current_qty = size
-                    pos.in_position = True # ФИКС: Помечаем, что поза реально жива
+                    pos.in_position = True # ФИКС: Поза физически налилась!
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
-                    # ФИКС: Убиваем только если поза УЖЕ БЫЛА в рынке. 
-                    # Ждущие ордера с size=0 вебсокет игнорирует.
+                    # ФИКС: Убиваем только если поза УЖЕ БЫЛА в рынке.
+                    # Пустые дельты для ждущих ордеров игнорируем!
                     if getattr(pos, 'in_position', False):
                         pos.is_closed_by_exchange = True
                         pos.current_qty = 0.0

@@ -1,5 +1,5 @@
-2026-04-09 23:25:50 | INFO | bot | ▶️ Инициализация систем...
-2026-04-09 23:25:51 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+2026-04-10 01:37:41 | INFO | bot | ▶️ Инициализация систем...
+2026-04-10 01:37:41 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
 🎛 <b>[APP & RISK]</b>
 Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
 Max Positions: <b>1</b>
@@ -27,33 +27,39 @@ Funding: <b>True</b> | Thresh: &gt;= <b>2.0%</b>
 <b>Interference:</b> True | Usual Vol: <b>3%</b>
 <b>TTL Close:</b> None | TTL: <b>60s</b> | Wait: <b>2s</b>
 <b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
-2026-04-09 23:25:57 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
-2026-04-09 23:25:57 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
-2026-04-09 23:26:00 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
-2026-04-09 23:26:03 | DEBUG | bot | [GOATUSDT] Exception при отмене 62ed6873-bbc3-47f9-b3b7-09f2a5b88df4: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
-2026-04-09 23:26:04 | WARNING | bot | [GOATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:04 | INFO | bot | [GOATUSDT_LONG] Вход отменен.
-2026-04-09 23:26:04 | INFO | bot | [GOATUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
-2026-04-09 23:26:05 | DEBUG | bot | [ALTUSDT] Exception при отмене 6b721710-c23f-4db5-a1e7-11305d863335: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
-2026-04-09 23:26:06 | WARNING | bot | [ALTUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:06 | INFO | bot | [ALTUSDT_LONG] Вход отменен.
-2026-04-09 23:26:06 | INFO | bot | [ALTUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
-2026-04-09 23:26:11 | DEBUG | bot | [RAVEUSDT] Exception при отмене adcbe4f2-0a95-4824-93c1-8bc2a49b7c94: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
-2026-04-09 23:26:11 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:11 | INFO | bot | [RAVEUSDT_LONG] Вход отменен.
-2026-04-09 23:26:11 | INFO | bot | [RAVEUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
-2026-04-09 23:26:13 | DEBUG | bot | [MAVUSDT] Exception при отмене 7ad5144f-d805-438b-a05e-935d61c3e0f6: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
-2026-04-09 23:26:13 | WARNING | bot | [MAVUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:13 | INFO | bot | [MAVUSDT_LONG] Вход отменен.
-2026-04-09 23:26:13 | INFO | bot | [MAVUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
-2026-04-09 23:26:17 | WARNING | bot | [STOUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:17 | INFO | bot | [STOUSDT_LONG] Вход отменен.
-2026-04-09 23:26:17 | INFO | bot | [STOUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
-2026-04-09 23:26:29 | DEBUG | bot | [KGENUSDT] Exception при отмене 7b386b18-8e23-447e-8534-10e1a182cd0e: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
-2026-04-09 23:26:29 | WARNING | bot | [KGENUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:29 | INFO | bot | [KGENUSDT_LONG] Вход отменен.
-2026-04-09 23:26:29 | INFO | bot | [KGENUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
-2026-04-09 23:26:31 | INFO | bot | ⏹ Остановка процессов...
-2026-04-09 23:26:31 | DEBUG | bot | [FIDAUSDT] Exception при отмене f612da8d-0743-49f2-99ac-45658d194bf7: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
-2026-04-09 23:26:31 | WARNING | bot | [FIDAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
-2026-04-09 23:26:31 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-10 01:37:47 | INFO | bot | [FIDAUSDT_SHORT] 🧹 Удалена из стейта (закрыта на бирже пока бот был оффлайн).
+2026-04-10 01:37:47 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-10 01:37:47 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-10 01:37:48 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-10 01:37:52 | DEBUG | bot | [CELOUSDT] Exception при отмене 8160a780-3156-4058-b3f0-eed9cc0faa08: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 01:37:52 | WARNING | bot | [CELOUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:37:52 | INFO | bot | [CELOUSDT_LONG] Вход отменен.
+2026-04-10 01:37:52 | INFO | bot | [CELOUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:37:53 | ERROR | bot | [ONTUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-10 01:37:53 | WARNING | bot | [ONTUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:37:53 | INFO | bot | [ONTUSDT_LONG] Вход отменен.
+2026-04-10 01:37:53 | INFO | bot | [ONTUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:38:01 | DEBUG | bot | [FIDAUSDT] Exception при отмене 9d5cecb5-1b7d-4b13-9a37-be32f16a8b78: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 01:38:01 | WARNING | bot | [FIDAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:38:01 | INFO | bot | [FIDAUSDT_LONG] Вход отменен.
+2026-04-10 01:38:01 | INFO | bot | [FIDAUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:38:03 | DEBUG | bot | [IOSTUSDT] Exception при отмене f0b2ab40-2172-4548-a8de-13b2f66cdf20: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 01:38:03 | WARNING | bot | [IOSTUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:38:03 | INFO | bot | [IOSTUSDT_LONG] Вход отменен.
+2026-04-10 01:38:03 | INFO | bot | [IOSTUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:38:03 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-10 01:38:03 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:38:03 | INFO | bot | [RAVEUSDT_LONG] Вход отменен.
+2026-04-10 01:38:03 | INFO | bot | [RAVEUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:38:14 | DEBUG | bot | [RAREUSDT] Exception при отмене 7d1023c0-cbbe-4382-bf22-84ce4d1540ee: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 01:38:14 | WARNING | bot | [RAREUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:38:14 | INFO | bot | [RAREUSDT_LONG] Вход отменен.
+2026-04-10 01:38:14 | INFO | bot | [RAREUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:38:18 | ERROR | bot | [2ZUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-10 01:38:18 | WARNING | bot | [2ZUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 01:38:18 | INFO | bot | [2ZUSDT_LONG] Вход отменен.
+2026-04-10 01:38:18 | INFO | bot | [2ZUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 01:38:23 | INFO | bot | ⏹ Остановка процессов...
+2026-04-10 01:38:23 | DEBUG | bot | [LABUSDT] Exception при отмене f23c8412-b639-46ac-b480-07400ef02c7d: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 01:38:24 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-10 01:38:24 | WARNING | bot | [LABUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
