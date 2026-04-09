@@ -137,36 +137,20 @@ class ConfigManager:
 
 
 class Reporters:
-    """Централизованный шаблонизатор отчетов для Телеграма и Логов."""
-    # Нужно адаптировать под новый пейплайн бота, покрывая все ключевые моменты информатирования в ТГ во время торговой итерации.
-    
     @staticmethod
     def entry_signal(symbol: str, signal: dict, b_price: float, p_price: float) -> str:
-        side_str = "🟢 LONG 📈" if signal.get('side') == "LONG" else "🔴 SHORT 📉"
+        side_str = "🟢 LONG" if signal.get('side') == "LONG" else "🔴 SHORT"
         return (
-            f"Монета: <b>#{symbol}</b>\n"
-            f"Направление: {side_str}\n"
-            f"Цена срабатывания: {signal.get('trigger_price', signal.get('price'))}\n"
-            f"Spread (3 уровня): {signal.get('spr3_pct', 0)}%\n"
-            f"Множитель (Rate): {signal.get('rate', 0)}x\n\n"
-            f"🔥 <b>Горячие цены:</b>\n"
-            f"Binance: {b_price}\n"
-            f"Phemex: {p_price}\n"
+            f"<b>#{symbol}</b> | {side_str}\n"
+            f"Вход: <b>{signal.get('price')}</b>\n"
+            f"Rate: {signal.get('rate', 0)}x | Spr3: {signal.get('spr3_pct', 0)}%\n\n"
+            f"Binance: {b_price} | Phemex: {p_price}"
         )
 
     @staticmethod
     def extrime_alert(symbol: str, reason: str) -> str:
-        """Используется только при КРИТИЧЕСКОЙ ошибке Экстрим-ордеров."""
-        return f"🚨 <b>КРИТИЧЕСКИЙ ОТКАЗ API</b>\n#{symbol}\nЭкстрим ордера отклоняются. {reason}"
-
-    @staticmethod
-    def ttl_close(symbol: str, pos_key: str, lifetime_sec: float) -> str:
-        return f"⏳ <b>БУ РЕЖИМ</b>\n#{pos_key}\nВремя в сделке: {lifetime_sec} сек. Цель переведена в БУ."
-
-    @staticmethod
-    def dust_close(symbol: str, pos_key: str, price: float) -> str:
-        return f"🧹 <b>DUST CLEARED (< 5 USDT)</b>\n#{pos_key}\nState сброшен по цене {price}."
+        return f"🚨 <b>ОТКАЗ API</b>\n#{symbol}\nЭкстрим ордера отклоняются: {reason}"
 
     @staticmethod
     def exit_success(pos_key: str, semantic: str, price: float) -> str:
-        return f"✅ <b>{semantic}</b>\nМонета: #{pos_key}\nЦена выхода: {price}"
+        return f"✅ <b>{semantic}</b>\n#{pos_key}\nЦена закрытия: <b>{price}</b>"

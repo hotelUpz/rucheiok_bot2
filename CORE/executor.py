@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from c_log import UnifiedLogger
 from consts import TIME_ZONE
 from CORE._utils import Reporters
+from CORE.models_fsm import ActivePosition
 
 if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
@@ -147,7 +148,6 @@ class OrderExecutor:
 
         price = round_step(signal["price"], spec.tick_size)
         
-        # 1. Расчет QTY
         row_vol_asset = signal.get("row_vol_asset", 0.0)
         target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
         
@@ -156,53 +156,67 @@ class OrderExecutor:
         target_usdt = max(target_usdt, self.min_exchange_notional)
         
         qty = round_step(target_usdt / price, spec.lot_size)
-        if qty <= 0: return False
+        min_notional_asset = max(spec.lot_size, self.min_exchange_notional / price)
+        
+        if qty < min_notional_asset: return False
+
+        # --- СОЗДАНИЕ ПОЗИЦИИ В СТЕЙТЕ ---
+        async with self._get_lock(pos_key):
+            if pos_key not in self.tb.state.active_positions:
+                self.tb.state.active_positions[pos_key] = ActivePosition(
+                    symbol=symbol,
+                    side=signal["side"],
+                    pending_qty=qty,
+                    min_notional_asset=min_notional_asset,
+                    init_ask1=signal.get("init_ask1", price),
+                    init_bid1=signal.get("init_bid1", price),
+                    base_target_price_100=signal.get("base_target_price_100", price)
+                )
 
         side = "Buy" if signal["side"] == "LONG" else "Sell"
         phemex_pos_side = "Long" if signal["side"] == "LONG" else "Short"
 
-        # 2. Итерации попыток
         for attempt in range(max(1, self.max_entry_retries)):
             try:
                 resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
                 if resp.get("code") == 0:
                     order_id = resp.get("data", {}).get("orderID")
                     
-                    # 3. Выдержка таймаута и отмена
                     await asyncio.sleep(self.entry_timeout)
                     
                     if order_id:
                         await self.execute_cancel(symbol, phemex_pos_side, order_id)
                     
-                    # 4. Проверка стейта (налило ли хоть что-то)
+                    # Проверяем, налило ли хоть что-то
                     async with self._get_lock(pos_key):
                         pos = self.tb.state.active_positions.get(pos_key)
-                        if pos and (pos.in_position or pos.current_qty > 0):
-                            logger.info(f"[{pos_key}] ✅ Вход выполнен. Цена: {price}, Итоговый объем: {pos.current_qty}")
-                            
-                            # Отправка в ТГ
+                        if pos and pos.current_qty >= min_notional_asset:
+                            logger.info(f"[{pos_key}] ✅ Вход выполнен. Цена: {price}, Объем: {pos.current_qty}")
                             if self.tb.tg:
                                 msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                 asyncio.create_task(self.tb.tg.send_message(msg))
-                                
                             return True
                         else:
                             logger.warning(f"[{pos_key}] ⚠️ Ордер не налило за {self.entry_timeout}с.")
                             return False
-                            
                 else:
                     logger.warning(f"[{pos_key}] ❌ Ошибка постановки входа: {resp}")
             except Exception as e:
                 logger.error(f"[{pos_key}] Исключение при execute_entry: {e}")
             
-            await asyncio.sleep(0.2) # Небольшая пауза перед ретраем
+            await asyncio.sleep(0.2)
             
-        # 5. Если дошли сюда, все попытки провалились. Карантин.
+        # Карантин при полном провале
         quarantine_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
         if str(quarantine_hours).lower() != "inf":
             self.tb.state.quarantine_until[symbol] = time.time() + (float(quarantine_hours) * 3600)
-            logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {quarantine_hours}ч.")
             
+        # Отправляем в мусорку пустую позицию
+        async with self._get_lock(pos_key):
+            pos = self.tb.state.active_positions.get(pos_key)
+            if pos and pos.current_qty < min_notional_asset:
+                pos.is_closed_by_exchange = True
+
         return False
 
     async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:

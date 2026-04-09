@@ -24,12 +24,11 @@ class AverageScenario:
     def _calc_virtual_tp(self, pos: ActivePosition) -> float:
         """Вычисляет виртуальный TP без сайд-эффектов."""
         if pos.side == "LONG":
-            return pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate # для хедж позиции будет путаница. Нужно использовать отдельные структуры для Лонга и для Шорта.
-        return pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate # то же.
+            return pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate
+        return pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate
 
     def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> float | None:
-
-        if pos.current_qty <= 0.0: return None # возможно избыточно.
+        # if pos.current_qty <= pos.min_notional_asset: return None # возможно избыточно.
         
         if pos.in_breakeven_mode or pos.in_extrime_mode:
             return None

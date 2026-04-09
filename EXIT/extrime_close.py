@@ -1,7 +1,10 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 from c_log import UnifiedLogger
+
+# ИМПОРТ ИЗ УТИЛИТ
+from EXIT.utils import get_top_bid_ask
+
 if TYPE_CHECKING:
     from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
@@ -9,57 +12,36 @@ if TYPE_CHECKING:
 logger = UnifiedLogger("exit")
 
 class ExtrimeClose:
-    """
-    Аварийный выход из позиции методом нарастающего давления.
-    """
     def __init__(self, cfg: dict):
         self.cfg = cfg
         self.enable = cfg.get("enable", True)
         self.retry_ttl = cfg.get("retry_ttl", 3)
         self.retry_num = cfg.get("retry_num", "inf")
         self.bid_to_ask_orientation = cfg.get("bid_to_ask_orientation", 0.0)
-        # increase_fraction -- % от (ask1 - bid1). В конфиге 2.5 = 2.5% = 0.025
         self.increase_fraction = cfg.get("increase_fraction", 2.5) / 100
 
     def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> float | None:
-        if not self.enable: 
-            return None
+        if not self.enable: return None
         
-        if pos.current_qty <= 0.0: # возможно избыточно. есть смысл делать на внейней стороне.
-            return None
+        # ЗАМЕНА на min_notional
+        if pos.current_qty < pos.min_notional_asset: return None
         
-        # 1. Каждые retry_ttl секунд вычисляется новая exit-цена.
-        if now - pos.last_extrime_try_ts < self.retry_ttl: 
-            return None
+        if now - pos.last_extrime_try_ts < self.retry_ttl: return None
         
-        # мсожно получить при помощи get_top_bid_ask -- см в других модулях.
-        ask1 = depth.asks[0][0] if depth.asks else 0.0
-        bid1 = depth.bids[0][0] if depth.bids else 0.0
-        if not ask1 or not bid1: 
-            return None
+        # ИСПОЛЬЗУЕМ УТИЛИТУ
+        bid1, ask1 = get_top_bid_ask(depth)
+        if not ask1 or not bid1: return None
 
-        # 3. Если число попыток ограничено и лимит исчерпан: действие не ожидается. Молимся Богу.
         if str(self.retry_num).lower() != "inf" and pos.extrime_retries_count >= int(self.retry_num):
             logger.warning(f"Осторожно! extrime_retries_count >= retry_num, но позиция {pos.symbol} не закрыта!")
-            """TODO: можно вызывать некий глобальный флаг ВНИМАНИЯ и слать алерт в телеграм. Однако, на практике retry_num будет inf"""
             return None
 
-        # 2. Цена рассчитывается:
-        # относительно mid = (ask1 + bid1) / 2; -- ось.
         mid = (ask1 + bid1) / 2
         spread = ask1 - bid1
-        
-        # bid_to_ask_orientation == 0 -- прямо в эту ось, с последующими смещениями в компромисную сторону.
         base_price = mid + (spread * self.bid_to_ask_orientation)
-        
-        # с нарастающим ухудшением через increase_fraction. increase_fraction -- % от (ask1 - bid1).
         shift = spread * self.increase_fraction * pos.extrime_retries_count
         
-        # Ухудшаем качество выхода (для LONG смещаем цену вниз к бидам, для SHORT - вверх к аскам)
-        if pos.side == "LONG": 
-            target_price = base_price - shift
-        else: 
-            target_price = base_price + shift
+        target_price = base_price - shift if pos.side == "LONG" else base_price + shift
             
         pos.extrime_retries_count += 1
         pos.last_extrime_try_ts = now
