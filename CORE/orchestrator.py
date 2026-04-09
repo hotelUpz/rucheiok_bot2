@@ -22,7 +22,7 @@ from ENTRY.signal_engine import SignalEngine
 from CORE.restorator import BotState
 from CORE.executor import OrderExecutor
 from CORE.models_fsm import WsInterpreter
-from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager
+from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
 
 # Импорт сценариев выхода
 from EXIT.scenarios.base import AverageScenario
@@ -105,7 +105,7 @@ class TradingBot:
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
 
     # ==========================================
-    # ХЕЛПЕРЫ (Без изменений)
+    # ХЕЛПЕРЫ
     # ==========================================
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
@@ -184,8 +184,12 @@ class TradingBot:
         """Инвариант 1: Контроль жизни текущих позиций."""
         now = time.time()
         
+        # Безопасное чтение таймаутов из конфига
+        exit_cfg = self.cfg.get("exit", {})
+        timeout_extrime = exit_cfg.get("extrime_close", {}).get("extrime_timeout_sec", 0.1)
+        timeout_hunt = exit_cfg.get("hunting_timeout_sec", 0.1)
+        
         for pos_key in (long_key, short_key):
-            # Блокируем чтение/запись стейта на время оценки
             async with self._get_lock(pos_key):
                 pos = self.state.active_positions.get(pos_key)
                 if not pos or pos.current_qty <= 0:
@@ -206,7 +210,7 @@ class TradingBot:
                     ext_price = self.scen_extrime.analyze(snap, pos, now)
                     if ext_price and pos.current_close_price != ext_price:
                         asyncio.create_task(self.executor.execute_exit(
-                            symbol, pos_key, ext_price, self.cfg["exit"]["extrime_close"].get("extrime_timeout_sec", 0.1)
+                            symbol, pos_key, ext_price, timeout_extrime
                         ))
                     continue # В экстрим режиме базовый хантинг отключается
 
@@ -215,7 +219,7 @@ class TradingBot:
                     be_price = self.scen_ttl.build_target_price(pos)
                     if pos.current_close_price != be_price:
                         asyncio.create_task(self.executor.execute_exit(
-                            symbol, pos_key, be_price, self.cfg["exit"].get("hunting_timeout_sec", 0.1)
+                            symbol, pos_key, be_price, timeout_hunt
                         ))
                     continue # Базовый хантинг отключается
 
@@ -223,7 +227,7 @@ class TradingBot:
                 base_price = self.scen_base.analyze(snap, pos, now)
                 if base_price and pos.current_close_price != base_price:
                     asyncio.create_task(self.executor.execute_exit(
-                        symbol, pos_key, base_price, self.cfg["exit"].get("hunting_timeout_sec", 0.1)
+                        symbol, pos_key, base_price, timeout_hunt
                     ))
 
                 # 6. Скупка помех (INTERFERENCE)
@@ -293,6 +297,37 @@ class TradingBot:
     async def _main_trading_loop(self):
         logger.info("🎮 Главная торговая живолупа (Game Loop) запущена.")
         while self._is_running:
+            
+            # --- 1. GARBAGE COLLECTOR & REPORTING ---
+            keys_to_check = list(self.state.active_positions.keys())
+            for pos_key in keys_to_check:
+                async with self._get_lock(pos_key):
+                    pos = self.state.active_positions.get(pos_key)
+                    
+                    # Проверяем, повесил ли WebSocket бирку is_closed_by_exchange
+                    if pos and getattr(pos, 'is_closed_by_exchange', False):
+                        
+                        # Если позиция действительно была в рынке, собираем отчет
+                        if self.tg and pos.entry_price > 0.0 and pos.realized_exit_price > 0.0:
+                            if pos.in_extrime_mode:
+                                semantic = "⚠️ Аварийный выход (Extrime Mode)"
+                            elif pos.in_breakeven_mode:
+                                semantic = "🛡 Выход по безубытку (TTL)"
+                            else:
+                                semantic = "🎯 Тейк-профит (Base Scenario)"
+                                
+                            msg = Reporters.exit_success(pos_key, semantic, pos.realized_exit_price)
+                            asyncio.create_task(self.tg.send_message(msg))
+                        
+                        elif pos.entry_price == 0.0:
+                            # Ордер отменен по таймауту на входе, спамить не нужно
+                            logger.info(f"[{pos_key}] Вход отменен по таймауту.")
+
+                        # СНОСИМ СТАТУ (удаляем позицию из памяти)
+                        logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
+                        self.state.active_positions.pop(pos_key, None)
+
+            # --- 2. ОБРАБОТКА ПОТОКА (Main Logic) ---
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:
                 await asyncio.sleep(0.01)
@@ -377,70 +412,3 @@ class TradingBot:
         self._signal_timeouts.clear()
 
         await self.state.save()
-
-
-
-
-# # --- 1. GARBAGE COLLECTOR & REPORTING --- # это так и не понял куда.
-#             keys_to_check = list(self.state.active_positions.keys())
-#             for pos_key in keys_to_check:
-#                 async with self._get_lock(pos_key):
-#                     pos = self.state.active_positions.get(pos_key)
-#                     if pos and getattr(pos, 'is_closed_by_exchange', False):
-                        
-#                         # Если вход реально состоялся, шлем отчет
-#                         if self.tg and pos.entry_price > 0.0 and pos.realized_exit_price > 0.0:
-#                             if pos.in_extrime_mode:
-#                                 semantic = "Аварийный выход (Extrime)"
-#                             elif pos.in_breakeven_mode:
-#                                 semantic = "Выход по безубытку (TTL)"
-#                             else:
-#                                 semantic = "Тейк-профит (Base)"
-                                
-#                             msg = Reporters.exit_success(pos_key, semantic, pos.realized_exit_price)
-#                             asyncio.create_task(self.tg.send_message(msg))
-#                         elif pos.entry_price == 0.0:
-#                             # Ордер отменен по таймауту, спамить не нужно
-#                             logger.info(f"[{pos_key}] Вход отменен по таймауту, стейт очищен.")
-                        
-#                         self.state.active_positions.pop(pos_key, None)
-
-
-
-#     async def _main_trading_loop(self): # актуально ли еще?
-#         logger.info("🎮 Главная торговая живолупа (Game Loop) запущена.")
-#         while self._is_running:
-            
-#             # --- 1. GARBAGE COLLECTOR & REPORTING ---
-#             keys_to_check = list(self.state.active_positions.keys())
-#             for pos_key in keys_to_check:
-#                 async with self._get_lock(pos_key):
-#                     pos = self.state.active_positions.get(pos_key)
-#                     if pos and getattr(pos, 'is_closed_by_exchange', False):
-                        
-#                         # Собираем контекст для ТГ отчета перед удалением
-#                         if self.tg:
-#                             # Определяем по какому сценарию закрылись
-#                             if pos.in_extrime_mode:
-#                                 semantic = "⚠️ Аварийный выход (Extrime Mode)"
-#                             elif pos.in_breakeven_mode:
-#                                 semantic = "🛡 Выход по безубытку (TTL)"
-#                             else:
-#                                 semantic = "🎯 Тейк-профит (Base Scenario)"
-                                
-#                             msg = Reporters.exit_success(pos_key, semantic, pos.realized_exit_price)
-#                             asyncio.create_task(self.tg.send_message(msg))
-                        
-#                         # Теперь, когда отчет отправлен, сносим стату к е...
-#                         logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
-#                         self.state.active_positions.pop(pos_key, None)
-            
-#             # --- 2. ОБРАБОТКА ПОТОКА ---
-#             current_snaps = list(self._latest_market_data.values())
-#             if not current_snaps:
-#                 await asyncio.sleep(0.01)
-#                 continue
-
-#             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
-#             await asyncio.gather(*tasks, return_exceptions=True)
-#             await asyncio.sleep(0.001)
