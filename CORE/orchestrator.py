@@ -37,7 +37,7 @@ from utils import get_config_summary
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("bot")
+logger = UnifiedLogger("core")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 

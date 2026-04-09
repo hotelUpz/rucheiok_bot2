@@ -1,5 +1,6 @@
 # ============================================================
 # FILE: CORE/models_fsm.py
+# ROLE: FSM для ActivePosition. Интерпретатор событий WebSocket.
 # ============================================================
 from __future__ import annotations
 
@@ -12,14 +13,14 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from CORE.restorator import BotState
 
-logger = UnifiedLogger("ws")
+logger = UnifiedLogger("ws_model")
 
 @dataclass
 class ActivePosition:
     symbol: str             
     side: str               
     
-    in_position: bool = False            # ФИКС: Якорь физического присутствия в рынке!
+    in_position: bool = False            # Якорь физического присутствия в рынке!
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
@@ -88,54 +89,80 @@ class WsInterpreter:
 
     async def _handle_order_update(self, o: Dict[str, Any]):
         symbol = o.get("symbol")
-        pos_side_raw = o.get("posSide", o.get("side", ""))
-        if not symbol or not pos_side_raw: return
-            
-        pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
+        if not symbol: return
+
+        pos_side_raw = str(o.get("posSide", ""))
+        order_side = str(o.get("side", "")).lower()
+
+        # ФИКС PHEMEX API: При Market Close биржа шлет posSide="None". 
+        # Вычисляем сторону реверсивным путем: Sell закрывает Long, Buy закрывает Short.
+        if pos_side_raw.lower() in ("none", ""):
+            exec_inst = str(o.get("execInst", "")).lower()
+            if "close" in exec_inst or "reduce" in exec_inst or o.get("action") == "Replace":
+                pos_side = "LONG" if order_side == "sell" else "SHORT"
+            else:
+                return # Игнорируем маржинальные апдейты аккаунта
+        else:
+            pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
+
         pos_key = f"{symbol}_{pos_side}"
         ord_status = str(o.get("ordStatus", "")).upper()
-        
+        exec_status = str(o.get("execStatus", "")).upper()
+
         async with self._get_lock(pos_key):
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
 
-            is_closing_order = (pos.side == "LONG" and o.get("side", "").lower() == "sell") or \
-                               (pos.side == "SHORT" and o.get("side", "").lower() == "buy")
+            is_closing_order = (pos.side == "LONG" and order_side == "sell") or \
+                               (pos.side == "SHORT" and order_side == "buy")
 
-            if ord_status in ("FILLED", "PARTIALLYFILLED"):
-                fill_price = self._safe_float(o.get("priceRp", o.get("price")))
+            # Ловим физический налив ордера
+            if ord_status in ("FILLED", "PARTIALLYFILLED") or "FILL" in exec_status:
                 
+                # ФИКС ЦЕНЫ: Phemex прячет реальную цену исполнения в execPriceRp
+                fill_price = self._safe_float(o.get("execPriceRp", 0.0))
+                if fill_price <= 0:
+                    fill_price = self._safe_float(o.get("priceRp", o.get("price", 0.0)))
+
+                logger.debug(f"[WS_ORDERS] 🔔 Налив ордера {pos_key} | Закрывающий: {is_closing_order} | Цена: {fill_price}")
+
                 if is_closing_order:
-                    pos.realized_exit_price = fill_price
+                    if fill_price > 0: 
+                        pos.realized_exit_price = fill_price
                 else:
-                    if pos.entry_price == 0.0:  
+                    if pos.entry_price == 0.0 and fill_price > 0:
                         pos.opened_at = time.time()
                         pos.entry_price = fill_price
 
     async def _handle_position_update(self, p: Dict[str, Any]):
         symbol = p.get("symbol")
-        pos_side_raw = p.get("posSide", p.get("side", ""))
-        if not symbol or not pos_side_raw: return
-            
+        pos_side_raw = str(p.get("posSide", ""))
+
+        if pos_side_raw.lower() in ("none", ""): return 
+        if not symbol: return
+
         pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
         pos_key = f"{symbol}_{pos_side}"
-        
+
         async with self._get_lock(pos_key):
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
-                
+
             if "size" in p or "sizeRq" in p:
-                raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
-                size = abs(raw_size)
+                size = abs(self._safe_float(p.get("sizeRq", p.get("size"))))
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
+
+                logger.debug(f"[WS_POS] 📊 Апдейт {pos_key} | Size: {size} | InPos: {pos.in_position}")
 
                 if size > 0:
                     pos.current_qty = size
-                    pos.in_position = True # ФИКС: Позиция физически налита
+                    pos.in_position = True # ФИКС: Якорь, что позиция РЕАЛЬНО в рынке
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
-                    # ФИКС: Убиваем только если поза УЖЕ БЫЛА в рынке.
-                    # Пустые дельты (size=0) для ждущих ордеров тупо игнорируем!
+                    # ФИКС МУСОРОСБОРЩИКА: 
+                    # Игнорируем пустые апдейты, если позиция еще не наливалась (ждущая лимитка).
                     if getattr(pos, 'in_position', False):
+                        logger.info(f"[{pos_key}] 💀 Биржа прислала size=0. Позиция закрыта.")
                         pos.is_closed_by_exchange = True
                         pos.current_qty = 0.0
+                        pos.in_position = False

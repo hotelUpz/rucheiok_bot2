@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
 
 load_dotenv()
-logger = UnifiedLogger(name="bot")
+logger = UnifiedLogger(name="core")
 TZ = pytz.timezone(TIME_ZONE)
 
 def round_step(value: float, step: float) -> float:
