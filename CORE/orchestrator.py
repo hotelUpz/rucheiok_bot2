@@ -309,10 +309,18 @@ class TradingBot:
             for pos_key in keys_to_check:
                 async with self._get_lock(pos_key):
                     pos = self.state.active_positions.get(pos_key)
-                    if pos and getattr(pos, 'is_closed_by_exchange', False):
+                    if not pos: continue
+
+                    # 1. ЗАЩИТА ОТ ЗОМБИ (Очистка зависших входов через 15 сек)
+                    if not getattr(pos, 'is_closed_by_exchange', False):
+                        if pos.current_qty == 0 and (time.time() - pos.opened_at) > 15.0:
+                            logger.warning(f"[{pos_key}] 🧟‍♀️ Зомби-позиция (WS не принес данные за 15с). Очищаем.")
+                            pos.is_closed_by_exchange = True
+
+                    # 2. МУСОРОСБОРЩИК (GC)
+                    if getattr(pos, 'is_closed_by_exchange', False):
                         if self.tg and pos.entry_price > 0.0:
                             
-                            # ЛОГИКА КАРАНТИНОВ И СБРОСОВ ФЕЙЛОВ ПРИ ЗАКРЫТИИ
                             if pos.in_extrime_mode: 
                                 semantic = "⚠️ Аварийный выход (Extrime Mode)"
                                 self.apply_loss_quarantine(pos.symbol)

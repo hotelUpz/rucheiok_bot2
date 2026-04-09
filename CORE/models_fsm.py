@@ -1,6 +1,5 @@
 # ============================================================
 # FILE: CORE/models_fsm.py
-# ROLE: FSM для ActivePosition. Интерпретатор событий WebSocket.
 # ============================================================
 from __future__ import annotations
 
@@ -132,11 +131,11 @@ class WsInterpreter:
 
                 if size > 0:
                     pos.current_qty = size
-                    pos.in_position = True # ФИКС: Поза физически налилась!
+                    pos.in_position = True # ФИКС: Позиция физически налита
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
                     # ФИКС: Убиваем только если поза УЖЕ БЫЛА в рынке.
-                    # Пустые дельты для ждущих ордеров игнорируем!
+                    # Пустые дельты (size=0) для ждущих ордеров тупо игнорируем!
                     if getattr(pos, 'in_position', False):
                         pos.is_closed_by_exchange = True
                         pos.current_qty = 0.0
