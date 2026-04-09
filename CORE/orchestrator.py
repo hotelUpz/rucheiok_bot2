@@ -376,3 +376,45 @@ class TradingBot:
         self._signal_timeouts.clear()
 
         await self.state.save()
+
+
+
+# # (Замени только метод _main_trading_loop в CORE/orchestrator.py) -- давай приклеем к писюну.
+
+#     async def _main_trading_loop(self):
+#         logger.info("🎮 Главная торговая живолупа (Game Loop) запущена.")
+#         while self._is_running:
+            
+#             # --- 1. GARBAGE COLLECTOR & REPORTING ---
+#             keys_to_check = list(self.state.active_positions.keys())
+#             for pos_key in keys_to_check:
+#                 async with self._get_lock(pos_key):
+#                     pos = self.state.active_positions.get(pos_key)
+#                     if pos and getattr(pos, 'is_closed_by_exchange', False):
+                        
+#                         # Собираем контекст для ТГ отчета перед удалением
+#                         if self.tg:
+#                             # Определяем по какому сценарию закрылись
+#                             if pos.in_extrime_mode:
+#                                 semantic = "⚠️ Аварийный выход (Extrime Mode)"
+#                             elif pos.in_breakeven_mode:
+#                                 semantic = "🛡 Выход по безубытку (TTL)"
+#                             else:
+#                                 semantic = "🎯 Тейк-профит (Base Scenario)"
+                                
+#                             msg = Reporters.exit_success(pos_key, semantic, pos.realized_exit_price)
+#                             asyncio.create_task(self.tg.send_message(msg))
+                        
+#                         # Теперь, когда отчет отправлен, сносим стату к е...
+#                         logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
+#                         self.state.active_positions.pop(pos_key, None)
+            
+#             # --- 2. ОБРАБОТКА ПОТОКА ---
+#             current_snaps = list(self._latest_market_data.values())
+#             if not current_snaps:
+#                 await asyncio.sleep(0.01)
+#                 continue
+
+#             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
+#             await asyncio.gather(*tasks, return_exceptions=True)
+#             await asyncio.sleep(0.001)
