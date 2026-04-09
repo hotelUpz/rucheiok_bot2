@@ -24,7 +24,6 @@ from CORE.executor import OrderExecutor
 from CORE.models_fsm import WsInterpreter
 from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
 
-# ИМПОРТ ИСПРАВЛЕН
 from EXIT.scenarios.base import BaseScenario
 from EXIT.scenarios.negative import NegativeScenario
 from EXIT.scenarios.breakeven import PositionTTLClose
@@ -94,7 +93,6 @@ class TradingBot:
         exit_cfg = self.cfg.get("exit", {})
         scen_cfg = exit_cfg.get("scenarios", {})
         
-        # ИСПОЛЬЗУЕМ BaseScenario
         self.scen_base = BaseScenario(scen_cfg.get("base", {}))
         self.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
@@ -184,12 +182,10 @@ class TradingBot:
                     continue
 
                 neg_res = self.scen_neg.analyze(snap, pos, now)
-                if neg_res == "NEGATIVE_TIMEOUT":
-                    pos.in_extrime_mode = True
+                if neg_res == "NEGATIVE_TIMEOUT": pos.in_extrime_mode = True
 
                 ttl_res = await self.scen_ttl.analyze(pos, now)
-                if ttl_res == "EXTRIME_SCENARIO":
-                    pos.in_extrime_mode = True
+                if ttl_res == "EXTRIME_SCENARIO": pos.in_extrime_mode = True
 
                 if pos.in_extrime_mode:
                     ext_price = self.scen_extrime.analyze(snap, pos, now)
@@ -225,16 +221,18 @@ class TradingBot:
         pos_key = f"{symbol}_{signal['side']}"
         if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: 
             return 
+        
+        now = time.time()
 
-        if self._signal_timeouts.get(pos_key, 0) > time.time(): return
-        self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
+        if self._signal_timeouts.get(pos_key, 0) > now: return
+        self._signal_timeouts[pos_key] = now + self.signal_timeout_sec
 
         try:
             signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
             signal["init_ask1"] = snap.asks[0][0]
             signal["init_bid1"] = snap.bids[0][0]
             
-            self.state.pending_entry_orders[pos_key] = str(time.time())
+            self.state.pending_entry_orders[pos_key] = str(now)
             asyncio.create_task(self.executor.execute_entry(symbol, pos_key, signal))
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
@@ -267,12 +265,12 @@ class TradingBot:
                 async with self._get_lock(pos_key):
                     pos = self.state.active_positions.get(pos_key)
                     if pos and getattr(pos, 'is_closed_by_exchange', False):
-                        # ФИКС: Сообщение в ТГ шлется с подстраховкой цены, если WS не успел её схватить
                         if self.tg and pos.entry_price > 0.0:
                             if pos.in_extrime_mode: semantic = "⚠️ Аварийный выход (Extrime Mode)"
                             elif pos.in_breakeven_mode: semantic = "🛡 Выход по безубытку (TTL)"
                             else: semantic = "🎯 Тейк-профит (Base Scenario)"
                             
+                            # Подстраховка цены для ТГ, если WS не успел перехватить order_p
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                             msg = Reporters.exit_success(pos_key, semantic, exit_pr)
                             asyncio.create_task(self.tg.send_message(msg))
@@ -300,8 +298,6 @@ class TradingBot:
 
         symbols_info = await self.phemex_sym_api.get_all(quote=self.bl_manager.quota_asset, only_active=True)
         self.symbol_specs = {s.symbol: s for s in symbols_info if s and s.symbol not in self.black_list}
-
-        # ВЫРЕЗАН БЕСПОЛЕЗНЫЙ ЗАПРОС К БИРЖЕ НА ТОРГОВЫЙ РЕЖИМ
 
         await self._recover_state()
 

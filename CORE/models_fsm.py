@@ -16,50 +16,41 @@ if TYPE_CHECKING:
 
 logger = UnifiedLogger("ws")
 
-
 @dataclass
 class ActivePosition:
     symbol: str             
     side: str               
     
-    # --- State Flags ---
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
     interference_disabled: bool = False  
     is_closed_by_exchange: bool = False  
-    interf_in_flight: bool = False       # ЯКОРЬ ИДЕМПОТЕНТНОСТИ ДЛЯ ПОМЕХ
+    interf_in_flight: bool = False       
     
-    # --- Pricing ---
     entry_price: float = 0.0             
     pending_price: float = 0.0           
     avg_price: float = 0.0               
-    current_close_price: float = 0.0     # ЯКОРЬ ИДЕМПОТЕНТНОСТИ ДЛЯ ВЫХОДА
+    current_close_price: float = 0.0     
     realized_exit_price: float = 0.0     
     
-    # --- Quantities & Limits ---
     pending_qty: float = 0.0             
     current_qty: float = 0.0             
     interf_comulative_qty: float = 0.0 
-    min_notional_asset: float = 0.0      
     
-    # --- Signal Initialization ---
     init_ask1: float = 0.0
     init_bid1: float = 0.0
     base_target_price_100: float = 0.0   
     
-    # --- Tracking & Hunting ---
     current_target_rate: float = 1.0     
     close_order_id: str = ""             
     
-    # --- Timestamps ---
     opened_at: float = field(default_factory=time.time)
     last_shift_ts: float = 0.0
     last_negative_check_ts: float = 0.0
     breakeven_start_ts: float = 0.0
     last_extrime_try_ts: float = 0.0
     
-    # --- Counters ---
     extrime_retries_count: int = 0
 
     def to_dict(self) -> dict:
@@ -134,13 +125,15 @@ class WsInterpreter:
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
                 
-            size = self._safe_float(p.get("sizeRq", p.get("size")))
-            avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
+            # ФИКС 4: Защита от левых дельт. Проверяем наличие ключа!
+            if "size" in p or "sizeRq" in p:
+                size = self._safe_float(p.get("sizeRq", p.get("size"))) or 0.0
+                if size: size = abs(size)
+                avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
-            # ИСПРАВЛЕНИЕ: Любой size > 0 означает, что позиция ЖИВА.
-            if size > 0:
-                pos.current_qty = size
-                if avg_price > 0: pos.avg_price = avg_price
-            else:
-                pos.is_closed_by_exchange = True
-                pos.current_qty = 0.0
+                if size > 0:
+                    pos.current_qty = size
+                    if avg_price > 0: pos.avg_price = avg_price
+                else:
+                    pos.is_closed_by_exchange = True
+                    pos.current_qty = 0.0

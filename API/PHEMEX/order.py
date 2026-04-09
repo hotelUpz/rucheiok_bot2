@@ -19,11 +19,23 @@ class PhemexPrivateClient:
         self.session = session
         self.retries = retries
 
+        # Инструменты для контроля лимитов
+        self._lock = asyncio.Lock()
+        self._last_send_time = 0
+        self.MIN_SEND_INTERVAL = 0.025  # 50 миллисекунд
+
     def _get_signature(self, path: str, query_no_question: str, expiry: int, body_str: str) -> str:
         message = f"{path}{query_no_question}{expiry}{body_str}"
         return hmac.new(self.api_secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).hexdigest()
 
     async def _request(self, method: str, path: str, query_no_q: str = "", body: Optional[Dict[str, Any]] = None, timeout_sec: float = 10.0) -> Dict[str, Any]:
+        async with self._lock:
+            elapsed = time.monotonic() - self._last_send_time
+            if elapsed < self.MIN_SEND_INTERVAL:
+                await asyncio.sleep(self.MIN_SEND_INTERVAL - elapsed)
+            
+            self._last_send_time = time.monotonic()        
+        
         query_for_url = f"?{query_no_q}" if query_no_q else ""
         url = f"{self.BASE_URL}{path}{query_for_url}"
         body_str = json.dumps(body, separators=(',', ':')) if body else ""

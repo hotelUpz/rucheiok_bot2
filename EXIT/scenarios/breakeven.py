@@ -54,9 +54,3 @@ class PositionTTLClose:
                 pos.in_breakeven_mode = False  
                 return "EXTRIME_SCENARIO"
             return None
-        
-        # if pos.in_breakeven_mode:
-        #     if pos.current_qty > pos.min_notional_asset and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
-        #         pos.in_breakeven_mode = False  
-        #         return "EXTRIME_SCENARIO"
-        #     return None

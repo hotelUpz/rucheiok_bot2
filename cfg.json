@@ -48,7 +48,7 @@
             "margin_mode": 2
         },
         "margin_size": "row",
-        "notional_limit": 25.0,
+        "notional_limit": 15.0,
         "min_exchange_notional": 5.0,
         "margin_over_size_pct": 1,
         "hedge_mode": false,

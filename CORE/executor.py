@@ -23,12 +23,14 @@ load_dotenv()
 logger = UnifiedLogger(name="bot")
 TZ = pytz.timezone(TIME_ZONE)
 
+
 def round_step(value: float, step: float) -> float:
     if not step or step <= 0: return value
     val_d = Decimal(str(value))
     step_d = Decimal(str(step))
     rounded = (val_d / step_d).quantize(Decimal("1"), rounding=ROUND_DOWN) * step_d
     return float(rounded)
+
 
 class OrderExecutor:
     def __init__(self, tb: "TradingBot"):
@@ -44,9 +46,9 @@ class OrderExecutor:
         self.max_exit_retries = self.cfg.get("exit", {}).get("max_place_order_retries", 1)
         
         risk = self.cfg.get("risk", {})
-        self.notional_limit = risk.get("notional_limit", 25.0)
-        self.min_exchange_notional = risk.get("min_exchange_notional", 5.0)
-        self.margin_over_size_pct = risk.get("margin_over_size_pct", 1.0)
+        self.notional_limit = float(risk.get("notional_limit", 25.0))
+        self.min_exchange_notional = float(risk.get("min_exchange_notional", 5.0))
+        self.margin_over_size_pct = float(risk.get("margin_over_size_pct", 1.0))
         self.leverage = risk.get("leverage", {}).get("val", 10)
 
     async def cancel_all_orders(self, symbol: str) -> bool:
@@ -116,19 +118,21 @@ class OrderExecutor:
             
             # ФИКС 1: Жесткий расчет маржи без безумного умножения на плечо
             target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
-            max_notional = float(self.notional_limit) 
-            target_usdt = min(target_usdt, max_notional)
-            target_usdt = max(target_usdt, self.min_exchange_notional)
+            target_usdt = min(target_usdt, self.notional_limit)
+            target_usdt = max(target_usdt, self.min_exchange_notional) # self.min_exchange_notional. да, здесь его и надо использовать.
             
             qty = round_step(target_usdt / price, spec.lot_size)
             min_notional_asset = max(spec.lot_size, self.min_exchange_notional / price)
-            if qty < min_notional_asset: return False
+            
+            # ЗАЩИТА: Отсекаем, если биржа не примет такой микро-объем
+            if qty < min_notional_asset: 
+                logger.warning(f"[{pos_key}] Qty {qty} меньше биржевого минимума {min_notional_asset}. Пропуск.")
+                return False
 
             async with self.tb._get_lock(pos_key):
                 if pos_key not in self.tb.state.active_positions:
                     self.tb.state.active_positions[pos_key] = ActivePosition(
                         symbol=symbol, side=signal["side"], pending_qty=qty,
-                        min_notional_asset=min_notional_asset,
                         init_ask1=signal.get("init_ask1", price),
                         init_bid1=signal.get("init_bid1", price),
                         base_target_price_100=signal.get("base_target_price_100", price)
@@ -143,7 +147,11 @@ class OrderExecutor:
                     if resp.get("code") == 0:
                         order_id = resp.get("data", {}).get("orderID")
                         await asyncio.sleep(self.entry_timeout)
-                        if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                        
+                        if order_id: 
+                            await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                            # ФИКС 2: ГОНКА ПОТОКОВ. Ждем полсекунды, чтобы WS 100% обновил стейт после отмены
+                            # await asyncio.sleep(0.5) # тут сто процентов не нужно. у нас же await.
                         
                         async with self.tb._get_lock(pos_key):
                             pos = self.tb.state.active_positions.get(pos_key)
@@ -152,15 +160,17 @@ class OrderExecutor:
                                 if self.tb.tg:
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                     asyncio.create_task(self.tb.tg.send_message(msg))
+                                # Успешный вход -> сброс счетчика неудач (Карантин 1)
+                                self.tb.state.consecutive_fails[symbol] = 0
                                 return True
                     else:
                         logger.warning(f"[{pos_key}] ❌ Ошибка входа: {resp}")
                 except Exception as e:
                     logger.error(f"[{pos_key}] Исключение execute_entry: {e}")
                 
-                await asyncio.sleep(0.2)
+                # await asyncio.sleep(0.2) # мина
                 
-            # ФИКС 2: Корректный карантин для "inf"
+            # ФИКС 3: Корректный карантин для неудачного входа
             quarantine_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
             if str(quarantine_hours).lower() == "inf":
                 self.tb.state.quarantine_until[symbol] = float('inf')
@@ -170,7 +180,7 @@ class OrderExecutor:
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos and pos.current_qty <= 0:
-                    pos.is_closed_by_exchange = True
+                    pos.is_closed_by_exchange = True # Отправляем пустую позу в мусор
 
             return False
             
@@ -211,7 +221,7 @@ class OrderExecutor:
                 except Exception as e:
                     logger.error(f"[{pos_key}] Исключение execute_exit: {e}")
                 
-                await asyncio.sleep(0.2)
+                # await asyncio.sleep(0.2)
                 
             return False
             
