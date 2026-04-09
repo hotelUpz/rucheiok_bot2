@@ -27,20 +27,21 @@ class ActivePosition:
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
     interference_disabled: bool = False  
-    is_closed_by_exchange: bool = False  # ФЛАГ МУСОРОСБОРЩИКА
+    is_closed_by_exchange: bool = False  
+    interf_in_flight: bool = False       # ЯКОРЬ ИДЕМПОТЕНТНОСТИ ДЛЯ ПОМЕХ
     
     # --- Pricing ---
     entry_price: float = 0.0             
     pending_price: float = 0.0           
     avg_price: float = 0.0               
-    current_close_price: float = 0.0     
+    current_close_price: float = 0.0     # ЯКОРЬ ИДЕМПОТЕНТНОСТИ ДЛЯ ВЫХОДА
     realized_exit_price: float = 0.0     
     
-    # --- Quantities & Limits (Биржевая спецификация) ---
+    # --- Quantities & Limits ---
     pending_qty: float = 0.0             
     current_qty: float = 0.0             
     interf_comulative_qty: float = 0.0 
-    min_notional_asset: float = 0.0      # Минимальный допустимый объем (в монетах)
+    min_notional_asset: float = 0.0      
     
     # --- Signal Initialization ---
     init_ask1: float = 0.0
@@ -117,7 +118,7 @@ class WsInterpreter:
                 if is_closing_order:
                     pos.realized_exit_price = fill_price
                 else:
-                    if pos.entry_price == 0.0:  # Запись цены только первого входа
+                    if pos.entry_price == 0.0:  
                         pos.opened_at = time.time()
                         pos.entry_price = fill_price
 
@@ -136,10 +137,10 @@ class WsInterpreter:
             size = self._safe_float(p.get("sizeRq", p.get("size")))
             avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
-            if size >= pos.min_notional_asset and size > 0:
+            # ИСПРАВЛЕНИЕ: Любой size > 0 означает, что позиция ЖИВА.
+            if size > 0:
                 pos.current_qty = size
                 if avg_price > 0: pos.avg_price = avg_price
             else:
-                # Физика! Мы не делаем pop(), мы просто констатируем факт смерти.
                 pos.is_closed_by_exchange = True
                 pos.current_qty = 0.0
