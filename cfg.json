@@ -69,8 +69,8 @@
                 "name": "Rucheiok pattern",
                 "enable": true,
                 "depth": 8,
-                "min_first_row_usdt_notional": 350,
-                "max_first_row_usdt_notional": 750,
+                "min_first_row_usdt_notional": 100,
+                "max_first_row_usdt_notional": 500,
                 "header": {
                     "roc_window": 3,
                     "max_one_roc_pct": 0.5
@@ -101,15 +101,15 @@
         }
     },
     "exit": {
-        "hunting_timeout_sec": 0.1,
-        "exit_timeout_sec": 0.5,
+        "hunting_timeout_sec": 0.2,
+        "exit_timeout_sec": 0.25,
         "max_place_order_retries": 1,
         "scenarios": {
             "base": {
                 "stabilization_ttl": 0,
-                "target_rate": 1.0,
+                "target_rate": 0.7,
                 "shift_demotion": 0.2,
-                "min_target_rate": 0.8,
+                "min_target_rate": 0.3,
                 "shift_ttl": 10
             },
             "negative": {

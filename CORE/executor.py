@@ -1,6 +1,6 @@
 # ============================================================
 # FILE: CORE/executor.py
-# ROLE: Шаблоны отправки ордеров на биржу, защита от гонок потоков...
+# ROLE: Шаблоны отправки ордеров на биржу, защита от гонок потоков
 # ============================================================
 from __future__ import annotations
 
@@ -51,10 +51,7 @@ class OrderExecutor:
         self.margin_over_size_pct = risk.get("margin_over_size_pct", 1.0)
         self.leverage = risk.get("leverage", {}).get("val", 10)
 
-    def _get_lock(self, pos_key: str) -> asyncio.Lock:
-        if pos_key not in self.tb.active_positions_locker:
-            self.tb.active_positions_locker[pos_key] = asyncio.Lock()
-        return self.tb.active_positions_locker[pos_key]
+    # _get_lock удален. Используем self.tb._get_lock(pos_key)
 
     async def cancel_all_orders(self, symbol: str) -> bool:
         try:
@@ -90,7 +87,7 @@ class OrderExecutor:
             req_qty = round_step(qty, spec.lot_size)
             if req_qty <= 0: return None
 
-            async with self._get_lock(pos_key):
+            async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if not pos: return None
                 pos_side_raw = pos.side
@@ -103,14 +100,14 @@ class OrderExecutor:
                 order_id = resp.get("data", {}).get("orderID")
                 await asyncio.sleep(self.interf_timeout)
                 if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
-                return req_qty # Phemex WS сам приплюсует объем
+                return req_qty 
             else:
                 logger.debug(f"[{pos_key}] Отказ скупки помехи: {resp}")
         except Exception as e:
             logger.debug(f"[{pos_key}] Ошибка скупки помех: {e}")
         finally:
-            # ОЧИСТКА ЯКОРЯ ИДЕМПОТЕНТНОСТИ ПОМЕХ!
-            async with self._get_lock(pos_key):
+            # ОЧИСТКА ЯКОРЯ ИДЕМПОТЕНТНОСТИ ПОМЕХ
+            async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos: pos.interf_in_flight = False
         return None
@@ -132,7 +129,7 @@ class OrderExecutor:
             min_notional_asset = max(spec.lot_size, self.min_exchange_notional / price)
             if qty < min_notional_asset: return False
 
-            async with self._get_lock(pos_key):
+            async with self.tb._get_lock(pos_key):
                 if pos_key not in self.tb.state.active_positions:
                     self.tb.state.active_positions[pos_key] = ActivePosition(
                         symbol=symbol, side=signal["side"], pending_qty=qty,
@@ -153,9 +150,9 @@ class OrderExecutor:
                         await asyncio.sleep(self.entry_timeout)
                         if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
                         
-                        async with self._get_lock(pos_key):
+                        async with self.tb._get_lock(pos_key):
                             pos = self.tb.state.active_positions.get(pos_key)
-                            if pos and pos.current_qty > 0: # Любой налив > 0 это вход!
+                            if pos and pos.current_qty > 0: 
                                 logger.info(f"[{pos_key}] ✅ Вход выполнен. Цена: {price}, Объем: {pos.current_qty}")
                                 if self.tb.tg:
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
@@ -168,11 +165,12 @@ class OrderExecutor:
                 
                 await asyncio.sleep(0.2)
                 
+            # Если дошли сюда — ордер не исполнился
             quarantine_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
             if str(quarantine_hours).lower() != "inf":
                 self.tb.state.quarantine_until[symbol] = time.time() + (float(quarantine_hours) * 3600)
                 
-            async with self._get_lock(pos_key):
+            async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos and pos.current_qty <= 0:
                     pos.is_closed_by_exchange = True # Отправляем в мусоросборщик
@@ -180,7 +178,8 @@ class OrderExecutor:
             return False
             
         finally:
-            # ОЧИСТКА ЯКОРЯ ВХОДА! (Разблокируем эту монету для новых сигналов, если вход не удался)
+            # ОЧИСТКА ЯКОРЯ ВХОДА! 
+            # Выполнится гарантированно: при успехе (return True), при фейле (return False) и при краше.
             self.tb.state.pending_entry_orders.pop(pos_key, None)
 
     async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
@@ -188,7 +187,7 @@ class OrderExecutor:
             spec = self.tb.symbol_specs.get(symbol)
             if not spec: return False
 
-            async with self._get_lock(pos_key):
+            async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if not pos or pos.current_qty <= 0: return False
                 qty = pos.current_qty
@@ -207,7 +206,7 @@ class OrderExecutor:
                     if resp.get("code") == 0:
                         order_id = resp.get("data", {}).get("orderID")
                         
-                        async with self._get_lock(pos_key):
+                        async with self.tb._get_lock(pos_key):
                             if pos: pos.close_order_id = order_id
                             
                         await asyncio.sleep(timeout_sec)
@@ -224,7 +223,7 @@ class OrderExecutor:
             
         finally:
             # ОЧИСТКА ЯКОРЯ ВЫХОДА!
-            async with self._get_lock(pos_key):
+            async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if pos:
                     pos.current_close_price = 0.0
