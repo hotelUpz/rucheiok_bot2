@@ -1,0 +1,59 @@
+2026-04-09 23:25:50 | INFO | bot | ▶️ Инициализация систем...
+2026-04-09 23:25:51 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>15.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>0s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.15%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.1%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>0s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>40s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>60s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-09 23:25:57 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-09 23:25:57 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-09 23:26:00 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-09 23:26:03 | DEBUG | bot | [GOATUSDT] Exception при отмене 62ed6873-bbc3-47f9-b3b7-09f2a5b88df4: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:04 | WARNING | bot | [GOATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:04 | INFO | bot | [GOATUSDT_LONG] Вход отменен.
+2026-04-09 23:26:04 | INFO | bot | [GOATUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-09 23:26:05 | DEBUG | bot | [ALTUSDT] Exception при отмене 6b721710-c23f-4db5-a1e7-11305d863335: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:06 | WARNING | bot | [ALTUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:06 | INFO | bot | [ALTUSDT_LONG] Вход отменен.
+2026-04-09 23:26:06 | INFO | bot | [ALTUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-09 23:26:11 | DEBUG | bot | [RAVEUSDT] Exception при отмене adcbe4f2-0a95-4824-93c1-8bc2a49b7c94: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:11 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:11 | INFO | bot | [RAVEUSDT_LONG] Вход отменен.
+2026-04-09 23:26:11 | INFO | bot | [RAVEUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-09 23:26:13 | DEBUG | bot | [MAVUSDT] Exception при отмене 7ad5144f-d805-438b-a05e-935d61c3e0f6: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:13 | WARNING | bot | [MAVUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:13 | INFO | bot | [MAVUSDT_LONG] Вход отменен.
+2026-04-09 23:26:13 | INFO | bot | [MAVUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-09 23:26:17 | WARNING | bot | [STOUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:17 | INFO | bot | [STOUSDT_LONG] Вход отменен.
+2026-04-09 23:26:17 | INFO | bot | [STOUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-09 23:26:29 | DEBUG | bot | [KGENUSDT] Exception при отмене 7b386b18-8e23-447e-8534-10e1a182cd0e: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:29 | WARNING | bot | [KGENUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:29 | INFO | bot | [KGENUSDT_LONG] Вход отменен.
+2026-04-09 23:26:29 | INFO | bot | [KGENUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-09 23:26:31 | INFO | bot | ⏹ Остановка процессов...
+2026-04-09 23:26:31 | DEBUG | bot | [FIDAUSDT] Exception при отмене f612da8d-0743-49f2-99ac-45658d194bf7: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:31 | WARNING | bot | [FIDAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-09 23:26:31 | INFO | bot | 💾 Финальное сохранение стейта на диск...

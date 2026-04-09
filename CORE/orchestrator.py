@@ -49,6 +49,7 @@ class TradingBot:
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
+        
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
@@ -117,8 +118,6 @@ class TradingBot:
     async def quarantine_util(self, symbol) -> bool:        
         if symbol in self.state.quarantine_until:
             q_val = self.state.quarantine_until[symbol]
-            
-            # БЕЗОПАСНАЯ БЕСКОНЕЧНОСТЬ: перевариваем JSON-строку "inf" во float
             try:
                 limit_time = float(q_val)
             except (ValueError, TypeError):
@@ -127,7 +126,7 @@ class TradingBot:
             if time.time() > limit_time:
                 del self.state.quarantine_until[symbol]
                 self.state.consecutive_fails[symbol] = 0
-                asyncio.create_task(self.state.save()) # Фоновое сохранение стейта
+                asyncio.create_task(self.state.save()) 
                 return True            
             elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
                 return False
@@ -137,7 +136,7 @@ class TradingBot:
         """Карантин для неудачных ВХОДОВ"""
         q_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
         if str(q_hours).lower() == "inf":
-            self.state.quarantine_until[symbol] = "inf" # Строка безопасна для JSON RFC 8259
+            self.state.quarantine_until[symbol] = "inf"
             logger.warning(f"[{symbol}] 🚫 Помещен в бессрочный карантин (вход не удался).")
         elif float(q_hours) > 0:
             self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
@@ -146,7 +145,7 @@ class TradingBot:
         asyncio.create_task(self.state.save())
 
     def apply_loss_quarantine(self, symbol: str):
-        """Карантин для ПРОИГРАВШИХ символов"""
+        """Карантин для ПРОИГРАВШИХ символов (Экстрим выход)"""
         q_cfg = self.cfg.get("risk", {}).get("quarantine", {})
         max_fails = q_cfg.get("max_consecutive_fails", 1)
         q_hours = q_cfg.get("quarantine_hours", "inf")
@@ -155,7 +154,7 @@ class TradingBot:
         
         if self.state.consecutive_fails[symbol] >= max_fails:
             if str(q_hours).lower() == "inf":
-                self.state.quarantine_until[symbol] = "inf" # Строка безопасна для JSON
+                self.state.quarantine_until[symbol] = "inf" 
             else:
                 self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
             logger.warning(f"[{symbol}] 💀 Карантин ПОТЕРЬ: {self.state.consecutive_fails[symbol]} фейлов. Блокировка на {q_hours}ч.")
@@ -163,7 +162,6 @@ class TradingBot:
         asyncio.create_task(self.state.save())
 
     async def _recover_state(self):
-        """Интеллектуальная синхронизация стейта с биржей (Ремонт амнезии)"""
         try:
             self.state.load()
             resp = await self.private_client.get_active_positions()
@@ -181,19 +179,15 @@ class TradingBot:
                     pos_key = f"{symbol}_{pos_side}"
                     exchange_positions[pos_key] = {"size": abs(size), "side": pos_side, "symbol": symbol}
 
-            # 1. Удаляем из памяти позы, которые были закрыты, пока бот был оффлайн
             keys_to_remove = [k for k in list(self.state.active_positions.keys()) if k not in exchange_positions]
             for k in keys_to_remove:
                 logger.info(f"[{k}] 🧹 Удалена из стейта (закрыта на бирже пока бот был оффлайн).")
                 self.state.active_positions.pop(k, None)
 
-            # 2. Обновляем живые позы
+            # Обновляем живые позы. Чужие ручные позиции тупо игнорируем! Никакого спама в логи.
             for pos_key, ex_data in exchange_positions.items():
                 if pos_key in self.state.active_positions:
                     self.state.active_positions[pos_key].current_qty = ex_data["size"]
-                else:
-                    # Поза есть на бирже, но нет в JSON (ручная или потеряна)
-                    logger.warning(f"[{pos_key}] ⚠️ Найдена НЕУЧТЕННАЯ позиция! Бот не имеет данных о паттерне входа. Рекомендуется закрыть вручную.")
 
             await self.state.save()
             logger.info(f"✅ Стейт синхронизирован. В памяти {len(self.state.active_positions)} активных позиций.")
@@ -206,7 +200,6 @@ class TradingBot:
         return self.active_positions_locker[pos_key]
 
     def _check_risk_limits(self, symbol: str) -> bool:
-        """Инвариант 2: Проверка квот (Слоты). Срабатывает ДО анализа сигнала."""
         active_keys = set(self.state.active_positions.keys())
         pending_keys = set(self.state.pending_entry_orders.keys())
         
@@ -295,14 +288,10 @@ class TradingBot:
             if symbol in self.black_list: return
             if hasattr(self, 'quarantine_util') and not await self.quarantine_util(symbol): return
             
-            # 1. Выходы (обрабатываем живые позы)
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             await self._evaluate_exit_scenarios(snap, symbol, pos_long_key, pos_short_key)
             
-            # 2. Проверка лимита слотов перед тратой времени на сигналы
             if not self._check_risk_limits(symbol): return
-            
-            # 3. Вход
             await self._evaluate_entry_signal(snap, symbol)
         except Exception as e:
             err_tb = traceback.format_exc()
@@ -322,9 +311,17 @@ class TradingBot:
                     pos = self.state.active_positions.get(pos_key)
                     if pos and getattr(pos, 'is_closed_by_exchange', False):
                         if self.tg and pos.entry_price > 0.0:
-                            if pos.in_extrime_mode: semantic = "⚠️ Аварийный выход (Extrime Mode)"
-                            elif pos.in_breakeven_mode: semantic = "🛡 Выход по безубытку (TTL)"
-                            else: semantic = "🎯 Тейк-профит (Base Scenario)"
+                            
+                            # ЛОГИКА КАРАНТИНОВ И СБРОСОВ ФЕЙЛОВ ПРИ ЗАКРЫТИИ
+                            if pos.in_extrime_mode: 
+                                semantic = "⚠️ Аварийный выход (Extrime Mode)"
+                                self.apply_loss_quarantine(pos.symbol)
+                            elif pos.in_breakeven_mode: 
+                                semantic = "🛡 Выход по безубытку (TTL)"
+                                self.state.consecutive_fails[pos.symbol] = 0
+                            else: 
+                                semantic = "🎯 Тейк-профит (Base Scenario)"
+                                self.state.consecutive_fails[pos.symbol] = 0
                             
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                             msg = Reporters.exit_success(pos_key, semantic, exit_pr)
@@ -334,8 +331,6 @@ class TradingBot:
 
                         logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
                         self.state.active_positions.pop(pos_key, None)
-                        
-                        # Сохраняем стейт на диск после закрытия позиции (Асинхронно!)
                         asyncio.create_task(self.state.save())
 
             current_snaps = list(self._latest_market_data.values())

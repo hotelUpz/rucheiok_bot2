@@ -51,7 +51,6 @@ class OrderExecutor:
         risk = self.cfg.get("risk", {})
         self.notional_limit = float(risk.get("notional_limit", 25.0))
         self.margin_over_size_pct = float(risk.get("margin_over_size_pct", 1.0))
-        self.leverage = risk.get("leverage", {}).get("val", 10)
 
     async def cancel_all_orders(self, symbol: str) -> bool:
         try:
@@ -123,7 +122,6 @@ class OrderExecutor:
             
             qty = round_step(target_usdt / price, spec.lot_size)
             
-            # ТОТАЛЬНАЯ ПРИВЯЗКА К ФИЗИКЕ: Ордер не может быть меньше минимального лота биржи
             if qty < spec.lot_size: 
                 logger.warning(f"[{pos_key}] Qty {qty} меньше биржевого шага лота {spec.lot_size}. Пропуск.")
                 return False
@@ -160,8 +158,7 @@ class OrderExecutor:
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 
-                                self.tb.state.consecutive_fails[symbol] = 0
-                                asyncio.create_task(self.tb.state.save()) # Сохраняем успешный вход на диск
+                                asyncio.create_task(self.tb.state.save())
                                 return True
                     else:
                         logger.warning(f"[{pos_key}] ❌ Ошибка входа: {resp}")

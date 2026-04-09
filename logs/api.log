@@ -21,3 +21,25 @@
 2026-04-09 22:31:19 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
 2026-04-09 22:31:33 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
 2026-04-09 22:31:35 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:00 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 25 монет.
+2026-04-09 23:26:00 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:01 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-09 23:26:01 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 23:26:01 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-09 23:26:03 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:05 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:11 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:13 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:29 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 23:26:31 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
