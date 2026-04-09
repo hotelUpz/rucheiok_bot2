@@ -22,3 +22,6 @@
 2026-04-10 01:38:14 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
 2026-04-10 01:38:18 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
 2026-04-10 01:38:23 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 02:07:27 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-10 02:07:27 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-10 02:07:27 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
