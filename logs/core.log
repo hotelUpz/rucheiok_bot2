@@ -1,0 +1,47 @@
+2026-04-10 02:54:05 | INFO | core | ▶️ Инициализация систем...
+2026-04-10 02:54:05 | INFO | core | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>15.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>0s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.15%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.1%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>0s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>40s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>60s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-10 02:54:08 | INFO | core | [LABUSDT_LONG] 🧹 Удалена из стейта (закрыта на бирже пока бот был оффлайн).
+2026-04-10 02:54:08 | INFO | core | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-10 02:54:08 | INFO | core | 🔄 Прогрев кэша цен и фандинга...
+2026-04-10 02:54:09 | INFO | core | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-10 02:54:24 | DEBUG | core | [ARIAUSDT] Exception при отмене 80407a92-e69d-40d1-9bf5-b9d8b045e880: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 02:54:24 | WARNING | core | [ARIAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 02:54:24 | INFO | core | [ARIAUSDT_LONG] Вход отменен.
+2026-04-10 02:54:24 | INFO | core | [ARIAUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 02:54:37 | DEBUG | core | [PRLUSDT] Exception при отмене befb1bfb-78ef-42b7-865c-b431727bc4d4: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 02:54:37 | WARNING | core | [PRLUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 02:54:37 | INFO | core | [PRLUSDT_LONG] Вход отменен.
+2026-04-10 02:54:37 | INFO | core | [PRLUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 02:54:39 | DEBUG | core | [ALTUSDT] Exception при отмене df0c5611-0fb8-4b45-b67c-349a4e518ffc: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 02:54:39 | WARNING | core | [ALTUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 02:54:39 | INFO | core | [ALTUSDT_LONG] Вход отменен.
+2026-04-10 02:54:39 | INFO | core | [ALTUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.
+2026-04-10 02:54:41 | INFO | core | ⏹ Остановка процессов...
+2026-04-10 02:54:41 | INFO | core | 💾 Финальное сохранение стейта на диск...

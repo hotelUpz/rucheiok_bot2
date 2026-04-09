@@ -57,8 +57,8 @@
         }
     },
     "entry": {
-        "signal_timeout_sec": 0.05,
-        "entry_timeout_sec": 0.5,
+        "signal_timeout_sec": 0.01,
+        "entry_timeout_sec": 0.3,
         "max_place_order_retries": 1,
         "quarantine": {
             "quarantine_hours": 1
@@ -100,7 +100,7 @@
         }
     },
     "exit": {
-        "hunting_timeout_sec": 0.2,
+        "hunting_timeout_sec": 0.25,
         "exit_timeout_sec": 0.25,
         "max_place_order_retries": 1,
         "scenarios": {

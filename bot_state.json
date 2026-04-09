@@ -1,36 +1,5 @@
 {
-    "positions": {
-        "LABUSDT_LONG": {
-            "symbol": "LABUSDT",
-            "side": "LONG",
-            "in_position": false,
-            "in_base_mode": false,
-            "in_breakeven_mode": false,
-            "in_extrime_mode": false,
-            "interference_disabled": false,
-            "is_closed_by_exchange": true,
-            "interf_in_flight": false,
-            "entry_price": 0.0,
-            "pending_price": 0.0,
-            "avg_price": 0.0,
-            "current_close_price": 0.0,
-            "realized_exit_price": 0.0,
-            "pending_qty": 36.39,
-            "current_qty": 0.0,
-            "interf_comulative_qty": 0.0,
-            "init_ask1": 0.41212,
-            "init_bid1": 0.41113,
-            "base_target_price_100": 0.4132,
-            "current_target_rate": 1.0,
-            "close_order_id": "",
-            "opened_at": 1775774302.2788613,
-            "last_shift_ts": 0.0,
-            "last_negative_check_ts": 0.0,
-            "breakeven_start_ts": 0.0,
-            "last_extrime_try_ts": 0.0,
-            "extrime_retries_count": 0
-        }
-    },
+    "positions": {},
     "fails": {
         "PARTIUSDT": 0,
         "BABYUSDT": 0,
@@ -66,16 +35,15 @@
         "2ZUSDT": 0,
         "KGENUSDT": 0,
         "4USDT": 0,
-        "ONTUSDT": 0
+        "ONTUSDT": 0,
+        "RAREUSDT": 0,
+        "LABUSDT": 0,
+        "CELOUSDT": 0,
+        "IOSTUSDT": 0
     },
     "quarantine": {
-        "CELOUSDT": "1775777872.200289",
-        "ONTUSDT": "1775777873.431402",
-        "FIDAUSDT": "1775777881.2815747",
-        "IOSTUSDT": "1775777883.1631424",
-        "RAVEUSDT": "1775777883.5100682",
-        "RAREUSDT": "1775777894.618511",
-        "2ZUSDT": "1775777898.7572181",
-        "LABUSDT": "1775777904.1012645"
+        "ARIAUSDT": "1775782464.883688",
+        "PRLUSDT": "1775782477.5017705",
+        "ALTUSDT": "1775782479.6315904"
     }
 }
