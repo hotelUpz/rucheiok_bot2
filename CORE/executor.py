@@ -147,8 +147,15 @@ class OrderExecutor:
                         await asyncio.sleep(self.entry_timeout)
                         
                         if order_id: 
-                            await self.execute_cancel(symbol, phemex_pos_side, order_id)
-                            await asyncio.sleep(self.WS_SYNC_PAUSE_SEC)
+                            # SMART CHECK: Отменяем только если не налило полностью
+                            curr_qty = 0.0
+                            async with self.tb._get_lock(pos_key):
+                                pos = self.tb.state.active_positions.get(pos_key)
+                                if pos: curr_qty = pos.current_qty
+                                
+                            if curr_qty < qty:
+                                await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                                await asyncio.sleep(self.WS_SYNC_PAUSE_SEC)
                         
                         async with self.tb._get_lock(pos_key):
                             pos = self.tb.state.active_positions.get(pos_key)
@@ -158,6 +165,7 @@ class OrderExecutor:
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 
+                                self.tb.state.consecutive_fails[symbol] = 0
                                 asyncio.create_task(self.tb.state.save())
                                 return True
                     else:
@@ -206,7 +214,17 @@ class OrderExecutor:
                             if pos: pos.close_order_id = order_id
                             
                         await asyncio.sleep(timeout_sec)
-                        if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                        
+                        if order_id: 
+                            # SMART CHECK: Отменяем только если позиция еще жива
+                            curr_qty = 0.0
+                            async with self.tb._get_lock(pos_key):
+                                pos = self.tb.state.active_positions.get(pos_key)
+                                if pos: curr_qty = pos.current_qty
+                                
+                            if curr_qty > 0:
+                                await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                                
                         return True
                     else:
                         logger.warning(f"[{pos_key}] ❌ Ошибка выхода: {resp}")

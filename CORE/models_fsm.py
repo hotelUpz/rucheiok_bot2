@@ -16,11 +16,13 @@ if TYPE_CHECKING:
 
 logger = UnifiedLogger("core")
 
+
 @dataclass
 class ActivePosition:
     symbol: str             
     side: str               
     
+    in_position: bool = False            # <--- ОБЯЗАТЕЛЬНО ДОБАВИТЬ ЭТОТ ФЛАГ
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
@@ -125,17 +127,19 @@ class WsInterpreter:
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
                 
-            # Согласно официальной доке Phemex, "size" приходит при обновлениях. 
-            # Для шортов он может быть отрицательным, берем abs().
             if "size" in p or "sizeRq" in p:
                 raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
-                size = abs(raw_size)
+                size = abs(raw_size) # Для шортов Phemex может слать минус
                 
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
                 if size > 0:
                     pos.current_qty = size
+                    pos.in_position = True # ФИКС: Помечаем, что поза реально жива
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
-                    pos.is_closed_by_exchange = True
-                    pos.current_qty = 0.0
+                    # ФИКС: Убиваем только если поза УЖЕ БЫЛА в рынке. 
+                    # Ждущие ордера с size=0 вебсокет игнорирует.
+                    if getattr(pos, 'in_position', False):
+                        pos.is_closed_by_exchange = True
+                        pos.current_qty = 0.0
