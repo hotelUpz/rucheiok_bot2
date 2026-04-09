@@ -48,7 +48,7 @@ class TradingBot:
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        self.min_exchange_notional = float(self.cfg.get("risk", {}).get("min_exchange_notional", 5.0))
+        # self.min_exchange_notional = float(self.cfg.get("risk", {}).get("min_exchange_notional", 5.0))
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
@@ -96,7 +96,7 @@ class TradingBot:
         self.scen_base = BaseScenario(scen_cfg.get("base", {}))
         self.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
-        self.scen_interf = Interference(exit_cfg.get("interference", {}), self.min_exchange_notional)
+        self.scen_interf = Interference(exit_cfg.get("interference", {}))
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
 
     async def _await_task(self, task: asyncio.Task | None):

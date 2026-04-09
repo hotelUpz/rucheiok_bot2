@@ -1,0 +1,23 @@
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 25 монет.
+2026-04-09 22:30:57 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:58 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-09 22:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:58 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-09 22:30:58 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-09 22:31:05 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-09 22:31:09 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 22:31:11 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 22:31:13 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 22:31:19 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-09 22:31:33 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-09 22:31:35 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
