@@ -53,6 +53,8 @@ class ActivePosition:
     
     extrime_retries_count: int = 0
 
+    is_closed_by_exchange: bool = False
+
     def to_dict(self) -> dict:
         return self.__dict__
 
