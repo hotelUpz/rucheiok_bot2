@@ -15,6 +15,7 @@ from CORE._utils import Reporters
 
 if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
+    from ENTRY.pattern_math import EntrySignal
 
 from dotenv import load_dotenv    
 load_dotenv()
@@ -107,7 +108,7 @@ class OrderExecutor:
             logger.debug(f"[{pos_key}] Ошибка скупки помех: {e}")
         return None
 
-    async def execute_entry(self, symbol: str, pos_key: str, signal: dict) -> bool:
+    async def execute_entry(self, symbol: str, pos_key: str, signal: EntrySignal) -> bool:
         """
         1. Расчитывает количество ордера и цену постатовки лимитного ордера, согласно рискам.
         2. Ставит ордер через await. Дожидается ответа в течение entry_timeout_sec.
@@ -118,8 +119,8 @@ class OrderExecutor:
             spec = self.tb.symbol_specs.get(symbol)
             if not spec: return False
 
-            price = round_step(signal["price"], spec.tick_size)
-            row_vol_asset = signal.get("row_vol_asset", 0.0)
+            price = round_step(signal.price, spec.tick_size)
+            row_vol_asset = signal.row_vol_asset or 0.0
             
             target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
             target_usdt = min(target_usdt, self.notional_limit)
@@ -129,8 +130,8 @@ class OrderExecutor:
                 logger.warning(f"[{pos_key}] Qty {qty} меньше лота {spec.lot_size}. Пропуск.")
                 return False
 
-            side = "Buy" if signal["side"] == "LONG" else "Sell"
-            phemex_pos_side = "Long" if signal["side"] == "LONG" else "Short"
+            side = "Buy" if signal.side == "LONG" else "Sell"
+            phemex_pos_side = "Long" if signal.side == "LONG" else "Short"
 
             for attempt in range(max(1, self.max_entry_retries)):
                 try:
@@ -155,7 +156,7 @@ class OrderExecutor:
                             if pos and (pos.current_qty > 0 or getattr(pos, 'in_position', False)): 
                                 logger.info(f"[{pos_key}] ✅ Вход выполнен. Объем: {pos.current_qty}")
                                 if self.tb.tg:
-                                    msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
+                                    msg = Reporters.entry_signal(symbol, signal, signal.b_price, signal.p_price)
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 return True
                                 

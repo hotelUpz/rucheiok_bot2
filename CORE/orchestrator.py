@@ -36,6 +36,7 @@ from utils import get_config_summary
 
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
+    from ENTRY.pattern_math import EntrySignal
 
 logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -283,32 +284,28 @@ class TradingBot:
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)
-        signal = self.signal_engine.analyze(snap, b_price, p_price)
+        signal: "EntrySignal" = self.signal_engine.analyze(snap, b_price, p_price)
         if not signal: return
 
-        pos_key = f"{symbol}_{signal['side']}"
+        pos_key = f"{symbol}_{signal.side}"
         if pos_key in self.state.active_positions: 
             return 
 
         if self._signal_timeouts.get(pos_key, 0) > time.time(): return
         self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
 
-        try:
-            signal["row_vol_asset"] = snap.asks[0][1] if signal["side"] == "LONG" else snap.bids[0][1]
-            signal["init_ask1"] = snap.asks[0][0]
-            signal["init_bid1"] = snap.bids[0][0]
-            
+        try:            
             # 1. Ордер отправили -- пометили пендинг (прямо в орке)
             async with self._get_lock(pos_key):
                 if pos_key not in self.state.active_positions:
                     from CORE.models_fsm import ActivePosition
                     self.state.active_positions[pos_key] = ActivePosition(
-                        symbol=symbol, side=signal["side"], pending_qty=0.0,
+                        symbol=symbol, side=signal.side, pending_qty=0.0,
                         in_pending=True,   # ЯКОРЬ
                         in_position=False,
-                        init_ask1=signal.get("init_ask1", signal["price"]),
-                        init_bid1=signal.get("init_bid1", signal["price"]),
-                        base_target_price_100=signal.get("base_target_price_100", signal["price"])
+                        init_ask1=signal.init_ask1,
+                        init_bid1=signal.init_bid1,
+                        base_target_price_100=signal.base_target_price_100
                     )
 
             # СТРОГИЙ AWAIT И ПРОВЕРКА БУЛЕВОГО ЗНАЧЕНИЯ (Решение принимает Генерал)

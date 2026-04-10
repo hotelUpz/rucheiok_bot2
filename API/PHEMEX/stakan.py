@@ -222,3 +222,58 @@ class PhemexStakanStream:
 #     asyncio.run(_main())
 
 # python -m API.PHEMEX.stakan
+
+# # # ----------------------------
+# # # SELF TEST (runs forever)
+# # # ----------------------------
+# if __name__ == "__main__":
+#     import logging
+#     import os
+#     from pathlib import Path
+    
+#     # Создаем папку логов, если ее нет
+#     Path("logs").mkdir(exist_ok=True)
+    
+#     # Настраиваем отдельный логгер чисто для стакана
+#     log_ext = logging.getLogger("stakan_test")
+#     log_ext.setLevel(logging.DEBUG)
+#     fh = logging.FileHandler("logs/test_stakan.log", mode='w', encoding='utf-8')
+#     fh.setFormatter(logging.Formatter('%(asctime)s | %(message)s'))
+#     log_ext.addHandler(fh)
+
+#     # Дублируем в консоль
+#     ch = logging.StreamHandler()
+#     ch.setFormatter(logging.Formatter('%(message)s'))
+#     log_ext.addHandler(ch)
+
+#     async def _main():
+#         symbols = ["BTCUSDT"] # Возьмем биток для теста
+        
+#         async def on_depth(d: DepthTop):
+#             if d.bids and d.asks:
+#                 log_ext.info(f"\n--- {d.symbol} СТАКАН (Time: {d.event_time_ms}) ---")
+                
+#                 # Asks (Продавцы). Должны идти по возрастанию цены
+#                 log_ext.info("🔴 ASKS (Продавцы):")
+#                 # Берем с конца в обратном порядке, чтобы красиво нарисовать "сверху вниз" до спреда
+#                 for i, (p, v) in reversed(list(enumerate(d.asks[:8]))):
+#                     log_ext.info(f"{i}__    {p} : {v}")
+                    
+#                 log_ext.info("----- СПРЕД -----")
+                
+#                 # Bids (Покупатели). Должны идти по убыванию цены
+#                 log_ext.info("🟢 BIDS (Покупатели):")
+#                 for i, (p, v) in enumerate(d.bids[:8]):
+#                     log_ext.info(f"{i}__    {p} : {v}")
+#                 log_ext.info("-" * 40)
+
+#         # throttle_ms=1000 значит, что мы будем печатать стакан раз в 1 секунду, чтобы не забить диск
+#         stream = PhemexStakanStream(symbols, depth=5, chunk_size=50, throttle_ms=1000)
+#         task = asyncio.create_task(stream.run(on_depth))
+#         try: 
+#             await asyncio.sleep(10**9)
+#         finally:
+#             stream.stop()
+#             await task
+            
+#     asyncio.run(_main())

@@ -9,14 +9,18 @@ from typing import Optional, TypedDict, Literal, Any, List
 class EntrySignal(TypedDict, total=False):
     side: Literal["LONG", "SHORT"]
     price: float
+    init_ask1: float
+    init_bid1: float
+    spr2_pct: float
     spr3_pct: float
     rate: float
     row_vol_usdt: float
-    base_target_price_100: float
-    b_price: float
-    p_price: float
-    spread: float
     row_vol_asset: float
+    base_target_price_100: float
+    b_price: Optional[float] = None
+    p_price: Optional[float] = None
+    spread: Optional[float] = None
+    
 
 class StakanEntryPattern:
     def __init__(self, phemex_cfg: dict[str, Any]):
@@ -39,6 +43,22 @@ class StakanEntryPattern:
         
         self.desired_rate: float = self.cfg.get("header_to_bottom_desired_rate", 0.0)
         self.max_dist_rate: float = self.cfg.get("max_bid_ask_distance_rate", 0.0)
+        self.print_metrics()
+
+    def print_metrics(self):
+            print(f"--- [StakanEntryPattern Metrics] ---")
+            print(f"Enabled: {self.enabled}")
+            print(f"Depth: {self.depth}")
+            print(f"Min Volume (Notional): {self.min_vol}")
+            print(f"Max Volume (Notional): {self.max_vol}")
+            print(f"Min Spread (2 rows): {self.min_spr2}%")
+            print(f"Min Spread (3 rows): {self.min_spr3}%")
+            print(f"ROC Window: {self.roc_window}")
+            print(f"Max One ROC: {self.max_one_roc}%")
+            print(f"ROC SMA Window: {self.sma_window}")
+            print(f"Desired Rate (H-to-B): {self.desired_rate}")
+            print(f"Max Bid-Ask Dist Rate: {self.max_dist_rate}")
+            print(f"------------------------------------")
 
     def analyze(self, bids: list[tuple[float, float]], asks: list[tuple[float, float]]) -> Optional[EntrySignal]:
         if not self.enabled or len(bids) < self.depth or len(asks) < self.depth:
@@ -51,7 +71,8 @@ class StakanEntryPattern:
         opp_p1 = opp_side[0][0]
         
         # 1. Проверка объема первой строки
-        vol_usdt = side[0][1] * p1
+        row_vol_asset = side[0][1]
+        vol_usdt = row_vol_asset * p1
         if (self.min_vol and vol_usdt < self.min_vol) or (self.max_vol and vol_usdt > self.max_vol):
             return None
 
@@ -63,7 +84,7 @@ class StakanEntryPattern:
             return None
 
         # 3. Дистанция bid/ask
-        dist_denom = abs(p3 - p1)
+        dist_denom = abs(p2 - p1)
         if dist_denom <= 0: return None
         
         if abs(p1 - opp_p1) / dist_denom > self.max_dist_rate:
@@ -85,11 +106,19 @@ class StakanEntryPattern:
         rate = spr3_pct / roc_sma
         if rate < self.desired_rate:
             return None
-
-        return {
-            "side": direction,
-            "price": p1,
-            "spr3_pct": round(spr3_pct, 4),
-            "rate": round(rate, 2),
-            "row_vol_usdt": vol_usdt
-        }
+        
+        return EntrySignal(
+            side=direction,
+            price=p1,
+            init_ask1=p1 if direction == "LONG" else opp_p1,
+            init_bid1=opp_p1 if direction == "LONG" else p1,
+            spr2_pct=round(spr2_pct, 4),
+            spr3_pct=round(spr3_pct, 4),
+            rate=round(rate, 2),
+            row_vol_usdt=vol_usdt,
+            row_vol_asset=row_vol_asset,
+            base_target_price_100=p2,
+            b_price=None,
+            p_price=None,
+            spread=None
+        )

@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from EXIT.utils import check_is_negative
+from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
     from CORE.models_fsm import ActivePosition
     from API.PHEMEX.stakan import DepthTop
+
+
+logger = UnifiedLogger("negative")
+
 
 class NegativeScenario:
     def __init__(self, cfg: dict):
@@ -14,6 +19,7 @@ class NegativeScenario:
         self.stab_neg = cfg.get("stabilization_ttl", 1.5)
         self.negative_spread_pct = cfg.get("negative_spread_pct", 0)
         self.negative_ttl = cfg.get("negative_ttl", 60)
+        # self.neg_flag = False
 
     def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> str | None:
         if not self.enable: return None
@@ -31,10 +37,13 @@ class NegativeScenario:
         if is_negative:
             # Мы в просадке! Якорь перестал обновляться.
             # Считаем чистое абсолютное время с момента, как всё стало плохо.
+            # logger.debug("+is_negative")
+            # self.neg_flag = True
             if (now - pos.last_negative_check_ts) >= self.negative_ttl:
                 return "NEGATIVE_TIMEOUT"
         else:
             # Мы в плюсе (или спред нулевой). Подтягиваем якорь к текущему моменту.
+            # if self.neg_flag: logger.debug("-is_negative break")
             pos.last_negative_check_ts = now
 
         return None

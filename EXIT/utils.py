@@ -24,3 +24,12 @@ def check_is_negative(pos: ActivePosition, depth: DepthTop, negative_spread_pct:
     else:
         spread = (pos.init_bid1 - bid1) / pos.init_bid1 * 100
         return spread <= negative_spread_pct
+
+    # mid = (ask1 + bid1) / 2
+
+    # if pos.side == "LONG":
+    #     spread = (mid - pos.avg_price) / pos.avg_price * 100
+    #     return spread <= negative_spread_pct
+    # else:
+    #     spread = (pos.avg_price - bid1) / pos.avg_price * 100
+    #     return spread <= negative_spread_pct

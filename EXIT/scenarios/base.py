@@ -72,15 +72,15 @@ class BaseScenario:
                     if vol > max_vol:
                         max_vol = vol
                         ideal_target_price = price
-                # else:
-                #     break
+                else:
+                    break
         else:
             for price, vol in depth.asks:
                 if price <= virtual_tp:
                     if vol > max_vol:
                         max_vol = vol
                         ideal_target_price = price
-                # else:
-                #     break
+                else:
+                    break
 
         return ideal_target_price

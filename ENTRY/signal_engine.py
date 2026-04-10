@@ -7,7 +7,7 @@ from __future__ import annotations
 import time
 from typing import Dict, Any, Optional, TYPE_CHECKING
 
-from ENTRY.pattern_math import StakanEntryPattern, EntrySignal
+from ENTRY.pattern_math import StakanEntryPattern
 from ENTRY.funding_filter import FundingFilter
 
 if TYPE_CHECKING:
@@ -29,7 +29,7 @@ class SignalEngine:
         self.pattern_ttl: int = self.phemex_cfg.get("pattern_ttl_sec", 0)
         
         self.binance_enabled: bool = self.binance_cfg.get("enable", True)
-        self.min_price_spread: float = abs(self.binance_cfg.get("min_price_spread_pct", 0.1))
+        self.min_price_spread_rate: float = abs(self.binance_cfg.get("min_price_spread_rate", 0.1))
         self.spread_ttl: int = self.binance_cfg.get("spread_ttl_sec", 0)
         
         # Внутренние таймеры для отслеживания удержания сигнала
@@ -62,12 +62,7 @@ class SignalEngine:
                 self._spread_first_seen.pop(k, None)
             return None
             
-        pos_key: str = f"{symbol}_{signal['side']}"
-
-        # Извлекаем базу для ТП из второго уровня
-        ask2: float = asks_sliced[1][0] if len(asks_sliced) > 1 else asks_sliced[0][0]
-        bid2: float = bids_sliced[1][0] if len(bids_sliced) > 1 else bids_sliced[0][0]
-        signal["base_target_price_100"] = ask2 if signal["side"] == "LONG" else bid2
+        pos_key: str = f"{symbol}_{signal.side}"
 
         passed_binance: bool = False
         spread_val: float = 0.0
@@ -75,7 +70,8 @@ class SignalEngine:
         if self.binance_enabled:
             if b_price and p_price:
                 spread_pct = (b_price - p_price) / p_price * 100
-                passed_binance = (spread_pct >= self.min_price_spread) if signal["side"] == "LONG" else (spread_pct <= -self.min_price_spread)
+                min_price_spread = abs(signal.spr2_pct * self.min_price_spread_rate)
+                passed_binance = (spread_pct >= min_price_spread) if signal.side == "LONG" else (spread_pct <= -min_price_spread)
                 spread_val = abs(spread_pct)
         else:
             passed_binance = True
@@ -97,8 +93,8 @@ class SignalEngine:
         self._pattern_first_seen.pop(pos_key, None)
         self._spread_first_seen.pop(pos_key, None)
         
-        signal["b_price"] = b_price
-        signal["p_price"] = p_price
-        signal["spread"] = spread_val
+        signal.b_price = b_price
+        signal.p_price = p_price
+        signal.spread = spread_val
         
         return signal

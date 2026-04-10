@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
     from API.PHEMEX.ticker import PhemexTickerAPI
     from API.BINANCE.ticker import BinanceTickerAPI
+    from ENTRY.pattern_math import EntrySignal
 
 logger = UnifiedLogger("core")
 
@@ -138,12 +139,12 @@ class ConfigManager:
 
 class Reporters:
     @staticmethod
-    def entry_signal(symbol: str, signal: dict, b_price: float, p_price: float) -> str:
-        side_str = "🟢 LONG" if signal.get('side') == "LONG" else "🔴 SHORT"
+    def entry_signal(symbol: str, signal: EntrySignal, b_price: float, p_price: float) -> str:
+        side_str = "🟢 LONG" if signal.side == "LONG" else "🔴 SHORT"
         return (
             f"<b>#{symbol}</b> | {side_str}\n"
-            f"Вход: <b>{signal.get('price')}</b>\n"
-            f"Rate: {signal.get('rate', 0)}x | Spr3: {signal.get('spr3_pct', 0)}%\n\n"
+            f"Вход: <b>{signal.price}</b>\n"
+            f"Rate: {signal.rate or 0}x | Spr2: {signal.spr2_pct or 0}% | Spr3: {signal.spr3_pct or 0}%\n\n"
             f"Binance: {b_price} | Phemex: {p_price}"
         )
 
