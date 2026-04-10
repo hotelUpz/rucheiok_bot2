@@ -37,7 +37,7 @@ from utils import get_config_summary
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
 
-logger = UnifiedLogger("core")
+logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
@@ -49,7 +49,6 @@ class TradingBot:
         
         self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
         self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        
         upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
         
         api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
@@ -118,10 +117,8 @@ class TradingBot:
     async def quarantine_util(self, symbol) -> bool:        
         if symbol in self.state.quarantine_until:
             q_val = self.state.quarantine_until[symbol]
-            try:
-                limit_time = float(q_val)
-            except (ValueError, TypeError):
-                limit_time = 0.0
+            try: limit_time = float(q_val)
+            except (ValueError, TypeError): limit_time = 0.0
 
             if time.time() > limit_time:
                 del self.state.quarantine_until[symbol]
@@ -133,7 +130,6 @@ class TradingBot:
         return True
         
     def apply_entry_quarantine(self, symbol: str):
-        """Карантин для неудачных ВХОДОВ"""
         q_hours = self.cfg.get("entry", {}).get("quarantine", {}).get("quarantine_hours", 1)
         if str(q_hours).lower() == "inf":
             self.state.quarantine_until[symbol] = "inf"
@@ -141,24 +137,18 @@ class TradingBot:
         elif float(q_hours) > 0:
             self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
             logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {q_hours}ч (вход не удался).")
-        
         asyncio.create_task(self.state.save())
 
     def apply_loss_quarantine(self, symbol: str):
-        """Карантин для ПРОИГРАВШИХ символов (Экстрим выход)"""
         q_cfg = self.cfg.get("risk", {}).get("quarantine", {})
         max_fails = q_cfg.get("max_consecutive_fails", 1)
         q_hours = q_cfg.get("quarantine_hours", "inf")
 
         self.state.consecutive_fails[symbol] = self.state.consecutive_fails.get(symbol, 0) + 1
-        
         if self.state.consecutive_fails[symbol] >= max_fails:
-            if str(q_hours).lower() == "inf":
-                self.state.quarantine_until[symbol] = "inf" 
-            else:
-                self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
+            if str(q_hours).lower() == "inf": self.state.quarantine_until[symbol] = "inf" 
+            else: self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
             logger.warning(f"[{symbol}] 💀 Карантин ПОТЕРЬ: {self.state.consecutive_fails[symbol]} фейлов. Блокировка на {q_hours}ч.")
-        
         asyncio.create_task(self.state.save())
 
     async def _recover_state(self):
@@ -181,13 +171,13 @@ class TradingBot:
 
             keys_to_remove = [k for k in list(self.state.active_positions.keys()) if k not in exchange_positions]
             for k in keys_to_remove:
-                logger.info(f"[{k}] 🧹 Удалена из стейта (закрыта на бирже пока бот был оффлайн).")
                 self.state.active_positions.pop(k, None)
 
-            # Обновляем живые позы. Чужие ручные позиции тупо игнорируем! Никакого спама в логи.
             for pos_key, ex_data in exchange_positions.items():
                 if pos_key in self.state.active_positions:
                     self.state.active_positions[pos_key].current_qty = ex_data["size"]
+                    self.state.active_positions[pos_key].in_position = True
+                    self.state.active_positions[pos_key].in_pending = False
 
             await self.state.save()
             logger.info(f"✅ Стейт синхронизирован. В памяти {len(self.state.active_positions)} активных позиций.")
@@ -204,13 +194,19 @@ class TradingBot:
         pending_keys = set(self.state.pending_entry_orders.keys())
         
         long_key, short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
-        if long_key in active_keys or short_key in active_keys or long_key in pending_keys or short_key in pending_keys:
-            return True
+        
+        # 1. Проверка Hedge Mode
+        has_long = long_key in active_keys or long_key in pending_keys
+        has_short = short_key in active_keys or short_key in pending_keys
+        if not self.hedge_mode and (has_long or has_short):
+            return False # Входить в противоположную сторону запрещено
 
+        # 2. Проверка слотов
         working_symbols = {k.split('_')[0] for k in (active_keys | pending_keys)}
-        if len(working_symbols) >= self.max_active_positions:
-            return False
-            
+        if symbol not in working_symbols:
+            if len(working_symbols) >= self.max_active_positions:
+                return False
+                
         return True
     
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
@@ -222,7 +218,7 @@ class TradingBot:
         for pos_key in (long_key, short_key):
             async with self._get_lock(pos_key):
                 pos = self.state.active_positions.get(pos_key)
-                if not pos or pos.current_qty <= 0:
+                if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0:
                     continue
 
                 neg_res = self.scen_neg.analyze(snap, pos, now)
@@ -311,16 +307,8 @@ class TradingBot:
                     pos = self.state.active_positions.get(pos_key)
                     if not pos: continue
 
-                    # 1. ЗАЩИТА ОТ ЗОМБИ (Очистка зависших входов через 15 сек)
-                    if not getattr(pos, 'is_closed_by_exchange', False):
-                        if pos.current_qty == 0 and (time.time() - pos.opened_at) > 15.0:
-                            logger.warning(f"[{pos_key}] 🧟‍♀️ Зомби-позиция (WS не принес данные за 15с). Очищаем.")
-                            pos.is_closed_by_exchange = True
-
-                    # 2. МУСОРОСБОРЩИК (GC)
                     if getattr(pos, 'is_closed_by_exchange', False):
-                        if self.tg and pos.entry_price > 0.0:
-                            
+                        if self.tg and getattr(pos, 'in_position', False) and pos.entry_price > 0.0:
                             if pos.in_extrime_mode: 
                                 semantic = "⚠️ Аварийный выход (Extrime Mode)"
                                 self.apply_loss_quarantine(pos.symbol)
@@ -334,10 +322,10 @@ class TradingBot:
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                             msg = Reporters.exit_success(pos_key, semantic, exit_pr)
                             asyncio.create_task(self.tg.send_message(msg))
-                        elif pos.entry_price == 0.0:
-                            logger.info(f"[{pos_key}] Вход отменен.")
+                            
+                        elif getattr(pos, 'in_pending', True):
+                            logger.info(f"[{pos_key}] 🗑 Вход не состоялся или отменен. Слот освобожден.")
 
-                        logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен оркестратором.")
                         self.state.active_positions.pop(pos_key, None)
                         asyncio.create_task(self.state.save())
 

@@ -3,7 +3,6 @@
 # ROLE: FSM для ActivePosition. Интерпретатор событий WebSocket.
 # ============================================================
 from __future__ import annotations
-
 import asyncio
 import time
 from dataclasses import dataclass, field, fields
@@ -13,14 +12,15 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from CORE.restorator import BotState
 
-logger = UnifiedLogger("ws_model")
+logger = UnifiedLogger("ws")
 
 @dataclass
 class ActivePosition:
     symbol: str             
     side: str               
     
-    in_position: bool = False            # Якорь физического присутствия в рынке!
+    in_pending: bool = True              # ФИКС: Якорь ожидания (ордер в пути)
+    in_position: bool = False            # ФИКС: Якорь физического присутствия в рынке
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
@@ -79,8 +79,8 @@ class WsInterpreter:
         except (ValueError, TypeError): return default
 
     async def process_phemex_message(self, event_data: Dict[str, Any]):
-        orders = event_data.get("orders") or event_data.get("order_p") or []
-        positions = event_data.get("positions") or event_data.get("position_p") or []
+        orders = event_data.get("orders_p") or event_data.get("orders") or []
+        positions = event_data.get("positions_p") or event_data.get("positions") or []
         
         for order in orders:
             await self._handle_order_update(order)
@@ -91,19 +91,13 @@ class WsInterpreter:
         symbol = o.get("symbol")
         if not symbol: return
 
-        pos_side_raw = str(o.get("posSide", ""))
+        raw_pos_side = str(o.get("posSide", "")).upper()
         order_side = str(o.get("side", "")).lower()
 
-        # ФИКС PHEMEX API: При Market Close биржа шлет posSide="None". 
-        # Вычисляем сторону реверсивным путем: Sell закрывает Long, Buy закрывает Short.
-        if pos_side_raw.lower() in ("none", ""):
-            exec_inst = str(o.get("execInst", "")).lower()
-            if "close" in exec_inst or "reduce" in exec_inst or o.get("action") == "Replace":
-                pos_side = "LONG" if order_side == "sell" else "SHORT"
-            else:
-                return # Игнорируем маржинальные апдейты аккаунта
+        if raw_pos_side in ("NONE", ""):
+            pos_side = "LONG" if order_side == "sell" else "SHORT"
         else:
-            pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
+            pos_side = raw_pos_side
 
         pos_key = f"{symbol}_{pos_side}"
         ord_status = str(o.get("ordStatus", "")).upper()
@@ -116,53 +110,44 @@ class WsInterpreter:
             is_closing_order = (pos.side == "LONG" and order_side == "sell") or \
                                (pos.side == "SHORT" and order_side == "buy")
 
-            # Ловим физический налив ордера
+            # МЫ ИГНОРИРУЕМ CANCELED И REJECTED! Ждем только факта сделки.
             if ord_status in ("FILLED", "PARTIALLYFILLED") or "FILL" in exec_status:
-                
-                # ФИКС ЦЕНЫ: Phemex прячет реальную цену исполнения в execPriceRp
                 fill_price = self._safe_float(o.get("execPriceRp", 0.0))
                 if fill_price <= 0:
                     fill_price = self._safe_float(o.get("priceRp", o.get("price", 0.0)))
 
-                logger.debug(f"[WS_ORDERS] 🔔 Налив ордера {pos_key} | Закрывающий: {is_closing_order} | Цена: {fill_price}")
-
-                if is_closing_order:
-                    if fill_price > 0: 
-                        pos.realized_exit_price = fill_price
-                else:
-                    if pos.entry_price == 0.0 and fill_price > 0:
+                if is_closing_order and fill_price > 0:
+                    pos.realized_exit_price = fill_price
+                elif not is_closing_order and fill_price > 0:
+                    if pos.entry_price == 0.0:
                         pos.opened_at = time.time()
                         pos.entry_price = fill_price
 
     async def _handle_position_update(self, p: Dict[str, Any]):
         symbol = p.get("symbol")
-        pos_side_raw = str(p.get("posSide", ""))
+        raw_pos_side = str(p.get("posSide", "")).upper()
+        
+        if not symbol or raw_pos_side in ("NONE", ""): return
 
-        if pos_side_raw.lower() in ("none", ""): return 
-        if not symbol: return
-
-        pos_side = "LONG" if pos_side_raw.lower() in ("long", "buy") else "SHORT"
-        pos_key = f"{symbol}_{pos_side}"
+        pos_key = f"{symbol}_{raw_pos_side}"
 
         async with self._get_lock(pos_key):
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
-
+            
             if "size" in p or "sizeRq" in p:
-                size = abs(self._safe_float(p.get("sizeRq", p.get("size"))))
+                raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
+                size = abs(raw_size) 
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
-
-                logger.debug(f"[WS_POS] 📊 Апдейт {pos_key} | Size: {size} | InPos: {pos.in_position}")
 
                 if size > 0:
                     pos.current_qty = size
-                    pos.in_position = True # ФИКС: Якорь, что позиция РЕАЛЬНО в рынке
+                    pos.in_pending = False   # Слот подтвержден
+                    pos.in_position = True   # Поза в рынке
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
-                    # ФИКС МУСОРОСБОРЩИКА: 
-                    # Игнорируем пустые апдейты, если позиция еще не наливалась (ждущая лимитка).
-                    if getattr(pos, 'in_position', False):
-                        logger.info(f"[{pos_key}] 💀 Биржа прислала size=0. Позиция закрыта.")
+                    # Убиваем только если поза УЖЕ БЫЛА в рынке.
+                    if pos.in_position:
                         pos.is_closed_by_exchange = True
                         pos.current_qty = 0.0
                         pos.in_position = False
