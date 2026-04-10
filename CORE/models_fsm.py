@@ -20,12 +20,13 @@ class ActivePosition:
     side: str               
     
     in_pending: bool = False             # 1. Ордер в пути (Слот занят)
-    in_position: bool = False            # 2. Позиция налита (Физически в рынке)
+    in_position: bool = False            # 2. Позиция физически налита
     
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
     interference_disabled: bool = False  
+    is_closed_by_exchange: bool = False  # Метка смерти для Оркестратора
     interf_in_flight: bool = False       
     
     entry_price: float = 0.0             
@@ -52,8 +53,6 @@ class ActivePosition:
     last_extrime_try_ts: float = 0.0
     
     extrime_retries_count: int = 0
-
-    is_closed_by_exchange: bool = False
 
     def to_dict(self) -> dict:
         return self.__dict__
@@ -112,7 +111,7 @@ class WsInterpreter:
             is_closing_order = (pos.side == "LONG" and order_side == "sell") or \
                                (pos.side == "SHORT" and order_side == "buy")
 
-            # Парсеру похуй на реджекты и отмены. Ловим только реальный налив.
+            # Вытаскиваем цены при реальном исполнении ордера
             if ord_status in ("FILLED", "PARTIALLYFILLED") or "FILL" in exec_status:
                 fill_price = self._safe_float(o.get("execPriceRp", 0.0))
                 if fill_price <= 0:
@@ -137,17 +136,20 @@ class WsInterpreter:
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
             
-            # Фиксируем ТОЛЬКО текущее количество ордера
+            # Игнорируем реджекты/канселы. Фиксируем ТОЛЬКО текущее количество ордера.
             if "size" in p or "sizeRq" in p:
                 raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
-                size = abs(raw_size)
+                size = abs(raw_size) 
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
                 if size > 0:
                     pos.current_qty = size
                     pos.in_position = True
-                    pos.in_pending = False  # Отменяем пендинг, позиция налита
+                    pos.in_pending = False  # Позиция налита, ожидание снимаем
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
-                    pos.current_qty = 0.0
-                    pos.in_position = False # Позиция пуста (GC удалит ее, если in_pending тоже False)
+                    # Если объем стал 0, ставим метку смерти, дальше работает Генерал (Оркестратор)
+                    if pos.in_position:
+                        pos.is_closed_by_exchange = True
+                        pos.current_qty = 0.0
+                        pos.in_position = False
