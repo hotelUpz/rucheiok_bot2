@@ -1,15 +1,5 @@
 {
     "positions": {},
-    "fails": {
-        "DASHUSDT": 1,
-        "BEATUSDT": 0,
-        "JASMYUSDT": 1,
-        "RAVEUSDT": 0,
-        "TACUSDT": 0,
-        "CLOUSDT": 0
-    },
-    "quarantine": {
-        "DASHUSDT": "inf",
-        "JASMYUSDT": "inf"
-    }
+    "fails": {},
+    "quarantine": {}
 }

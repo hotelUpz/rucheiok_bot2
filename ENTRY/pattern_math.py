@@ -4,9 +4,11 @@
 # ============================================================
 
 from __future__ import annotations
-from typing import Optional, TypedDict, Literal, Any, List
+from dataclasses import dataclass
+from typing import Optional, Literal, Any, List
 
-class EntrySignal(TypedDict, total=False):
+@dataclass
+class EntrySignal:
     side: Literal["LONG", "SHORT"]
     price: float
     init_ask1: float
@@ -17,6 +19,8 @@ class EntrySignal(TypedDict, total=False):
     row_vol_usdt: float
     row_vol_asset: float
     base_target_price_100: float
+    
+    # Опциональные поля (с дефолтными значениями) ОБЯЗАТЕЛЬНО должны идти в конце
     b_price: Optional[float] = None
     p_price: Optional[float] = None
     spread: Optional[float] = None
