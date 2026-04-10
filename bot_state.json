@@ -1,5 +1,37 @@
 {
-    "positions": {},
+    "positions": {
+        "TREEUSDT_LONG": {
+            "symbol": "TREEUSDT",
+            "side": "LONG",
+            "in_pending": false,
+            "in_position": true,
+            "in_base_mode": false,
+            "in_breakeven_mode": false,
+            "in_extrime_mode": false,
+            "interference_disabled": false,
+            "is_closed_by_exchange": false,
+            "interf_in_flight": false,
+            "entry_price": 0.0601,
+            "pending_price": 0.0,
+            "avg_price": 0.0601,
+            "current_close_price": 0.0,
+            "realized_exit_price": 0.0,
+            "pending_qty": 0.0,
+            "current_qty": 249.5,
+            "interf_comulative_qty": 0.0,
+            "init_ask1": 0.0601,
+            "init_bid1": 0.06,
+            "base_target_price_100": 0.0603,
+            "current_target_rate": 1.0,
+            "close_order_id": "",
+            "opened_at": 1775783568.6744144,
+            "last_shift_ts": 0.0,
+            "last_negative_check_ts": 1775783626.1165195,
+            "breakeven_start_ts": 0.0,
+            "last_extrime_try_ts": 0.0,
+            "extrime_retries_count": 0
+        }
+    },
     "fails": {
         "PARTIUSDT": 0,
         "BABYUSDT": 0,
@@ -39,11 +71,10 @@
         "RAREUSDT": 0,
         "LABUSDT": 0,
         "CELOUSDT": 0,
-        "IOSTUSDT": 0
+        "IOSTUSDT": 0,
+        "PRLUSDT": 0,
+        "ARIAUSDT": 0,
+        "TREEUSDT": 0
     },
-    "quarantine": {
-        "ARIAUSDT": "1775782464.883688",
-        "PRLUSDT": "1775782477.5017705",
-        "ALTUSDT": "1775782479.6315904"
-    }
+    "quarantine": {}
 }

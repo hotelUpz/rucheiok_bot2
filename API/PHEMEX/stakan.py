@@ -27,12 +27,6 @@ class DepthTop:
     asks: List[PriceLevel]
     event_time_ms: int
 
-# @dataclass(frozen=True)
-# class DepthTop:
-#     symbol: str
-#     bids: Dict[float, float]  # Теперь словари для скорости
-#     asks: Dict[float, float]
-#     event_time_ms: int
 
 class PhemexStakanStream:
     WS_URL = "wss://ws.phemex.com"
