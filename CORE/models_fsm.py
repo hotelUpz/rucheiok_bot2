@@ -19,13 +19,13 @@ class ActivePosition:
     symbol: str             
     side: str               
     
-    in_pending: bool = True              # ФИКС: Якорь ожидания (ордер в пути)
-    in_position: bool = False            # ФИКС: Якорь физического присутствия в рынке
+    in_pending: bool = False             # 1. Ордер в пути (Слот занят)
+    in_position: bool = False            # 2. Позиция налита (Физически в рынке)
+    
     in_base_mode: bool = False           
     in_breakeven_mode: bool = False      
     in_extrime_mode: bool = False        
     interference_disabled: bool = False  
-    is_closed_by_exchange: bool = False  
     interf_in_flight: bool = False       
     
     entry_price: float = 0.0             
@@ -110,7 +110,7 @@ class WsInterpreter:
             is_closing_order = (pos.side == "LONG" and order_side == "sell") or \
                                (pos.side == "SHORT" and order_side == "buy")
 
-            # МЫ ИГНОРИРУЕМ CANCELED И REJECTED! Ждем только факта сделки.
+            # Парсеру похуй на реджекты и отмены. Ловим только реальный налив.
             if ord_status in ("FILLED", "PARTIALLYFILLED") or "FILL" in exec_status:
                 fill_price = self._safe_float(o.get("execPriceRp", 0.0))
                 if fill_price <= 0:
@@ -135,19 +135,17 @@ class WsInterpreter:
             pos: ActivePosition = self.state.active_positions.get(pos_key)
             if not pos: return
             
+            # Фиксируем ТОЛЬКО текущее количество ордера
             if "size" in p or "sizeRq" in p:
                 raw_size = self._safe_float(p.get("sizeRq", p.get("size")))
-                size = abs(raw_size) 
+                size = abs(raw_size)
                 avg_price = self._safe_float(p.get("avgEntryPriceRp", p.get("avgEntryPrice")))
 
                 if size > 0:
                     pos.current_qty = size
-                    pos.in_pending = False   # Слот подтвержден
-                    pos.in_position = True   # Поза в рынке
+                    pos.in_position = True
+                    pos.in_pending = False  # Отменяем пендинг, позиция налита
                     if avg_price > 0: pos.avg_price = avg_price
                 else:
-                    # Убиваем только если поза УЖЕ БЫЛА в рынке.
-                    if pos.in_position:
-                        pos.is_closed_by_exchange = True
-                        pos.current_qty = 0.0
-                        pos.in_position = False
+                    pos.current_qty = 0.0
+                    pos.in_position = False # Позиция пуста (GC удалит ее, если in_pending тоже False)
