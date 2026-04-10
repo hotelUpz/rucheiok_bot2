@@ -1,0 +1,57 @@
+2026-04-10 04:31:57 | INFO | bot | ▶️ Инициализация систем...
+2026-04-10 04:31:57 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>15.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>0s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.15%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.1%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>0s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>40s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>60s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-10 04:32:03 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-10 04:32:03 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-10 04:32:05 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-10 04:32:07 | INFO | bot | [FOLKSUSDT_LONG] ✅ Вход выполнен. Объем: 16.57
+2026-04-10 04:32:22 | INFO | bot | [FOLKSUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:32:23 | INFO | bot | [FIDAUSDT_LONG] ✅ Вход выполнен. Объем: 945.0
+2026-04-10 04:32:53 | INFO | bot | [FIDAUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:32:54 | INFO | bot | [WAXPUSDT_LONG] ✅ Вход выполнен. Объем: 2276.0
+2026-04-10 04:33:36 | WARNING | bot | [WAXPUSDT] 💀 Карантин ПОТЕРЬ: 1 фейлов. Блокировка на infч.
+2026-04-10 04:33:36 | INFO | bot | [WAXPUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:33:37 | INFO | bot | [PRLUSDT_LONG] ✅ Вход выполнен. Объем: 88.0
+2026-04-10 04:34:51 | WARNING | bot | [PRLUSDT] 💀 Карантин ПОТЕРЬ: 1 фейлов. Блокировка на infч.
+2026-04-10 04:34:51 | INFO | bot | [PRLUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:34:51 | INFO | bot | [IOSTUSDT_LONG] ✅ Вход выполнен. Объем: 13711.0
+2026-04-10 04:35:29 | INFO | bot | [IOSTUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:35:30 | INFO | bot | [TREEUSDT_LONG] ✅ Вход выполнен. Объем: 248.3
+2026-04-10 04:36:02 | DEBUG | bot | [TREEUSDT] Исключение отмены 2ca69fa3-5acf-4b53-a71c-264de28e6ed6: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-10 04:36:02 | INFO | bot | [TREEUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:36:02 | ERROR | bot | [BLESSUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-10 04:36:02 | WARNING | bot | [BLESSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 04:36:03 | ERROR | bot | [ACHUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [20004]: TE_ERR_INCONSISTENT_POS_MODE
+2026-04-10 04:36:03 | WARNING | bot | [ACHUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-10 04:36:09 | INFO | bot | [C98USDT_LONG] ✅ Вход выполнен. Объем: 669.0
+2026-04-10 04:37:01 | WARNING | bot | [C98USDT] 💀 Карантин ПОТЕРЬ: 1 фейлов. Блокировка на infч.
+2026-04-10 04:37:01 | INFO | bot | [C98USDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-10 04:37:02 | INFO | bot | [ALTUSDT_LONG] ✅ Вход выполнен. Объем: 2232.0
+2026-04-10 04:37:42 | INFO | bot | ⏹ Остановка процессов...
+2026-04-10 04:37:42 | INFO | bot | 💾 Финальное сохранение стейта на диск...
