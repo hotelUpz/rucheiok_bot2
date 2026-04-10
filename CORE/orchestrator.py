@@ -190,11 +190,10 @@ class TradingBot:
         return self.active_positions_locker[pos_key]
 
     def _check_risk_limits(self, symbol: str) -> bool:
-        """Инвариант: Защита от превышения риск-лимитов."""
         working_symbols = set()
         has_long, has_short = False, False
         
-        # Считаем только живые слоты (Ордер в пути ИЛИ позиция налита)
+        # 2. Счетчик активных позиций считает на выбор по флагу in_position or in_pending
         for pos_key, pos in self.state.active_positions.items():
             if pos.in_position or pos.in_pending:
                 working_symbols.add(pos.symbol)
@@ -205,7 +204,10 @@ class TradingBot:
         if not self.hedge_mode and (has_long or has_short):
             return False
 
-        if len(working_symbols) >= self.max_active_positions and symbol not in working_symbols:
+        if symbol in working_symbols:
+            return True
+
+        if len(working_symbols) >= self.max_active_positions:
             return False
             
         return True
@@ -217,6 +219,9 @@ class TradingBot:
         timeout_hunt = exit_cfg.get("hunting_timeout_sec", 0.1)
         
         for pos_key in (long_key, short_key):
+            action_payload = None
+
+            # ШАГ 1: Собираем данные и принимаем решение ВНУТРИ локера
             async with self._get_lock(pos_key):
                 pos = self.state.active_positions.get(pos_key)
                 if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0:
@@ -232,64 +237,49 @@ class TradingBot:
                     ext_price = self.scen_extrime.analyze(snap, pos, now)
                     if ext_price and pos.current_close_price != ext_price:
                         pos.current_close_price = ext_price 
-                        asyncio.create_task(self._handle_exit_task(symbol, pos_key, ext_price, timeout_extrime))
-                    continue 
-
-                if pos.in_breakeven_mode:
+                        action_payload = ("EXIT", ext_price, timeout_extrime)
+                
+                elif pos.in_breakeven_mode:
                     be_price = self.scen_ttl.build_target_price(pos)
                     if pos.current_close_price != be_price:
                         pos.current_close_price = be_price 
-                        asyncio.create_task(self._handle_exit_task(symbol, pos_key, be_price, timeout_hunt))
-                    continue
+                        action_payload = ("EXIT", be_price, timeout_hunt)
+                
+                else:
+                    base_price = self.scen_base.analyze(snap, pos, now)
+                    if base_price and pos.current_close_price != base_price:
+                        pos.current_close_price = base_price 
+                        action_payload = ("EXIT", base_price, timeout_hunt)
 
-                base_price = self.scen_base.analyze(snap, pos, now)
-                if base_price and pos.current_close_price != base_price:
-                    pos.current_close_price = base_price 
-                    asyncio.create_task(self._handle_exit_task(symbol, pos_key, base_price, timeout_hunt))
-
-                if not pos.interf_in_flight:
+                if not action_payload and not pos.interf_in_flight:
                     interf_res = self.scen_interf.analyze(snap, pos, now)
                     if interf_res:
                         i_price, i_qty = interf_res
                         pos.interf_in_flight = True 
-                        asyncio.create_task(self.executor.interf_bought(symbol, pos_key, i_qty, i_price))
+                        action_payload = ("INTERFERENCE", i_price, i_qty)
 
-    async def _handle_entry_task(self, symbol: str, pos_key: str, signal: dict):
-        try:
-            # 1. Ордер отправляем — пометили пендинг прямо в орке.
-            async with self._get_lock(pos_key):
-                if pos_key not in self.state.active_positions:
-                    from CORE.models_fsm import ActivePosition
-                    self.state.active_positions[pos_key] = ActivePosition(
-                        symbol=symbol, side=signal["side"], pending_qty=0.0,
-                        in_pending=True,   # Слот жестко заблокирован
-                        in_position=False,
-                        init_ask1=signal.get("init_ask1", signal["price"]),
-                        init_bid1=signal.get("init_bid1", signal["price"]),
-                        base_target_price_100=signal.get("base_target_price_100", signal["price"])
-                    )
+            # ШАГ 2: Жесткий AWAIT Экзекьютора БЕЗ локера (чтобы избежать дедлока)
+            if action_payload:
+                cmd = action_payload[0]
+                
+                if cmd == "EXIT":
+                    price, timeout = action_payload[1], action_payload[2]
+                    # СТРОГАЯ ПРОВЕРКА БУЛЕВОГО ЗНАЧЕНИЯ
+                    success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
+                    if not success:
+                        # В случае провала (False) сбрасываем цену, чтобы попробовать еще раз
+                        async with self._get_lock(pos_key):
+                            p = self.state.active_positions.get(pos_key)
+                            if p and not getattr(p, 'is_closed_by_exchange', False):
+                                p.current_close_price = 0.0
 
-            success = await self.executor.execute_entry(symbol, pos_key, signal)
-            
-            if success:
-                self.state.consecutive_fails[symbol] = 0
-                asyncio.create_task(self.state.save())
-            else:
-                self.apply_entry_quarantine(symbol)
-                async with self._get_lock(pos_key):
-                    pos = self.state.active_positions.get(pos_key)
-                    if pos: 
-                        pos.in_pending = False
-                        pos.is_closed_by_exchange = True # Отдаем на растерзание GC
-        finally:
-            self.state.pending_entry_orders.pop(pos_key, None)
-
-    async def _handle_exit_task(self, symbol: str, pos_key: str, price: float, timeout: float):
-        await self.executor.execute_exit(symbol, pos_key, price, timeout)
-        async with self._get_lock(pos_key):
-            pos = self.state.active_positions.get(pos_key)
-            if pos and not getattr(pos, 'is_closed_by_exchange', False):
-                pos.current_close_price = 0.0
+                elif cmd == "INTERFERENCE":
+                    price, qty = action_payload[1], action_payload[2]
+                    res_qty = await self.executor.interf_bought(symbol, pos_key, qty, price)
+                    if not res_qty: # Провал скупки помех
+                        async with self._get_lock(pos_key):
+                            p = self.state.active_positions.get(pos_key)
+                            if p: p.interf_in_flight = False
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)
@@ -297,7 +287,7 @@ class TradingBot:
         if not signal: return
 
         pos_key = f"{symbol}_{signal['side']}"
-        if pos_key in self.state.active_positions or pos_key in self.state.pending_entry_orders: 
+        if pos_key in self.state.active_positions: 
             return 
 
         if self._signal_timeouts.get(pos_key, 0) > time.time(): return
@@ -308,11 +298,41 @@ class TradingBot:
             signal["init_ask1"] = snap.asks[0][0]
             signal["init_bid1"] = snap.bids[0][0]
             
-            self.state.pending_entry_orders[pos_key] = str(time.time())
-            asyncio.create_task(self._handle_entry_task(symbol, pos_key, signal))
+            # 1. Ордер отправили -- пометили пендинг (прямо в орке)
+            async with self._get_lock(pos_key):
+                if pos_key not in self.state.active_positions:
+                    from CORE.models_fsm import ActivePosition
+                    self.state.active_positions[pos_key] = ActivePosition(
+                        symbol=symbol, side=signal["side"], pending_qty=0.0,
+                        in_pending=True,   # ЯКОРЬ
+                        in_position=False,
+                        init_ask1=signal.get("init_ask1", signal["price"]),
+                        init_bid1=signal.get("init_bid1", signal["price"]),
+                        base_target_price_100=signal.get("base_target_price_100", signal["price"])
+                    )
+
+            # СТРОГИЙ AWAIT И ПРОВЕРКА БУЛЕВОГО ЗНАЧЕНИЯ (Решение принимает Генерал)
+            success = await self.executor.execute_entry(symbol, pos_key, signal)
+            
+            if success:
+                self.state.consecutive_fails[symbol] = 0
+                await self.state.save()
+            else:
+                # ОРДЕР ПРОВАЛИЛСЯ -> Врубаем карантин и сносим позицию (GC убьет)
+                self.apply_entry_quarantine(symbol)
+                async with self._get_lock(pos_key):
+                    p = self.state.active_positions.get(pos_key)
+                    if p:
+                        p.in_pending = False
+                        if not getattr(p, 'in_position', False):
+                            p.is_closed_by_exchange = True
+
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
-            self.state.pending_entry_orders.pop(pos_key, None) 
+            async with self._get_lock(pos_key):
+                if pos_key in self.state.active_positions:
+                    self.state.active_positions[pos_key].in_pending = False
+                    self.state.active_positions[pos_key].is_closed_by_exchange = True
 
     async def _process_symbol_pipeline(self, snap: DepthTop):
         symbol = snap.symbol
@@ -345,14 +365,6 @@ class TradingBot:
                     pos = self.state.active_positions.get(pos_key)
                     if not pos: continue
 
-                    # ANTI-ZOMBIE (Слот занят, но WS не пришел в течение 15 секунд)
-                    if pos.in_pending and not pos.in_position:
-                        if time.time() - pos.opened_at > 15.0:
-                            logger.info(f"[{pos_key}] 🗑 Вход не состоялся (таймаут ожидания налива). Слот освобожден.")
-                            pos.in_pending = False
-                            pos.is_closed_by_exchange = True
-
-                    # GARBAGE COLLECTOR
                     if getattr(pos, 'is_closed_by_exchange', False):
                         if pos.entry_price > 0.0:
                             if pos.in_extrime_mode: 

@@ -11,15 +11,15 @@ from typing import Dict, Any, TYPE_CHECKING, Optional
 from c_log import UnifiedLogger
 from decimal import Decimal, ROUND_DOWN
 from consts import TIME_ZONE
+from CORE._utils import Reporters
 
 if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
 
-logger = UnifiedLogger("bot")
-
 from dotenv import load_dotenv    
 load_dotenv()
 
+logger = UnifiedLogger(name="bot")
 TZ = pytz.timezone(TIME_ZONE)
 
 def round_step(value: float, step: float) -> float:
@@ -32,8 +32,7 @@ def round_step(value: float, step: float) -> float:
 
 class OrderExecutor:
     """
-    Прокладка между оркестратором и сетевым адаптером. 
-    Содержит шаблоны рутинных операций перед финальной отправкой запросов.
+    Прокладка между оркестратором и сетевым адаптером. Содержит шаблоны рутинных операций перед финальной отправкой запросов.
     """
     def __init__(self, tb: "TradingBot"):
         self.tb = tb
@@ -50,7 +49,12 @@ class OrderExecutor:
         risk = self.cfg.get("risk", {})
         self.notional_limit = float(risk.get("notional_limit", 25.0))
         self.margin_over_size_pct = float(risk.get("margin_over_size_pct", 1.0))
-        self.RETRY_PAUSE_SEC = 0.05 
+
+    async def cancel_all_orders(self, symbol: str) -> bool:
+        try:
+            resp = await self.client.cancel_all_orders(symbol)
+            return resp.get("code") == 0
+        except: return False
 
     async def execute_cancel(self, symbol: str, pos_side: str, order_id: str) -> bool:
         """
@@ -72,8 +76,8 @@ class OrderExecutor:
 
     async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float) -> Optional[float]:
         """
-        Роль: скупка маленьких ордеров. Неудачи логируем. 
-        Допустимые остатки переосмысливаются в оркестраторе.
+        Роль: скупка маленьких ордеров. Неудачи логируем. Допустимые остатки для скупки переосмысливаются в оркестраторе.
+        Возврат -- фактически исполненное количество ордера float | None
         """
         try:
             spec = self.tb.symbol_specs.get(symbol)
@@ -105,10 +109,10 @@ class OrderExecutor:
 
     async def execute_entry(self, symbol: str, pos_key: str, signal: dict) -> bool:
         """
-        1. Рассчитывает количество и цену.
-        2. Ставит лимитку, ждет entry_timeout_sec.
-        3. Если успех -> логируем ТГ -> отменяем остаток -> Возвращаем True.
-           Если неуспех -> Возвращаем False (все решения наверху).
+        1. Расчитывает количество ордера и цену постатовки лимитного ордера, согласно рискам.
+        2. Ставит ордер через await. Дожидается ответа в течение entry_timeout_sec.
+        3. Если успех: логирует результат, проверяет остаток, отменяет остаток, Возвращает True.
+           Если неуспех: логирует ошибку, делает ретрай, Возвращает False.
         """
         try:
             spec = self.tb.symbol_specs.get(symbol)
@@ -133,37 +137,34 @@ class OrderExecutor:
                     resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
                     if resp.get("code") == 0:
                         order_id = resp.get("data", {}).get("orderID")
-                        
                         await asyncio.sleep(self.entry_timeout)
                         
-                        if order_id:
+                        if order_id: 
                             curr_qty = 0.0
                             async with self.tb._get_lock(pos_key):
                                 pos = self.tb.state.active_positions.get(pos_key)
                                 if pos: curr_qty = pos.current_qty
                             
+                            # Если частичное исполнение или вообще ноль - отменяем остаток
                             if curr_qty < qty:
                                 await self.execute_cancel(symbol, phemex_pos_side, order_id)
                         
-                        # Проверяем факт налива (опираясь на WS-интерпретатор)
+                        # Проверяем, налило ли хоть что-то
                         async with self.tb._get_lock(pos_key):
                             pos = self.tb.state.active_positions.get(pos_key)
                             if pos and (pos.current_qty > 0 or getattr(pos, 'in_position', False)): 
                                 logger.info(f"[{pos_key}] ✅ Вход выполнен. Объем: {pos.current_qty}")
                                 if self.tb.tg:
-                                    from CORE._utils import Reporters
                                     msg = Reporters.entry_signal(symbol, signal, signal.get("b_price", 0), signal.get("p_price", 0))
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 return True
                                 
-                        return False # Не налило
+                        return False # Ордер не налился
                     else:
                         logger.warning(f"[{pos_key}] ❌ Ошибка входа API: {resp}")
                 except Exception as e:
                     logger.error(f"[{pos_key}] Исключение execute_entry: {e}")
                 
-                if self.max_entry_retries > 1: await asyncio.sleep(self.RETRY_PAUSE_SEC)
-                    
             return False
             
         except Exception as e:
@@ -172,9 +173,10 @@ class OrderExecutor:
 
     async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
         """
-        1. Ставит ордер, дожидается ответа.
-        2. Отменяет остатки.
-        3. Возвращает True/False.
+        1. Берет количество ордера. Цена постатовки лимитного ордера - order_price.
+        2. Ставит ордер через await. Дожидается ответа в течение timeout_sec.
+        3. Если успех: отменяет остаток, возвращает True.
+           Если неуспех: ретрай, возвращает False.
         """
         try:
             spec = self.tb.symbol_specs.get(symbol)
@@ -213,11 +215,9 @@ class OrderExecutor:
                                 
                         return True
                     else:
-                        logger.warning(f"[{pos_key}] ❌ Ошибка выхода: {resp}")
+                        logger.warning(f"[{pos_key}] ❌ Ошибка выхода API: {resp}")
                 except Exception as e:
                     logger.error(f"[{pos_key}] Исключение execute_exit: {e}")
-                
-                if self.max_exit_retries > 1: await asyncio.sleep(self.RETRY_PAUSE_SEC)
                 
             return False
             
