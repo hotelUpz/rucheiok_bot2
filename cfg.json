@@ -104,6 +104,18 @@
                 "check_interval_sec": 60,
                 "skip_before_counter_sec": 1800,
                 "funding_threshold_pct": 1.0
+            },
+            "funding_pattern1": {
+                "enable": true,
+                "check_interval_sec": 60,
+                "skip_before_counter_sec": 1800,
+                "threshold_pct": 2.0
+            },
+            "funding_pattern2": {
+                "enable": true,
+                "check_interval_sec": 60,
+                "skip_before_counter_sec": 1800,
+                "diff_threshold_pct": 0.05
             }
         }
     },

@@ -41,6 +41,7 @@ class ActivePosition:
     
     init_ask1: float = 0.0
     init_bid1: float = 0.0
+    mid_price: float = 0.0
     base_target_price_100: float = 0.0   
     
     current_target_rate: float = 1.0     

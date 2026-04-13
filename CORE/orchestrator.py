@@ -18,6 +18,7 @@ from API.PHEMEX.ws_private import PhemexPrivateWS
 from API.BINANCE.ticker import BinanceTickerAPI
 from API.PHEMEX.ticker import PhemexTickerAPI
 from API.PHEMEX.funding import PhemexFunding
+from API.BINANCE.funding import BinanceFunding
 
 from ENTRY.signal_engine import SignalEngine
 from CORE.restorator import BotState
@@ -30,6 +31,7 @@ from EXIT.scenarios.negative import NegativeScenario
 from EXIT.scenarios.breakeven import PositionTTLClose
 from EXIT.interference import Interference
 from EXIT.extrime_close import ExtrimeClose
+from ENTRY.funding_manager import FundingManager
 
 from c_log import UnifiedLogger
 from utils import get_config_summary
@@ -63,8 +65,9 @@ class TradingBot:
 
         self.phemex_sym_api = PhemexSymbols()
         self.binance_ticker_api = BinanceTickerAPI()
-        self.phemex_ticker_api = PhemexTickerAPI()
+        self.phemex_ticker_api = PhemexTickerAPI()        
         self.phemex_funding_api = PhemexFunding()
+        self.binance_funding_api = BinanceFunding()
         self.session = aiohttp.ClientSession()
 
         self.price_manager = PriceCacheManager(self.binance_ticker_api, self.phemex_ticker_api, upd_sec)
@@ -99,6 +102,17 @@ class TradingBot:
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
         self.scen_interf = Interference(exit_cfg.get("interference", {}))
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
+
+        self.funding_manager = FundingManager(
+            cfg["pattern"],
+            self.phemex_funding_api,
+            self.binance_funding_api
+        )
+        self.funding1_enabled = self.cfg["pattern"]["funding_pattern1"]["enable"]
+        self.funding2_enabled = self.cfg["pattern"]["funding_pattern2"]["enable"]
+
+
+
 
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
@@ -305,6 +319,7 @@ class TradingBot:
                         in_position=False,
                         init_ask1=signal.init_ask1,
                         init_bid1=signal.init_bid1,
+                        mid_price=signal.mid_price,
                         base_target_price_100=signal.base_target_price_100
                     )
 
@@ -407,7 +422,8 @@ class TradingBot:
         logger.info("🔄 Прогрев кэша цен и фандинга...")
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
-        self._funding_task = asyncio.create_task(self.signal_engine.funding_filter.run())
+        asyncio.create_task(self.funding_manager.run())
+        await asyncio.sleep(1)
         
         self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
