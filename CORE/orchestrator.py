@@ -81,7 +81,13 @@ class TradingBot:
             os.getenv("TELEGRAM_CHAT_ID") or tg_cfg.get("chat_id", ""),
         ) if tg_cfg.get("enable") else None
 
-        self.signal_engine = SignalEngine(cfg["entry"], self.phemex_funding_api)
+        self.funding_manager = FundingManager(
+            cfg["pattern"],
+            self.phemex_funding_api,
+            self.binance_funding_api
+        )
+
+        self.signal_engine = SignalEngine(cfg["entry"], self.funding_manager)
 
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
@@ -102,17 +108,6 @@ class TradingBot:
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
         self.scen_interf = Interference(exit_cfg.get("interference", {}))
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
-
-        self.funding_manager = FundingManager(
-            cfg["pattern"],
-            self.phemex_funding_api,
-            self.binance_funding_api
-        )
-        self.funding1_enabled = self.cfg["pattern"]["funding_pattern1"]["enable"]
-        self.funding2_enabled = self.cfg["pattern"]["funding_pattern2"]["enable"]
-
-
-
 
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
@@ -450,7 +445,7 @@ class TradingBot:
         logger.info("⏹ Остановка процессов...")
         if self.tg: await self.tg.send_message("⏹ Остановка процессов...")
         self.price_manager.stop()
-        self.signal_engine.funding_filter.stop()
+        self.funding_manager.stop()
         if self._stream: self._stream.stop()
         await self.private_ws.aclose()
         await self._await_task(getattr(self, '_price_updater_task', None))

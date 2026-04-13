@@ -49,6 +49,10 @@ class FundingManager:
 
         self.is_running: bool = False
 
+    def is_trade_allowed(self, symbol: str) -> bool:
+        """Проверка монеты сразу по двум фильтрам фандинга"""
+        return self.filter1.is_allowed(symbol) and self.filter2.is_allowed(symbol)
+
     async def run(self) -> None:
         if not self.enable_phemex:
             return

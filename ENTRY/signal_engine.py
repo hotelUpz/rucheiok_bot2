@@ -15,11 +15,13 @@ if TYPE_CHECKING:
     from ENTRY.pattern_math import EntrySignal
     from API.PHEMEX.stakan import DepthTop
     from ENTRY.funding_filters import FundingFilter1, FundingFilter2
+    from ENTRY.funding_manager import FundingManager
 
 
 class SignalEngine:
-    def __init__(self, cfg: Dict[str, Any]):
+    def __init__(self, cfg: Dict[str, Any], funding_manager: 'FundingManager'):
         self.cfg = cfg
+        self.funding_manager = funding_manager  # Сохраняем менеджер
         self.phemex_cfg: Dict[str, Any] = cfg["pattern"]["phemex"]
         self.binance_cfg: Dict[str, Any] = cfg["pattern"]["binance"]
         
@@ -40,7 +42,7 @@ class SignalEngine:
         symbol: str = depth.symbol
         
         # Семантический опрос валидатора фандинга
-        if not self.funding_filter.is_trade_allowed(symbol):
+        if not self.funding_manager.is_trade_allowed(symbol):
             return None
             
         now: float = time.time()
