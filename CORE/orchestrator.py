@@ -417,7 +417,7 @@ class TradingBot:
         logger.info("🔄 Прогрев кэша цен и фандинга...")
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
-        self._await_task(getattr(self, '_funding_task', None))
+        await self._await_task(getattr(self, '_funding_task', None))
         self._funding_task = asyncio.create_task(self.funding_manager.run())
         await asyncio.sleep(1)
         
