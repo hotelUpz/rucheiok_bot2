@@ -239,30 +239,37 @@ class TradingBot:
                 if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0:
                     continue
 
+                # --- 1. МАШИНА СОСТОЯНИЙ (Проверка переходов) ---
                 neg_res = self.scen_neg.analyze(snap, pos, now)
-                if neg_res == "NEGATIVE_TIMEOUT": pos.in_extrime_mode = True
+                if neg_res == "NEGATIVE_TIMEOUT": 
+                    pos.exit_status = "EXTRIME"
 
                 ttl_res = await self.scen_ttl.analyze(pos, now)
-                if ttl_res == "EXTRIME_SCENARIO": pos.in_extrime_mode = True
+                if ttl_res == "EXTRIME_SCENARIO": 
+                    pos.exit_status = "EXTRIME"
+                elif ttl_res == "BREAKEVEN_TIMEOUT" and pos.exit_status != "EXTRIME":
+                    pos.exit_status = "HUNTING"
 
-                if pos.in_extrime_mode:
+                # --- 2. ВЫПОЛНЕНИЕ ТЕКУЩЕГО СОСТОЯНИЯ ---
+                if pos.exit_status == "EXTRIME":
                     ext_price = self.scen_extrime.analyze(snap, pos, now)
                     if ext_price and pos.current_close_price != ext_price:
                         pos.current_close_price = ext_price 
                         action_payload = ("EXIT", ext_price, timeout_extrime)
                 
-                elif pos.in_breakeven_mode:
+                elif pos.exit_status == "HUNTING":
                     be_price = self.scen_ttl.build_target_price(pos)
                     if pos.current_close_price != be_price:
                         pos.current_close_price = be_price 
                         action_payload = ("EXIT", be_price, timeout_hunt)
                 
-                else:
+                else: # NORMAL (Base Scenario)
                     base_price = self.scen_base.analyze(snap, pos, now)
                     if base_price and pos.current_close_price != base_price:
                         pos.current_close_price = base_price 
                         action_payload = ("EXIT", base_price, timeout_hunt)
 
+                # Помехи: работают фоном, если нет срочной команды на выход
                 if not action_payload and not pos.interf_in_flight:
                     interf_res = self.scen_interf.analyze(snap, pos, now)
                     if interf_res:
@@ -376,15 +383,17 @@ class TradingBot:
 
                     if getattr(pos, 'is_closed_by_exchange', False):
                         if pos.entry_price > 0.0:
-                            if pos.in_extrime_mode: 
+                            # --- НОВАЯ FSM-ПРОВЕРКА ---
+                            if pos.exit_status == "EXTRIME": 
                                 semantic = "⚠️ Аварийный выход (Extrime Mode)"
                                 self.apply_loss_quarantine(pos.symbol)
-                            elif pos.in_breakeven_mode: 
+                            elif pos.exit_status == "HUNTING": 
                                 semantic = "🛡 Выход по безубытку (TTL)"
                                 self.state.consecutive_fails[pos.symbol] = 0
                             else: 
                                 semantic = "🎯 Тейк-профит (Base Scenario)"
                                 self.state.consecutive_fails[pos.symbol] = 0
+                            # --------------------------
                             
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                             

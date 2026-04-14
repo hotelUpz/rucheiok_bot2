@@ -22,12 +22,11 @@ class ActivePosition:
     in_pending: bool = False             # 1. Ордер отправлен (Слот занят)
     in_position: bool = False            # 2. Позиция налита
     
-    in_base_mode: bool = False           
-    in_breakeven_mode: bool = False      
-    in_extrime_mode: bool = False        
+    exit_status: str = "NORMAL"          # FSM: NORMAL -> HUNTING -> EXTRIME
+    
     interference_disabled: bool = False  
     is_closed_by_exchange: bool = False  
-    interf_in_flight: bool = False       
+    interf_in_flight: bool = False       # Оставляем как отдельный асинхронный лок для скупки помех     
     
     entry_price: float = 0.0             
     pending_price: float = 0.0           
