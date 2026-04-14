@@ -42,15 +42,9 @@ class BotState:
                     if pos.symbol not in self.black_list
                 },
                 "fails": dict(self.consecutive_fails),
-                "quarantine": {x: str(y) for x, y in dict(self.quarantine_until).items() if x and y}
+                "quarantine": {x: str(y) for x, y in dict(self.quarantine_until).items() if x and y},
+                "analytics": getattr(self, 'analytics', {})  # <--- ВОТ ЭТА СТРОКА ДОЛЖНА БЫТЬ ЗДЕСЬ
             }
-            # data = {
-            #     "active_positions": { ... твой текущий код ... },
-            #     "consecutive_fails": self.consecutive_fails,
-            #     "quarantine_until": self.quarantine_until,
-            #     "black_list": self.black_list,
-            #     "analytics": getattr(self, 'analytics', {}) # <--- ДОБАВИТЬ ЭТУ СТРОКУ
-            # }
             await asyncio.to_thread(self._sync_save, state_dict)
 
     def load(self):

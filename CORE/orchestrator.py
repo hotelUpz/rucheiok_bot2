@@ -440,15 +440,25 @@ class TradingBot:
         # ИНИЦИАЛИЗАЦИЯ ФИНАНСОВОГО АУДИТА
         # ==========================================
         try:
-            # Используем базовый ассет (например, USDT)
-            usd_balance = await self.private_client.get_equity(self.quota_asset)
-            
-            # Убедимся, что трекер существует (мы добавили его в __init__)
             if hasattr(self, 'tracker'):
-                self.tracker.set_initial_balance(usd_balance)
-                logger.info(f"💰 Стартовый баланс (Equity) зафиксирован: {usd_balance:.2f} {self.quota_asset}")
+                # 1. Проверяем, есть ли уже сохраненный стартовый баланс
+                saved_start_balance = self.tracker.data.get("start_balance", 0.0)
+                
+                if saved_start_balance > 0:
+                    logger.info(f"💰 Стартовый баланс успешно загружен из стейта: {saved_start_balance:.2f} {self.quota_asset}")
+                else:
+                    # 2. Если пусто (самый первый запуск), делаем запрос к бирже
+                    logger.info("📡 Запрашиваем Equity с биржи для инициализации аудита...")
+                    usd_balance = await self.private_client.get_equity(self.quota_asset)
+                    
+                    self.tracker.set_initial_balance(usd_balance)
+                    logger.info(f"💰 Стартовый баланс зафиксирован: {usd_balance:.2f} {self.quota_asset}")
+                    
+                    # 3. Принудительно сохраняем стейт на диск, чтобы закрепить старт
+                    await self.state.save()
+                    
         except Exception as e:
-            logger.error(f"❌ Не удалось получить стартовый баланс для аналитики: {e}")
+            logger.error(f"❌ Не удалось получить/установить стартовый баланс: {e}")
         # ==========================================
 
         logger.info("🔄 Прогрев кэша цен и фандинга...")
