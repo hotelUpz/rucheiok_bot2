@@ -98,7 +98,7 @@ class PerformanceTracker:
             "pnl": round(net_pnl, 4),
             "is_win": is_win
         })
-        if len(self.data["history"]) > 100:
+        if len(self.data["history"]) > 1_000_000:
             self.data["history"].pop(0)
 
         return net_pnl, is_win
