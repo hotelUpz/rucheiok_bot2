@@ -27,6 +27,7 @@ class BotState:
         self.leverage_configured: Set[str] = set()
         self._lock = asyncio.Lock()
         self.black_list = black_list
+        self.analytics: dict = {}
 
     def _sync_save(self, state_dict: dict):
         save_json_safe(self.filepath, state_dict)
@@ -43,6 +44,13 @@ class BotState:
                 "fails": dict(self.consecutive_fails),
                 "quarantine": {x: str(y) for x, y in dict(self.quarantine_until).items() if x and y}
             }
+            # data = {
+            #     "active_positions": { ... твой текущий код ... },
+            #     "consecutive_fails": self.consecutive_fails,
+            #     "quarantine_until": self.quarantine_until,
+            #     "black_list": self.black_list,
+            #     "analytics": getattr(self, 'analytics', {}) # <--- ДОБАВИТЬ ЭТУ СТРОКУ
+            # }
             await asyncio.to_thread(self._sync_save, state_dict)
 
     def load(self):
@@ -51,6 +59,7 @@ class BotState:
         
         self.consecutive_fails = data.get("fails", {})
         self.quarantine_until = data.get("quarantine", {})
+        self.analytics = data.get("analytics", {})
         
         saved_positions = data.get("positions", {})
         self.active_positions.clear()

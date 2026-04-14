@@ -106,3 +106,32 @@ class PhemexPrivateClient:
         """
         body = {"currency": currency, "targetPosMode": mode}
         return await self._request("PUT", "/g-positions/switch-pos-mode-sync", body=body)
+    
+    async def get_equity(self, currency: str = "USDT") -> float:
+        """
+        Получает реальный баланс аккаунта (Equity).
+        Equity = Общий баланс кошелька (вкл. маржу) + Нереализованный PnL.
+        """
+        # Используем твой базовый метод запроса
+        resp = await self._request("GET", "/g-accounts/accountPositions", query_no_q=f"currency={currency}")
+        
+        data_block = resp.get("data")
+        if not data_block:
+            raise RuntimeError(f"Phemex API error: Empty data object returned: {resp}")
+
+        account = data_block.get("account")
+        if not account:
+            raise RuntimeError(f"Phemex API error: Missing account object: {resp}")
+
+        # Локальный хелпер для безопасного каста
+        def _to_float(val: Any) -> float:
+            try:
+                return float(val) if val not in (None, "") else 0.0
+            except (TypeError, ValueError):
+                return 0.0
+
+        account_balance = _to_float(account.get("accountBalanceRv"))
+        positions = data_block.get("positions") or []
+        total_unrealized = sum(_to_float(p.get("unRealisedPnlRv")) for p in positions)
+
+        return account_balance + total_unrealized
