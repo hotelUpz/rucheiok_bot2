@@ -416,7 +416,7 @@ class TradingBot:
                                 side=pos.side,
                                 entry_price=pos.entry_price,
                                 exit_price=exit_pr,
-                                qty=pos.current_qty # Используем объем позиции
+                                qty=pos.closed_qty # Используем объем позиции
                             )
 
                             emoji = "💵" if is_win else "🩸"
@@ -456,6 +456,11 @@ class TradingBot:
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
             await asyncio.gather(*tasks, return_exceptions=False)
             await asyncio.sleep(0.001)
+
+    async def _on_ws_subscribe(self):
+        """Срабатывает при первом подключении и каждом успешном реконнекте WS"""
+        logger.info("🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...")
+        await self._recover_state()
 
     async def start(self):
         if getattr(self, '_is_running', False): return
@@ -502,7 +507,13 @@ class TradingBot:
         self._funding_task = asyncio.create_task(self.funding_manager.run())
         await asyncio.sleep(1)
         
-        self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
+        # self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
+        self._private_ws_task = asyncio.create_task(
+            self.private_ws.run(
+                self.ws_handler.process_phemex_message,
+                on_subscribe=self._on_ws_subscribe
+            )
+        )
 
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)

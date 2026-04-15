@@ -38,7 +38,8 @@ class ActivePosition:
     realized_exit_price: float = 0.0     
     
     pending_qty: float = 0.0             
-    current_qty: float = 0.0             
+    current_qty: float = 0.0    
+    closed_qty: float = 0.0         
     interf_comulative_qty: float = 0.0 
     
     init_ask1: float = 0.0
@@ -154,4 +155,5 @@ class WsInterpreter:
                     if pos.in_position:
                         pos.is_closed_by_exchange = True
                         pos.in_position = False
+                        pos.closed_qty = pos.current_qty # Сохраняем объем перед обнулением
                     pos.current_qty = 0.0

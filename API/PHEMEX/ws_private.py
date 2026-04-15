@@ -41,7 +41,9 @@ class PhemexPrivateWS:
         if self._ws and not self._ws.closed: await self._ws.close()
         if self._session and not self._session.closed: await self._session.close()
 
-    async def run(self, on_message: Callable[[Dict[str, Any]], Awaitable[None]]):
+    # async def run(self, on_message: Callable[[Dict[str, Any]], Awaitable[None]]):
+    #     self._stop.clear()
+    async def run(self, on_message: Callable[[Dict[str, Any]], Awaitable[None]], on_subscribe: Callable[[], Awaitable[None]] = None):
         self._stop.clear()
         self._session = aiohttp.ClientSession()
         backoff = 1.0
@@ -85,9 +87,19 @@ class PhemexPrivateWS:
                             
                             if not auth_passed: continue
 
+                            # if msg_id == 1002:
+                            #     if not data.get("error"):
+                            #         logger.info("🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.")
+                            #     else:
+                            #         logger.error(f"❌ Ошибка подписки: {data['error']}")
+                            #     continue
+
                             if msg_id == 1002:
                                 if not data.get("error"):
                                     logger.info("🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.")
+                                    # 2. Добавляем вызов коллбэка в виде независимой таски:
+                                    if on_subscribe:
+                                        asyncio.create_task(on_subscribe())
                                 else:
                                     logger.error(f"❌ Ошибка подписки: {data['error']}")
                                 continue
