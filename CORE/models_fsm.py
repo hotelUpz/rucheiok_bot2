@@ -21,8 +21,8 @@ class ActivePosition:
     
     in_pending: bool = False             # 1. Ордер отправлен (Слот занят)
     in_position: bool = False            # 2. Позиция налита
-    
-    exit_status: str = "NORMAL"          # FSM: NORMAL -> HUNTING -> EXTRIME
+
+    exit_status: str = "NORMAL"  # "NORMAL", "HUNTING_REQ", "INTERF_REQ", "EXTRIME"
 
     is_closed_by_exchange: bool = False  
     interf_in_flight: bool = False       # Оставляем как отдельный асинхронный лок для скупки помех     

@@ -38,19 +38,15 @@ class PositionTTLClose:
 
     async def analyze(self, pos: ActivePosition, now: float) -> str | None:
         if self.position_ttl in ("inf", None): return None
-
-        # Если уже улетели в экстрим — БУ не имеет значения
         if pos.exit_status == "EXTRIME": return None
         
-        # Если всё штатно, проверяем не вышел ли базовый таймер
-        if pos.exit_status == "NORMAL" and (now - pos.opened_at) >= self.position_ttl: 
-            pos.breakeven_start_ts = now  # Засекаем начало охоты
-            return "BREAKEVEN_TIMEOUT"
+        # 1. Если время жизни вышло, но мы еще не начали 'охоту'
+        if pos.breakeven_start_ts == 0 and (now - pos.opened_at) >= self.position_ttl: 
+            return "TRIGGER_HUNTING"
 
-        # Если мы уже в фазе охоты за безубытком (HUNTING), проверяем таймер ожидания БУ
-        if pos.exit_status == "HUNTING":
+        # 2. Если мы уже 'охотимся' (лимитка стоит), но время ожидания БУ вышло
+        if pos.breakeven_start_ts > 0:
             if pos.current_qty > 0.0 and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
-                return "EXTRIME_SCENARIO"
-            return None
+                return "TRIGGER_EXTRIME"
             
         return None
