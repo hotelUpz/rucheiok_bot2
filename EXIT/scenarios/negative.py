@@ -21,12 +21,10 @@ class NegativeScenario:
         self.negative_ttl = cfg.get("negative_ttl", 60)
         # self.neg_flag = False
 
-    def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> str | None:
-        if not self.enable: return None
-
-        if pos.in_breakeven_mode or pos.in_extrime_mode:
+    def scen_neg_analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> str | None:
+        if not self.enable:
             return None
-        
+
         # Во время стабилизации мы "в безопасности", поэтому тащим якорь за собой
         if (now - pos.opened_at) < self.stab_neg: 
             pos.last_negative_check_ts = now

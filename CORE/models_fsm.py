@@ -6,11 +6,13 @@ from __future__ import annotations
 import asyncio
 import time
 from dataclasses import dataclass, field, fields
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any, TYPE_CHECKING, Literal
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
     from CORE.restorator import BotState
+
+ExitStatusType = Literal["NORMAL", "EXTREME", "HUNTING", "INTERFERENCE"]
 
 logger = UnifiedLogger("ws")
 
@@ -22,8 +24,10 @@ class ActivePosition:
     in_pending: bool = False             # 1. Ордер отправлен (Слот занят)
     in_position: bool = False            # 2. Позиция налита
 
-    exit_status: str = "NORMAL"  # "NORMAL", "HUNTING_REQ", "INTERF_REQ", "EXTRIME"
-
+    exit_status: ExitStatusType = "NORMAL"
+    last_exit_status: ExitStatusType = "NORMAL"
+    
+    in_base_mode: bool = False
     is_closed_by_exchange: bool = False  
     interf_in_flight: bool = False       # Оставляем как отдельный асинхронный лок для скупки помех     
     

@@ -41,8 +41,6 @@ class OrderExecutor:
         self.cfg = tb.cfg
         
         self.entry_timeout = self.cfg.get("entry", {}).get("entry_timeout_sec", 0.5)
-        self.exit_timeout = self.cfg.get("exit", {}).get("exit_timeout_sec", 0.5)
-        self.interf_timeout = self.cfg.get("exit", {}).get("interference", {}).get("interference_timeout_sec", 0.1)
         
         self.max_entry_retries = self.cfg.get("entry", {}).get("max_place_order_retries", 1)
         self.max_exit_retries = self.cfg.get("exit", {}).get("max_place_order_retries", 1)
@@ -75,7 +73,7 @@ class OrderExecutor:
             logger.debug(f"[{symbol}] Исключение отмены {order_id}: {e}")
             return False
 
-    async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float) -> Optional[float]:
+    async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float, interf_timeout) -> Optional[float]:
         """
         Роль: скупка маленьких ордеров. Неудачи логируем. Допустимые остатки для скупки переосмысливаются в оркестраторе.
         Возврат -- фактически исполненное количество ордера float | None
@@ -99,7 +97,7 @@ class OrderExecutor:
             resp = await self.client.place_limit_order(symbol, side, req_qty, price, phemex_pos_side)
             if resp.get("code") == 0:
                 order_id = resp.get("data", {}).get("orderID")
-                await asyncio.sleep(self.interf_timeout)
+                await asyncio.sleep(interf_timeout)
                 if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
                 return req_qty 
             else:
