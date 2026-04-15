@@ -317,10 +317,11 @@ class TradingBot:
             if action_payload:
                 await self._payloader(action_payload, symbol, pos_key)
 
-            # --- 3. СБРОС ИДЕМПОТЕНТА pos.current_close_price ---
+                # --- 3. СБРОС ИДЕМПОТЕНТА pos.current_close_price ---
                 async with self._get_lock(pos_key):
                     pos = self.state.active_positions.get(pos_key)
-                    if pos: pos.current_close_price = 0.0
+                    if pos and pos.exit_status == "NORMAL":
+                        pos.current_close_price = 0.0
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)
@@ -453,7 +454,7 @@ class TradingBot:
                 await asyncio.sleep(0.01)
                 continue
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
-            await asyncio.gather(*tasks, return_exceptions=True)
+            await asyncio.gather(*tasks, return_exceptions=False)
             await asyncio.sleep(0.001)
 
     async def start(self):
