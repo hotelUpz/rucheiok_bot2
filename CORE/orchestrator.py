@@ -294,11 +294,18 @@ class TradingBot:
 
                 elif cmd == "INTERFERENCE":
                     price, qty = action_payload[1], action_payload[2]
-                    res_qty = await self.executor.interf_bought(symbol, pos_key, qty, price)
-                    if not res_qty: # Провал скупки помех
-                        async with self._get_lock(pos_key):
-                            p = self.state.active_positions.get(pos_key)
-                            if p: p.interf_in_flight = False
+                    # Выполняем ордер
+                    success = await self.executor.interf_bought(symbol, pos_key, qty, price)
+                    
+                    # Возвращаемся в лок для обновления стейта
+                    async with self._get_lock(pos_key):
+                        p = self.state.active_positions.get(pos_key)
+                        if p: 
+                            p.interf_in_flight = False # СНИМАЕМ ЛОК ПРИ ЛЮБОМ ИСХОДЕ!
+                            
+                            if success:
+                                # Только если ордер удался, плюсуем объем в копилку
+                                p.interf_comulative_qty += qty
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)

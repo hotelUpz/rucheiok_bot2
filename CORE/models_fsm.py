@@ -23,8 +23,7 @@ class ActivePosition:
     in_position: bool = False            # 2. Позиция налита
     
     exit_status: str = "NORMAL"          # FSM: NORMAL -> HUNTING -> EXTRIME
-    
-    interference_disabled: bool = False  
+
     is_closed_by_exchange: bool = False  
     interf_in_flight: bool = False       # Оставляем как отдельный асинхронный лок для скупки помех     
     

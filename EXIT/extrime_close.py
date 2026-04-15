@@ -48,3 +48,18 @@ class ExtrimeClose:
         pos.last_extrime_try_ts = now
         
         return target_price
+    
+    # def analyze(self, snap: DepthTop, pos: ActivePosition, now: float) -> float | None:
+    #     current_price = snap.asks[0][0] if pos.side == "LONG" else snap.bids[0][0]
+        
+    #     if pos.extrime_retries_count >= self.max_retries:
+    #         return current_price
+
+    #     if pos.last_extrime_try_ts > 0 and (now - pos.last_extrime_try_ts) < self.retry_delay_sec:
+    #         return None
+
+    #     # ВАЖНО: Мы больше НЕ делаем += 1 и = now здесь. Только возвращаем цену.
+    #     step = pos.avg_price * self.price_step_pct * pos.extrime_retries_count
+    #     fallback_price = current_price - step if pos.side == "LONG" else current_price + step
+        
+    #     return fallback_price

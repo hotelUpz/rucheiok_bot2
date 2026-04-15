@@ -26,11 +26,11 @@ class Interference:
         return None    
 
     def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> tuple[float, float] | None:
-        if not self.enable or pos.in_breakeven_mode or pos.in_extrime_mode:
+        if not self.enable:
             return None
             
         # ЗАМЕНА на min_notional
-        if pos.current_qty <= 0 or pos.interference_disabled:
+        if pos.current_qty <= 0:
             return None
 
         if (now - pos.opened_at) < self.stab_ttl: return None
@@ -43,7 +43,6 @@ class Interference:
         
         # ЗАМЕНА проверки лимита на min_notional_asset
         if allowed_remains <= 0.0: 
-            pos.interference_disabled = True
             return None
 
         max_chunk_vol = pos.pending_qty * self.usual_vol_pct
