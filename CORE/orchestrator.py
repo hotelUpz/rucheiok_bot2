@@ -238,37 +238,36 @@ class TradingBot:
                 if not pos or not pos.in_position or pos.current_qty <= 0:
                     continue
 
-                # --- БЛОКИРОВКА: если идет сетевой запрос, пропускаем итерацию ---
+                # --- 1. СЕТЕВАЯ БЛОКИРОВКА ---
                 if pos.exit_status in ("HUNTING_REQ", "INTERF_REQ"):
                     continue
 
-                # --- ТЕРМИНАЛЬНАЯ СТАДИЯ: если уже в EXTRIME, только он и работает ---
+                # --- 2. ТЕРМИНАЛЬНЫЙ ЭКСТРИМ ---
                 if pos.exit_status == "EXTRIME":
                     ext_price = self.scen_extrime.analyze(snap, pos, now)
                     if ext_price and pos.current_close_price != ext_price:
                         pos.current_close_price = ext_price
-                        action_payload = ("EXIT", ext_price, timeout_extrime)
-                        # Обновляем счетчики экстрима
+                        action_payload = ("EXIT_FINAL", ext_price, timeout_extrime)
                         pos.last_extrime_try_ts = now
                         pos.extrime_retries_count += 1
                 
-                # --- ГРАЖДАНСКАЯ СТАДИЯ: мониторинг и обратимые действия ---
+                # --- 3. ОБЫЧНЫЙ РЕЖИМ (NORMAL) ---
                 else:
                     ttl_res = await self.scen_ttl.analyze(pos, now)
                     
-                    # Переход в EXTRIME (необратимо)
+                    # Принудительный переход в экстрим (негатив или таймаут БУ)
                     if ttl_res == "TRIGGER_EXTRIME" or self.scen_neg.analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
                         pos.exit_status = "EXTRIME"
-                        continue # На этой итерации выходим, экстрим сработает на следующей
+                        continue 
 
-                    # Охота (обратимо)
+                    # Запрос на Охоту (Breakeven)
                     if ttl_res == "TRIGGER_HUNTING":
                         pos.exit_status = "HUNTING_REQ"
                         pos.breakeven_start_ts = now
                         be_price = self.scen_ttl.build_target_price(pos)
                         action_payload = ("HUNTING", be_price, timeout_hunt)
                     
-                    # Скупка (обратимо)
+                    # Запрос на Скупку Помех
                     elif not pos.interf_in_flight:
                         interf_res = self.scen_interf.analyze(snap, pos, now)
                         if interf_res:
@@ -277,36 +276,36 @@ class TradingBot:
                             pos.interf_in_flight = True
                             action_payload = ("INTERFERENCE", i_price, i_qty)
                     
-                    # Базовый сценарий (Тейк)
+                    # Базовый Тейк-Профит
                     else:
                         base_price = self.scen_base.analyze(snap, pos, now)
                         if base_price and pos.current_close_price != base_price:
                             pos.current_close_price = base_price
-                            action_payload = ("EXIT", base_price, timeout_hunt)
+                            action_payload = ("EXIT_TAKE", base_price, timeout_hunt)
 
-            # ШАГ 2: Сетевые запросы ВНЕ лока
+            # --- 4. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
             if action_payload:
                 cmd = action_payload[0]
                 
-                if cmd in ("EXIT", "HUNTING"):
+                if cmd in ("EXIT_FINAL", "EXIT_TAKE", "HUNTING"):
                     price, timeout = action_payload[1], action_payload[2]
                     success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
                     
-                    # СБРОС СТАТУСА: охота обратима
                     async with self._get_lock(pos_key):
                         p = self.state.active_positions.get(pos_key)
-                        if p and p.exit_status == "HUNTING_REQ":
-                            p.exit_status = "NORMAL"
+                        if p:
+                            # Если это была обратимая 'охота', возвращаем статус в NORMAL
+                            if p.exit_status == "HUNTING_REQ": p.exit_status = "NORMAL"
+                            # В EXTRIME статус НЕ сбрасываем
 
                 elif cmd == "INTERFERENCE":
                     price, qty = action_payload[1], action_payload[2]
                     success = await self.executor.interf_bought(symbol, pos_key, qty, price)
                     
-                    # СБРОС СТАТУСА и разблокировка скупки
                     async with self._get_lock(pos_key):
                         p = self.state.active_positions.get(pos_key)
                         if p:
-                            p.exit_status = "NORMAL"
+                            p.exit_status = "NORMAL" # Скупка завершена, возвращаемся в мониторинг
                             p.interf_in_flight = False
                             if success: p.interf_comulative_qty += qty
 

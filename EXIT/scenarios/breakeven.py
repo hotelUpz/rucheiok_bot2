@@ -48,5 +48,4 @@ class PositionTTLClose:
         if pos.breakeven_start_ts > 0:
             if pos.current_qty > 0.0 and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
                 return "TRIGGER_EXTRIME"
-            
         return None
