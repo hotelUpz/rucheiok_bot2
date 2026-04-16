@@ -84,3 +84,741 @@
 2026-04-10 20:51:54 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
 2026-04-10 20:52:08 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
 2026-04-10 20:59:00 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-10 23:53:45 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:46 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:46 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:46 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-10 23:53:46 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-10 23:53:46 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-10 23:54:42 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 02:15:35 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:15:53 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:16:46 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:30:51 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-11 02:32:28 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:32:32 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:40:22 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:46:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:46:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:46:27 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:46:34 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-11 02:46:34 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-11 02:46:34 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-11 02:47:16 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:47:29 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:47:32 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:48:16 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-11 02:48:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:48:37 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:48:38 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 02:49:46 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 04:14:36 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 12:58:18 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:18 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-11 12:58:20 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-11 12:58:20 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-11 13:03:03 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 14:03:11 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 14:41:02 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-11 15:04:58 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 16:06:24 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 17:53:10 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 19:10:40 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 20:32:59 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-11 21:12:08 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-11 23:02:27 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 02:59:31 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 05:26:18 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 09:03:33 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 10:16:34 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-12 10:42:44 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-12 10:42:44 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-12 10:42:44 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-12 10:49:21 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-12 11:23:12 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-12 17:28:25 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-12 17:33:48 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-12 18:04:29 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 20:53:46 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-12 21:13:05 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-12 22:17:07 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 01:05:58 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-13 01:32:35 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 06:15:24 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 06:17:57 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 08:39:20 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 12:32:25 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 14:15:23 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 14:21:07 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 15:57:39 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 17:08:00 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 17:57:57 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 20:16:52 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 20:29:31 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 21:28:04 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 22:21:11 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-13 23:20:26 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 01:23:02 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 02:17:20 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 02:51:43 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 03:11:29 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-14 03:11:31 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 03:11:34 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 03:12:16 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 03:12:28 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 03:45:21 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 04:16:07 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 04:17:41 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-14 04:18:07 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 04:18:07 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 04:18:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 04:18:09 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:22:22 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:23:12 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:23:13 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:23:13 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:23:14 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-14 05:23:15 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-14 05:23:15 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-14 05:23:32 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:23:36 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:24:34 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:24:53 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-14 05:30:35 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 05:31:29 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 06:47:59 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 07:22:58 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 07:48:22 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 07:54:40 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 09:21:44 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 10:31:11 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 12:54:51 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 13:55:15 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 15:28:01 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 16:30:53 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 16:54:13 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 18:06:18 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 19:20:55 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 19:31:36 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 20:37:34 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-14 21:42:21 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 21:53:19 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-14 22:49:30 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 01:04:35 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 02:19:47 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 03:37:28 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 05:15:32 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 05:30:26 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 07:00:44 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 08:16:47 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 08:37:14 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 09:43:00 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 10:10:44 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:44 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:46 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:46 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:46 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:47 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:49 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:53 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:54 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:54 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:10:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:01 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:09 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:09 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:09 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:17 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:20 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:20 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:23 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:23 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:23 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:27 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:39 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:41 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:42 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:46 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:47 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:11:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:08 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:13 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:17 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:39 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:47 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:12:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:13:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:08 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:09 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:20 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:20 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:20 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:20 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:23 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:28 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:36 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:36 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:14:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:10 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:18 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:15:54 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:16 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:18 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 10:16:32 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:33 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:33 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:36 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:36 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:39 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:39 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:41 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:41 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:44 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-15 10:16:44 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:45 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:46 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 10:16:48 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-15 10:16:49 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-15 10:16:49 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-15 11:02:54 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:56 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:02:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:08 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:09 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:09 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:12 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:13 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:13 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:13 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:13 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:23 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:26 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:27 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:34 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:34 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:34 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:36 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:39 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:56 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:03:57 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:13 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:16 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:16 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:26 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:36 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:38 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:42 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:42 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:44 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:47 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:56 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:04:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:02 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:18 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:19 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:26 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:27 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:30 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:37 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:38 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:40 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:41 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:46 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:56 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:05:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:08 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:11 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:17 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:23 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:26 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:27 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:28 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:28 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:34 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:39 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:43 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:44 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:46 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:49 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:54 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:56 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:06:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:03 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:04 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:34 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:35 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:35 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:39 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:40 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:42 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:44 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:46 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:07:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:00 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:01 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:07 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:10 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:24 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:30 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:31 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:32 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:33 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:35 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:36 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:37 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:53 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:55 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:56 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:58 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:08:59 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:05 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:05 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:06 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:14 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:15 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:19 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:21 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:22 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:25 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:26 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:27 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:29 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:39 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:41 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:43 | ERROR | api | Private WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:43 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:43 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:43 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:45 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:48 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:50 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:51 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:09:52 | ERROR | api | Stakan WS Переподключение: Cannot connect to host ws.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-15 11:10:06 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:06 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:07 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:09 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:13 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:14 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:14 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-15 11:10:14 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-15 11:10:14 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-15 11:10:14 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:15 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:18 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:19 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:22 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-15 11:10:22 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 11:10:23 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-15 12:33:14 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-15 13:13:40 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 14:01:54 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-15 18:40:43 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-15 20:15:06 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-15 20:57:45 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-16 00:22:23 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-16 01:01:40 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-16 01:43:09 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY

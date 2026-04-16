@@ -64,7 +64,7 @@ def get_config_summary(cfg: dict) -> str:
     lines.append(f"Sprd 3 row: &gt;= <b>{btm.get('min_spread_between_three_row_pct')}%</b>")
     
     lines.append("\n🔶 <b>[ENTRY BINANCE & FUNDING]</b>")
-    lines.append(f"Binance: <b>{binance.get('enable')}</b> | Sprd: &gt;= <b>{binance.get('min_price_spread_pct')}%</b>")
+    lines.append(f"Binance: <b>{binance.get('enable')}</b> | Sprd: &gt;= <b>{binance.get('min_price_spread_rate')}%</b>")
     lines.append(f"Funding: <b>{ff.get('enable')}</b> | Thresh: &gt;= <b>{ff.get('funding_threshold_pct')}%</b>")
 
     exit_cfg = cfg.get("exit", {})
