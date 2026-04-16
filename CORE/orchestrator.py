@@ -283,8 +283,8 @@ class TradingBot:
 
                     ttl_res = None
                     if not is_extrime: ttl_res = await self.scen_ttl.scen_ttl_analyze(pos, now)
-                    
-                    # Принудительный переход в экстрим (негатив или таймаут БУ)
+
+                    # 1. Сначала Extrime / Breakeven                    
                     if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or\
                         self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
                         pos.exit_status = "EXTREME"
@@ -303,22 +303,26 @@ class TradingBot:
                         if be_price and pos.current_close_price != be_price:
                             pos.current_close_price = be_price
                             action_payload = ("BREAKEVEN", be_price, self.breakeven_order_timeout_sec)
-                    
-                    # Базовый Тейк-Профит === Охота.
-                    base_price = self.scen_base.scen_base_analyze(snap, pos, now)
-                    if base_price and pos.current_close_price != base_price:
-                        pos.exit_status = "HUNTING"
-                        pos.current_close_price = base_price
-                        action_payload = ("HUNTING", base_price, self.base_order_timeout_sec) # это и есть охота.
-                    
-                    # Запрос на Скупку Помех
-                    if not pos.interf_in_flight:
-                        interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
-                        if interf_res:
-                            i_price, i_qty = interf_res
-                            pos.exit_status = "INTERFERENCE"
-                            pos.interf_in_flight = True
-                            action_payload = ("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec)
+
+                    # 2. Если экстренных действий нет, ищем тейк-профит
+                    if not action_payload and pos.exit_status not in ("EXTREME", "BREAKEVEN"):
+                        # Базовый Тейк-Профит === Охота.
+                        base_price = self.scen_base.scen_base_analyze(snap, pos, now)
+                        if base_price and pos.current_close_price != base_price:
+                            pos.exit_status = "HUNTING"
+                            pos.current_close_price = base_price
+                            action_payload = ("HUNTING", base_price, self.base_order_timeout_sec) # это и есть охота.
+
+                    # 3. Если и тейка нет, пробуем чистить стакан (Скупка помех)
+                    if not action_payload and not pos.interf_in_flight:                    
+                        # Запрос на Скупку Помех
+                        if not pos.interf_in_flight:
+                            interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
+                            if interf_res:
+                                i_price, i_qty = interf_res
+                                pos.exit_status = "INTERFERENCE"
+                                pos.interf_in_flight = True
+                                action_payload = ("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec)
 
             # --- 2. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
             if action_payload:
