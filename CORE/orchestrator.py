@@ -46,6 +46,8 @@ logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
+TRACKER_SLIPPAGE = 0.975
+
 class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
@@ -436,7 +438,8 @@ class TradingBot:
                                 side=pos.side,
                                 entry_price=pos.entry_price,
                                 exit_price=exit_pr,
-                                qty=pos.closed_qty # Используем объем позиции
+                                # qty=pos.closed_qty # Используем объем позиции
+                                qty=pos.pending_qty * TRACKER_SLIPPAGE
                             )
 
                             emoji = "💵" if is_win else "🩸"
@@ -471,11 +474,11 @@ class TradingBot:
 
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:
-                await asyncio.sleep(0.02)
+                await asyncio.sleep(0.01)
                 continue
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
             await asyncio.gather(*tasks, return_exceptions=False)
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.01)
 
     async def _on_ws_subscribe(self):
         """Срабатывает при первом подключении и каждом успешном реконнекте WS"""

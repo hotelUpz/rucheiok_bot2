@@ -128,6 +128,10 @@ class OrderExecutor:
             if qty < spec.lot_size: 
                 logger.warning(f"[{pos_key}] Qty {qty} меньше лота {spec.lot_size}. Пропуск.")
                 return False
+            
+            async with self.tb._get_lock(pos_key):
+                pos = self.tb.state.active_positions.get(pos_key)
+                pos.pending_qty = qty
 
             side = "Buy" if signal.side == "LONG" else "Sell"
             phemex_pos_side = "Long" if signal.side == "LONG" else "Short"
