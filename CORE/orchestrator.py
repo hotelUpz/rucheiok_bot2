@@ -427,6 +427,7 @@ class TradingBot:
                             # Прошло 5 секунд, WS молчит. Это 100% фейл. Сносим.
                             logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
                             self.state.active_positions.pop(pos_key, None)
+                            self.active_positions_locker.pop(pos_key, None)
                             asyncio.create_task(self.state.save())
                             continue
                     # ----------------------------------------------
@@ -440,7 +441,7 @@ class TradingBot:
                             net_pnl, is_win = self.tracker.register_trade(
                                 symbol=pos.symbol,
                                 side=pos.side,
-                                entry_price=pos.entry_price,
+                                entry_price=pos.avg_price if pos.avg_price > 0 else pos.entry_price,
                                 exit_price=exit_pr,
                                 qty=pos.max_realized_qty  # <--- ИДЕАЛЬНЫЙ ИСТОЧНИК ПРАВДЫ
                             )
@@ -473,6 +474,7 @@ class TradingBot:
                             logger.info(f"[{pos_key}] 🛑 Позиция закрыта. {emoji}: PnL: {net_pnl:.4f}$")
 
                         self.state.active_positions.pop(pos_key, None)
+                        self.active_positions_locker.pop(pos_key, None) # <--- УБИРАЕМ МУСОР
                         asyncio.create_task(self.state.save())
 
             current_snaps = list(self._latest_market_data.values())
