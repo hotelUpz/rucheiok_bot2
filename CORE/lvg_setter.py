@@ -97,35 +97,3 @@ class GlobalLeverageSetter:
 
         self._save_cache(new_cache)
         logger.info(f"✅ Готово. Настроено: {success_count}, Пропущено: {skipped_count}")
-
-    async def apply(self) -> None:
-        if not self.api_key or not self.api_secret: return
-        
-        logger.info("🔄 Загрузка спецификаций Phemex...")
-        sym_api = PhemexSymbols()
-        try: symbols_info = await sym_api.get_all(quote="USDT", only_active=True)
-        finally: await sym_api.aclose()
-
-        if not symbols_info: return
-
-        current_cache = self._load_cache()
-        new_cache = current_cache.copy()
-
-        async with aiohttp.ClientSession() as session:
-            client = PhemexPrivateClient(self.api_key, self.api_secret, session, retries=1)
-            success_count, skipped_count = 0, 0
-            
-            for spec in symbols_info:
-                sym = spec.symbol
-                if self.leverage_val is None or sym in self.black_list or (self.use_cache and sym in current_cache):
-                    skipped_count += 1
-                    continue
-                
-                res_lev = await self._apply_setup_with_fallback(client, sym, self.leverage_val, spec.max_leverage)
-                new_cache[sym] = res_lev
-                if res_lev is not None:
-                    success_count += 1
-                await asyncio.sleep(self.delay_sec)
-
-        self._save_cache(new_cache)
-        logger.info(f"✅ Готово. Настроено: {success_count}, Пропущено: {skipped_count}")

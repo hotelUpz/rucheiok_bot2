@@ -382,9 +382,9 @@ class TradingBot:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
             async with self._get_lock(pos_key):
                 if pos_key in self.state.active_positions:
-                    self.state.active_positions[pos_key].in_pending = False
+                    p = self.state.active_positions[pos_key] #
+                    p.in_pending = False
                     if not getattr(p, 'in_position', False):
-                        # Помечаем на отложенное удаление (ждем WS 5 секунд)
                         p.marked_for_death_ts = time.time()
 
     async def _process_symbol_pipeline(self, snap: DepthTop):
@@ -442,8 +442,7 @@ class TradingBot:
                                 side=pos.side,
                                 entry_price=pos.entry_price,
                                 exit_price=exit_pr,
-                                # qty=pos.closed_qty # Используем объем позиции
-                                qty=pos.pending_qty * TRACKER_SLIPPAGE
+                                qty=pos.max_realized_qty  # <--- ИДЕАЛЬНЫЙ ИСТОЧНИК ПРАВДЫ
                             )
 
                             emoji = "💵" if is_win else "🩸"
