@@ -243,6 +243,11 @@ class TradingBot:
                 if p:
                     p.last_exit_status = p.exit_status
                     if p.exit_status == "HUNTING": p.exit_status = "NORMAL"
+                    # --- НОВАЯ ЛОГИКА: ОТКАТ ПРИ СЕТЕВОЙ ОШИБКЕ ---
+                    if not success and p.exit_status in ("EXTREME", "BREAKEVEN"):
+                        logger.debug(f"[{pos_key}] Откат идемпотентности из-за ошибки сети. Retry...")
+                        p.current_close_price = 0.0 
+                    # ----------------------------------------------
 
         elif cmd == "INTERFERENCE":
             price, qty, interf_timeout = action_payload[1], action_payload[2], action_payload[3]
@@ -364,15 +369,17 @@ class TradingBot:
                     if p:
                         p.in_pending = False
                         if not getattr(p, 'in_position', False):
-                            # p.is_closed_by_exchange = True # -- сомнительно
-                            pass
+                            # Помечаем на отложенное удаление (ждем WS 5 секунд)
+                            p.marked_for_death_ts = time.time()
 
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
             async with self._get_lock(pos_key):
                 if pos_key in self.state.active_positions:
                     self.state.active_positions[pos_key].in_pending = False
-                    # self.state.active_positions[pos_key].is_closed_by_exchange = True # -- сомнительно
+                    if not getattr(p, 'in_position', False):
+                        # Помечаем на отложенное удаление (ждем WS 5 секунд)
+                        p.marked_for_death_ts = time.time()
 
     async def _process_symbol_pipeline(self, snap: DepthTop):
         symbol = snap.symbol
@@ -404,6 +411,19 @@ class TradingBot:
                 async with self._get_lock(pos_key):
                     pos: "ActivePosition" = self.state.active_positions.get(pos_key)
                     if not pos: continue
+
+                    # --- НОВЫЙ БЛОК: СБОРЩИК ФАНТОМНЫХ ВХОДОВ ---
+                    if getattr(pos, 'marked_for_death_ts', 0) > 0:
+                        if pos.in_position:
+                            # WS догнал нас и налил позицию! Спасаем ее.
+                            pos.marked_for_death_ts = 0.0 
+                        elif time.time() - pos.marked_for_death_ts > 5.0:
+                            # Прошло 5 секунд, WS молчит. Это 100% фейл. Сносим.
+                            logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
+                            self.state.active_positions.pop(pos_key, None)
+                            asyncio.create_task(self.state.save())
+                            continue
+                    # ----------------------------------------------
 
                     if getattr(pos, 'is_closed_by_exchange', False):
                         if pos.entry_price > 0.0:
@@ -451,11 +471,11 @@ class TradingBot:
 
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.02)
                 continue
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
             await asyncio.gather(*tasks, return_exceptions=False)
-            await asyncio.sleep(0.001)
+            await asyncio.sleep(0.02)
 
     async def _on_ws_subscribe(self):
         """Срабатывает при первом подключении и каждом успешном реконнекте WS"""
