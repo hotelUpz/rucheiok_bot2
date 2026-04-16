@@ -34,7 +34,6 @@ def get_config_summary(cfg: dict) -> str:
     lines.append(f"Name: <b>{app.get('name', '')}</b> | Quota: <b>{cfg.get('quota_asset', '')}</b>")
     lines.append(f"Max Positions: <b>{app.get('max_active_positions')}</b>")
     
-    # Защита от KeyError, если leverage — это dict или число (ты изменил структуру)
     lev_cfg = risk.get('leverage', {})
     lev_val = lev_cfg.get('val', 'N/A') if isinstance(lev_cfg, dict) else lev_cfg
     margin_mod = lev_cfg.get('margin_mode', 'N/A') if isinstance(lev_cfg, dict) else 'N/A'
@@ -54,7 +53,8 @@ def get_config_summary(cfg: dict) -> str:
     entry = cfg.get("entry", {}).get("pattern", {})
     ph = entry.get("phemex", {})
     binance = entry.get("binance", {})
-    ff = entry.get("phemex_funding_filter", {})
+    f1 = entry.get("funding_pattern1", {})
+    f2 = entry.get("funding_pattern2", {})
     
     lines.append("\n🎯 <b>[ENTRY PHEMEX]</b>")
     lines.append(f"Enable: <b>{ph.get('enable')}</b> | Depth: <b>{ph.get('depth')}</b> | TTL: <b>{ph.get('pattern_ttl_sec')}s</b>")
@@ -65,20 +65,21 @@ def get_config_summary(cfg: dict) -> str:
     
     lines.append("\n🔶 <b>[ENTRY BINANCE & FUNDING]</b>")
     lines.append(f"Binance: <b>{binance.get('enable')}</b> | Sprd: &gt;= <b>{binance.get('min_price_spread_rate')}%</b>")
-    lines.append(f"Funding: <b>{ff.get('enable')}</b> | Thresh: &gt;= <b>{ff.get('funding_threshold_pct')}%</b>")
+    lines.append(f"Fund1(Phemex): <b>{f1.get('enable')}</b> | Thresh: &gt;= <b>{f1.get('threshold_pct')}%</b>")
+    lines.append(f"Fund2(Diff): <b>{f2.get('enable')}</b> | Diff: &gt;= <b>{f2.get('diff_threshold_pct')}%</b>")
 
     exit_cfg = cfg.get("exit", {})
     scen = exit_cfg.get("scenarios", {})
-    avg = scen.get("base", {}) # БЫЛО average, ИСПРАВЛЕНО НА base
+    avg = scen.get("base", {})
     neg = scen.get("negative", {})
     inter = exit_cfg.get("interference", {})
-    ttl = scen.get("breakeven_ttl_close", {}) # БЫЛО position_ttl_close в корне exit, ИСПРАВЛЕНО
+    ttl = scen.get("breakeven_ttl_close", {})
     ext = exit_cfg.get("extrime_close", {})
     
     lines.append("\n🚪 <b>[EXIT SCENARIOS]</b>")
-    lines.append(f"<b>Base (Average):</b> {avg.get('enable', True)} | Stab TTL: <b>{avg.get('stabilization_ttl')}s</b>")
+    lines.append(f"<b>Base (Take):</b> {avg.get('enable', True)} | Stab TTL: <b>{avg.get('stabilization_ttl')}s</b>")
     lines.append(f"<b>Negative:</b> {neg.get('enable')} | Neg Spread &lt;= <b>{neg.get('negative_spread_pct')}%</b> for <b>{neg.get('negative_ttl')}s</b>")
-    lines.append(f"<b>Interference:</b> {inter.get('enable')} | Usual Vol: <b>{inter.get('usual_vol_pct_to_init_size')}%</b>") # ИСПРАВЛЕН КЛЮЧ
+    lines.append(f"<b>Interference:</b> {inter.get('enable')} | Usual Vol: <b>{inter.get('usual_vol_pct_to_init_size')}%</b>")
     lines.append(f"<b>TTL Close:</b> {ttl.get('enable')} | TTL: <b>{ttl.get('position_ttl')}s</b> | Wait: <b>{ttl.get('breakeven_wait_sec')}s</b>")
     lines.append(f"<b>Extrime:</b> {ext.get('enable')} | Retries: <b>{ext.get('retry_num')}</b> per <b>{ext.get('retry_ttl')}s</b>")
 

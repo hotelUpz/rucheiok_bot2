@@ -87,7 +87,7 @@ class TradingBot:
         ) if tg_cfg.get("enable") else None
 
         self.funding_manager = FundingManager(
-            cfg["pattern"],
+            cfg.get("entry", {}).get("pattern", {}),
             self.phemex_funding_api,
             self.binance_funding_api
         )

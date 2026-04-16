@@ -102,7 +102,6 @@ class PriceCacheManager:
 
 
 class ConfigManager:
-    # Нужно согласовать с новыми настройками.
     def __init__(self, cfg_path: Path | str, tb: "TradingBot"):
         self.cfg_path = cfg_path
         self.tb = tb
@@ -119,17 +118,52 @@ class ConfigManager:
             if hasattr(self.tb.state, 'black_list'):
                 self.tb.state.black_list = self.tb.black_list
 
-            # ИСПРАВЛЕНИЕ: Использование signal_engine
-            old_ff = getattr(self.tb.signal_engine, 'funding_filter', None) if hasattr(self.tb, 'signal_engine') else None
-            if old_ff: old_ff.stop()
+            # --- ПЕРЕЗАГРУЗКА ИНСТРУМЕНТОВ ВХОДА (ВКЛЮЧАЯ ФАНДИНГ V5) ---
+            from ENTRY.funding_manager import FundingManager
+            from ENTRY.signal_engine import SignalEngine
+            
+            # Тормозим старую таску фандинга, если есть
+            if hasattr(self.tb, 'funding_manager'):
+                self.tb.funding_manager.stop()
+                
+            old_task = getattr(self.tb, '_funding_task', None)
+            if old_task and not old_task.done():
+                old_task.cancel()
 
-            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.phemex_funding_api)
+            # Создаем новый инстанс FundingManager
+            self.tb.funding_manager = FundingManager(
+                self.tb.cfg.get("entry", {}).get("pattern", {}), 
+                self.tb.phemex_funding_api, 
+                self.tb.binance_funding_api
+            )
+            
+            # Пересоздаем движок сигналов (математика стакана обновится здесь же)
+            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.funding_manager)
 
+            # Перезапускаем луп фандинга
             if getattr(self.tb, '_is_running', False):
-                old_task = getattr(self.tb, '_funding_task', None)
-                if old_task and not old_task.done():
-                    old_task.cancel()
-                self.tb._funding_task = asyncio.create_task(self.tb.signal_engine.funding_filter.run())
+                self.tb._funding_task = asyncio.create_task(self.tb.funding_manager.run())
+
+            # --- ПЕРЕЗАГРУЗКА СЦЕНАРИЕВ ВЫХОДА ---
+            exit_cfg = self.tb.cfg.get("exit", {})
+            scen_cfg = exit_cfg.get("scenarios", {})
+            
+            from EXIT.scenarios.base import BaseScenario
+            from EXIT.scenarios.negative import NegativeScenario
+            from EXIT.scenarios.breakeven import PositionTTLClose
+            from EXIT.interference import Interference
+            from EXIT.extrime_close import ExtrimeClose
+            
+            self.tb.scen_base = BaseScenario(scen_cfg.get("base", {}))
+            self.tb.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
+            self.tb.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.tb.active_positions_locker)
+            self.tb.scen_interf = Interference(exit_cfg.get("interference", {}))
+            self.tb.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
+
+            self.tb.base_order_timeout_sec = scen_cfg.get("base", {}).get("order_timeout_sec", 0.1)   
+            self.tb.breakeven_order_timeout_sec = scen_cfg.get("breakeven_ttl_close", {}).get("order_timeout_sec", 0.1)     
+            self.tb.interference_order_timeout_sec = exit_cfg.get("interference", {}).get("order_timeout_sec", 0.1)        
+            self.tb.extrime_order_timeout_sec = exit_cfg.get("extrime_close", {}).get("order_timeout_sec", 0.1)
 
             return True, "Конфигурация успешно обновлена в памяти!"
         except Exception as e:

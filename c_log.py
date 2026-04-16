@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
+import sys
 # import os
 from datetime import datetime
 from functools import wraps
@@ -12,7 +13,6 @@ from typing import Any, Optional
 import pytz
 
 from consts import LOG_DEBUG, LOG_ERROR, LOG_INFO, LOG_WARNING, MAX_LOG_LINES, TIME_ZONE
-
 
 TZ = pytz.timezone(TIME_ZONE)
 
@@ -37,35 +37,40 @@ class UnifiedLogger:
         base_logger.propagate = False
 
         if not base_logger.handlers:
-            handler = RotatingFileHandler(log_path, maxBytes=max_bytes, backupCount=2, encoding="utf-8")
-            handler.setFormatter(_TzFormatter("%(asctime)s | %(levelname)s | %(context)s | %(message)s", "%Y-%m-%d %H:%M:%S"))
-            base_logger.addHandler(handler)
+            # Создаем единый форматер для всех выводов
+            formatter = _TzFormatter("%(asctime)s | %(levelname)s | %(context)s | %(message)s", "%Y-%m-%d %H:%M:%S")
+
+            # 1. Обработчик для записи в файл
+            file_handler = RotatingFileHandler(log_path, maxBytes=max_bytes, backupCount=2, encoding="utf-8")
+            file_handler.setFormatter(formatter)
+            base_logger.addHandler(file_handler)
+
+            # 2. Обработчик для вывода в консоль (заменяет print)
+            if LOG_DEBUG: 
+                console_handler = logging.StreamHandler(sys.stdout)
+                console_handler.setFormatter(formatter)
+                base_logger.addHandler(console_handler)
 
         self._logger = logging.LoggerAdapter(base_logger, extra={"context": context or name})
 
     def debug(self, msg: str, *args, **kwargs) -> None:
         if LOG_DEBUG:
-            print(msg)
             self._logger.debug(msg, *args, **kwargs)
 
     def info(self, msg: str, *args, **kwargs) -> None:
         if LOG_INFO:
-            print(msg)
             self._logger.info(msg, *args, **kwargs)
 
     def warning(self, msg: str, *args, **kwargs) -> None:
         if LOG_WARNING:
-            print(msg)
             self._logger.warning(msg, *args, **kwargs)
 
     def error(self, msg: str, *args, **kwargs) -> None:
         if LOG_ERROR:
-            print(msg)
             self._logger.error(msg, *args, **kwargs)
 
     def exception(self, msg: str, *args, **kwargs) -> None:
         if LOG_ERROR:
-            print(msg)
             self._logger.exception(msg, *args, **kwargs)
 
     def total_exception_decor(self, func, context: Optional[Any] = None):

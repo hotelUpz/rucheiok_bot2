@@ -1,0 +1,40 @@
+2026-04-17 01:01:11 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-17 01:01:27 | INFO | bot | ▶️ Инициализация систем...
+2026-04-17 01:01:27 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Fund1(Phemex): <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Take):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-17 01:01:29 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 01:01:29 | INFO | bot | 📡 Запрашиваем Equity с биржи для инициализации аудита...
+2026-04-17 01:01:30 | INFO | bot | 💰 Стартовый баланс зафиксирован: 10441.25 USDT
+2026-04-17 01:01:30 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-17 01:01:32 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-17 01:01:33 | INFO | bot | 🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...
+2026-04-17 01:01:34 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 01:01:39 | INFO | bot | ⏹ Остановка процессов...
+2026-04-17 01:01:39 | INFO | bot | 💾 Финальное сохранение стейта на диск...
