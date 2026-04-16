@@ -41,8 +41,6 @@ class OrderExecutor:
         self.cfg = tb.cfg
         
         self.entry_timeout = self.cfg.get("entry", {}).get("entry_timeout_sec", 0.5)
-        self.exit_timeout = self.cfg.get("exit", {}).get("exit_timeout_sec", 0.5)
-        self.interf_timeout = self.cfg.get("exit", {}).get("interference", {}).get("interference_timeout_sec", 0.1)
         
         self.max_entry_retries = self.cfg.get("entry", {}).get("max_place_order_retries", 1)
         self.max_exit_retries = self.cfg.get("exit", {}).get("max_place_order_retries", 1)
@@ -75,7 +73,7 @@ class OrderExecutor:
             logger.debug(f"[{symbol}] Исключение отмены {order_id}: {e}")
             return False
 
-    async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float) -> Optional[float]:
+    async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float, interf_timeout) -> Optional[float]:
         """
         Роль: скупка маленьких ордеров. Неудачи логируем. Допустимые остатки для скупки переосмысливаются в оркестраторе.
         Возврат -- фактически исполненное количество ордера float | None
@@ -99,7 +97,7 @@ class OrderExecutor:
             resp = await self.client.place_limit_order(symbol, side, req_qty, price, phemex_pos_side)
             if resp.get("code") == 0:
                 order_id = resp.get("data", {}).get("orderID")
-                await asyncio.sleep(self.interf_timeout)
+                await asyncio.sleep(interf_timeout)
                 if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
                 return req_qty 
             else:
@@ -120,6 +118,7 @@ class OrderExecutor:
             if not spec: return False
 
             price = round_step(signal.price, spec.tick_size)
+            if not price: return
             row_vol_asset = signal.row_vol_asset or 0.0
             
             target_usdt = row_vol_asset * price * (1 + self.margin_over_size_pct / 100.0)
@@ -171,48 +170,73 @@ class OrderExecutor:
         except Exception as e:
             logger.error(f"[{pos_key}] Глобальная ошибка execute_entry: {e}")
             return False
-
+        
     async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
         """
-        1. Берет количество ордера. Цена постатовки лимитного ордера - order_price.
-        2. Ставит ордер через await. Дожидается ответа в течение timeout_sec.
-        3. Если успех: отменяет остаток, возвращает True.
-           Если неуспех: ретрай, возвращает False.
+        1. Безопасно отменяет предыдущий лимитный ордер закрытия (если он завис из-за обрыва сети).
+        2. Ставит новый ордер и ждет timeout_sec.
+        3. Если позиция не закрылась полностью — отменяет остаток.
         """
         try:
             spec = self.tb.symbol_specs.get(symbol)
             if not spec: return False
 
+            # 1. Забираем параметры и проверяем наличие старого ордера
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0: 
                     return False
                 qty = pos.current_qty
                 pos_side_raw = pos.side
+                old_order_id = pos.close_order_id # <-- Читаем ID старого ордера
 
+            phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
+            
+            # 2. УБИВАЕМ СТАРЫЙ ОРДЕР (разблокируем маржу для нового ордера)
+            if old_order_id:
+                await self.execute_cancel(symbol, phemex_pos_side, old_order_id)
+                # Очищаем память от старого ордера
+                async with self.tb._get_lock(pos_key):
+                    pos = self.tb.state.active_positions.get(pos_key)
+                    if pos: pos.close_order_id = ""
+
+            # 3. Подготовка к постановке нового ордера
             price = round_step(order_price, spec.tick_size)
             qty = round_step(qty, spec.lot_size)
             if qty < spec.lot_size: return False
 
             side = "Sell" if pos_side_raw == "LONG" else "Buy"
-            phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
 
+            # 4. Основной цикл постановки
             for attempt in range(max(1, self.max_exit_retries)):
                 try:
                     resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
                     if resp.get("code") == 0:
-                        order_id = resp.get("data", {}).get("orderID")
+                        new_order_id = resp.get("data", {}).get("orderID")
+                        
+                        # Сохраняем новый ID в стейт на случай краша (чтобы на следующем тике Оркестратор его нашел и убил)
+                        if new_order_id:
+                            async with self.tb._get_lock(pos_key):
+                                pos = self.tb.state.active_positions.get(pos_key)
+                                if pos: pos.close_order_id = new_order_id
                             
+                        # Ждем исполнения
                         await asyncio.sleep(timeout_sec)
                         
-                        if order_id: 
+                        # 5. Проверка исполнения после паузы
+                        if new_order_id: 
                             curr_qty = 0.0
                             async with self.tb._get_lock(pos_key):
                                 pos = self.tb.state.active_positions.get(pos_key)
                                 if pos: curr_qty = pos.current_qty
                                 
                             if curr_qty > 0:
-                                await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                                # Позиция всё еще висит -> отменяем лимитку
+                                await self.execute_cancel(symbol, phemex_pos_side, new_order_id)
+                                async with self.tb._get_lock(pos_key):
+                                    pos = self.tb.state.active_positions.get(pos_key)
+                                    if pos and pos.close_order_id == new_order_id:
+                                        pos.close_order_id = "" # Успешно отменили, сбрасываем ID
                                 
                         return True
                     else:
@@ -225,3 +249,57 @@ class OrderExecutor:
         except Exception as e:
             logger.error(f"[{pos_key}] Глобальная ошибка execute_exit: {e}")
             return False
+
+    # async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
+    #     """
+    #     1. Берет количество ордера. Цена постатовки лимитного ордера - order_price.
+    #     2. Ставит ордер через await. Дожидается ответа в течение timeout_sec.
+    #     3. Если успех: отменяет остаток, возвращает True.
+    #        Если неуспех: ретрай, возвращает False.
+    #     """
+    #     try:
+    #         spec = self.tb.symbol_specs.get(symbol)
+    #         if not spec: return False
+
+    #         async with self.tb._get_lock(pos_key):
+    #             pos = self.tb.state.active_positions.get(pos_key)
+    #             if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0: 
+    #                 return False
+    #             qty = pos.current_qty
+    #             pos_side_raw = pos.side
+
+    #         price = round_step(order_price, spec.tick_size)
+    #         qty = round_step(qty, spec.lot_size)
+    #         if qty < spec.lot_size: return False
+
+    #         side = "Sell" if pos_side_raw == "LONG" else "Buy"
+    #         phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
+
+    #         for attempt in range(max(1, self.max_exit_retries)):
+    #             try:
+    #                 resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
+    #                 if resp.get("code") == 0:
+    #                     order_id = resp.get("data", {}).get("orderID")
+                            
+    #                     await asyncio.sleep(timeout_sec)
+                        
+    #                     if order_id: 
+    #                         curr_qty = 0.0
+    #                         async with self.tb._get_lock(pos_key):
+    #                             pos = self.tb.state.active_positions.get(pos_key)
+    #                             if pos: curr_qty = pos.current_qty
+                                
+    #                         if curr_qty > 0:
+    #                             await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                                
+    #                     return True
+    #                 else:
+    #                     logger.warning(f"[{pos_key}] ❌ Ошибка выхода API: {resp}")
+    #             except Exception as e:
+    #                 logger.error(f"[{pos_key}] Исключение execute_exit: {e}")
+                
+    #         return False
+            
+    #     except Exception as e:
+    #         logger.error(f"[{pos_key}] Глобальная ошибка execute_exit: {e}")
+    #         return False

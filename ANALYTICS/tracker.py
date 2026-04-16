@@ -67,19 +67,25 @@ class PerformanceTracker:
             self.data["current_balance"] += net_pnl
             cb = self.data["current_balance"]
             
+            # Фиксация нового исторического максимума (ATH)
             if cb > self.data["max_balance"]:
                 self.data["max_balance"] = cb
+                current_dd_usd = 0.0
+                current_dd_pct = 0.0
+            else:
+                # Расчет текущей мгновенной просадки от пика депозита
+                current_dd_usd = self.data["max_balance"] - cb
+                current_dd_pct = (current_dd_usd / self.data["max_balance"]) * 100
+
+            # Обновляем исторический минимум
             if cb < self.data["min_balance"]:
                 self.data["min_balance"] = cb
 
-            # MDD считается от исторического максимума баланса
-            drawdown_usd = self.data["max_balance"] - cb
-            drawdown_pct = (drawdown_usd / self.data["max_balance"]) * 100 if self.data["max_balance"] > 0 else 0.0
-
-            if drawdown_usd > self.data["mdd_usd"]:
-                self.data["mdd_usd"] = drawdown_usd
-            if drawdown_pct > self.data["mdd_pct"]:
-                self.data["mdd_pct"] = drawdown_pct
+            # Обновляем рекорды максимальных просадок (MDD)
+            if current_dd_usd > self.data["mdd_usd"]:
+                self.data["mdd_usd"] = current_dd_usd
+            if current_dd_pct > self.data["mdd_pct"]:
+                self.data["mdd_pct"] = current_dd_pct
 
         # 5. По-символьная статистика
         if symbol not in self.data["symbols"]:

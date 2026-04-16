@@ -36,11 +36,11 @@ class BaseScenario:
             return pos.entry_price + (pos.base_target_price_100 - pos.entry_price) * pos.current_target_rate
         return pos.entry_price - (pos.entry_price - pos.base_target_price_100) * pos.current_target_rate
 
-    def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> float | None:
-        if not self.enable or pos.in_breakeven_mode or pos.in_extrime_mode:
-            return None
-            
-        if pos.current_qty <= 0: 
+    def scen_base_analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> float | None:
+        if not self.enable:
+            return None   
+
+        if pos.current_qty <= 0:
             return None
 
         if (now - pos.opened_at) < self.stab_ttl:

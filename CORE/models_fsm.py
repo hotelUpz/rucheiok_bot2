@@ -6,11 +6,13 @@ from __future__ import annotations
 import asyncio
 import time
 from dataclasses import dataclass, field, fields
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any, TYPE_CHECKING, Literal
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
     from CORE.restorator import BotState
+
+ExitStatusType = Literal["NORMAL", "EXTREME", "HUNTING", "INTERFERENCE", "BREAKEVEN"]
 
 logger = UnifiedLogger("ws")
 
@@ -21,13 +23,13 @@ class ActivePosition:
     
     in_pending: bool = False             # 1. Ордер отправлен (Слот занят)
     in_position: bool = False            # 2. Позиция налита
+
+    exit_status: ExitStatusType = "NORMAL"
+    last_exit_status: ExitStatusType = "NORMAL"
     
-    in_base_mode: bool = False           
-    in_breakeven_mode: bool = False      
-    in_extrime_mode: bool = False        
-    interference_disabled: bool = False  
+    in_base_mode: bool = False
     is_closed_by_exchange: bool = False  
-    interf_in_flight: bool = False       
+    interf_in_flight: bool = False       # Оставляем как отдельный асинхронный лок для скупки помех     
     
     entry_price: float = 0.0             
     pending_price: float = 0.0           
@@ -36,7 +38,8 @@ class ActivePosition:
     realized_exit_price: float = 0.0     
     
     pending_qty: float = 0.0             
-    current_qty: float = 0.0             
+    current_qty: float = 0.0    
+    closed_qty: float = 0.0         
     interf_comulative_qty: float = 0.0 
     
     init_ask1: float = 0.0
@@ -54,6 +57,7 @@ class ActivePosition:
     last_extrime_try_ts: float = 0.0
     
     extrime_retries_count: int = 0
+    marked_for_death_ts: float = 0.0
 
     def to_dict(self) -> dict:
         return self.__dict__
@@ -152,4 +156,5 @@ class WsInterpreter:
                     if pos.in_position:
                         pos.is_closed_by_exchange = True
                         pos.in_position = False
+                        pos.closed_qty = pos.current_qty # Сохраняем объем перед обнулением
                     pos.current_qty = 0.0

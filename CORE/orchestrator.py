@@ -23,7 +23,7 @@ from API.BINANCE.funding import BinanceFunding
 from ENTRY.signal_engine import SignalEngine
 from CORE.restorator import BotState
 from CORE.executor import OrderExecutor
-from CORE.models_fsm import WsInterpreter
+from CORE.models_fsm import WsInterpreter, ActivePosition
 from CORE._utils import BlackListManager, PriceCacheManager, ConfigManager, Reporters
 
 from EXIT.scenarios.base import BaseScenario
@@ -40,6 +40,7 @@ from utils import get_config_summary
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
     from ENTRY.pattern_math import EntrySignal
+    # from CORE.models_fsm import ActivePosition
 
 logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,6 +111,11 @@ class TradingBot:
         self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
         self.scen_interf = Interference(exit_cfg.get("interference", {}))
         self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
+
+        self.base_order_timeout_sec = scen_cfg.get("base", {}).get("order_timeout_sec", 0.1)   
+        self.breakeven_order_timeout_sec = scen_cfg.get("breakeven_ttl_close", {}).get("order_timeout_sec", 0.1)     
+        self.interference_order_timeout_sec = exit_cfg.get("interference", {}).get("order_timeout_sec", 0.1)        
+        self.extrime_order_timeout_sec = exit_cfg.get("extrime_close", {}).get("order_timeout_sec", 0.1)        
 
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
@@ -224,74 +230,103 @@ class TradingBot:
             
         return True
     
+    # --- СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
+    async def _payloader(self, action_payload: tuple, symbol: str, pos_key: str) -> None:       
+        cmd = action_payload[0]
+        
+        if cmd in ("EXTREME", "BREAKEVEN", "HUNTING"):
+            price, timeout = action_payload[1], action_payload[2]
+            success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
+            
+            async with self._get_lock(pos_key):
+                p = self.state.active_positions.get(pos_key)
+                if p:
+                    p.last_exit_status = p.exit_status
+                    if p.exit_status == "HUNTING": p.exit_status = "NORMAL"
+                    # --- НОВАЯ ЛОГИКА: ОТКАТ ПРИ СЕТЕВОЙ ОШИБКЕ ---
+                    if not success and p.exit_status in ("EXTREME", "BREAKEVEN"):
+                        logger.debug(f"[{pos_key}] Откат идемпотентности из-за ошибки сети. Retry...")
+                        p.current_close_price = 0.0 
+                    # ----------------------------------------------
+
+        elif cmd == "INTERFERENCE":
+            price, qty, interf_timeout = action_payload[1], action_payload[2], action_payload[3]
+            success = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout)
+            
+            async with self._get_lock(pos_key):
+                p = self.state.active_positions.get(pos_key)
+                if p:
+                    p.exit_status = "NORMAL" # Скупка завершена, возвращаемся в мониторинг
+                    p.interf_in_flight = False
+                    if success: p.interf_comulative_qty += qty
+    
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         now = time.time()
-        exit_cfg = self.cfg.get("exit", {})
-        timeout_extrime = exit_cfg.get("extrime_close", {}).get("extrime_timeout_sec", 0.1)
-        timeout_hunt = exit_cfg.get("hunting_timeout_sec", 0.1)
         
         for pos_key in (long_key, short_key):
             action_payload = None
 
-            # ШАГ 1: Собираем данные и принимаем решение ВНУТРИ локера
             async with self._get_lock(pos_key):
                 pos = self.state.active_positions.get(pos_key)
-                if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0:
+                if not pos or not pos.in_position or pos.current_qty <= 0:
                     continue
 
-                neg_res = self.scen_neg.analyze(snap, pos, now)
-                if neg_res == "NEGATIVE_TIMEOUT": pos.in_extrime_mode = True
-
-                ttl_res = await self.scen_ttl.analyze(pos, now)
-                if ttl_res == "EXTRIME_SCENARIO": pos.in_extrime_mode = True
-
-                if pos.in_extrime_mode:
-                    ext_price = self.scen_extrime.analyze(snap, pos, now)
-                    if ext_price and pos.current_close_price != ext_price:
-                        pos.current_close_price = ext_price 
-                        action_payload = ("EXIT", ext_price, timeout_extrime)
+                # --- 1. СЕТЕВАЯ БЛОКИРОВКА ---
+                if pos.exit_status in ("HUNTING", "INTERFERENCE"):
+                    continue
                 
-                elif pos.in_breakeven_mode:
-                    be_price = self.scen_ttl.build_target_price(pos)
-                    if pos.current_close_price != be_price:
-                        pos.current_close_price = be_price 
-                        action_payload = ("EXIT", be_price, timeout_hunt)
-                
+                # ---  ---
                 else:
-                    base_price = self.scen_base.analyze(snap, pos, now)
+                    is_extrime = pos.exit_status == "EXTREME"
+
+                    ttl_res = None
+                    if not is_extrime: ttl_res = await self.scen_ttl.scen_ttl_analyze(pos, now)
+                    
+                    # Принудительный переход в экстрим (негатив или таймаут БУ)
+                    if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or\
+                        self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
+                        pos.exit_status = "EXTREME"
+
+                        ext_price = self.scen_extrime.scen_extrime_analyze(snap, pos, now)
+                        if ext_price and pos.current_close_price != ext_price:
+                            pos.current_close_price = ext_price
+                            pos.last_extrime_try_ts = now
+                            pos.extrime_retries_count += 1
+                            action_payload = ("EXTREME", ext_price, self.extrime_order_timeout_sec)
+
+                    elif ttl_res == "BREAKEVEN":
+                        pos.exit_status = "BREAKEVEN"
+                        pos.breakeven_start_ts = now
+                        be_price = self.scen_ttl.build_target_price(pos)
+                        if be_price and pos.current_close_price != be_price:
+                            pos.current_close_price = be_price
+                            action_payload = ("BREAKEVEN", be_price, self.breakeven_order_timeout_sec)
+                    
+                    # Базовый Тейк-Профит === Охота.
+                    base_price = self.scen_base.scen_base_analyze(snap, pos, now)
                     if base_price and pos.current_close_price != base_price:
-                        pos.current_close_price = base_price 
-                        action_payload = ("EXIT", base_price, timeout_hunt)
+                        pos.exit_status = "HUNTING"
+                        pos.current_close_price = base_price
+                        action_payload = ("HUNTING", base_price, self.base_order_timeout_sec) # это и есть охота.
+                    
+                    # Запрос на Скупку Помех
+                    if not pos.interf_in_flight:
+                        interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
+                        if interf_res:
+                            i_price, i_qty = interf_res
+                            pos.exit_status = "INTERFERENCE"
+                            pos.interf_in_flight = True
+                            action_payload = ("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec)
 
-                if not action_payload and not pos.interf_in_flight:
-                    interf_res = self.scen_interf.analyze(snap, pos, now)
-                    if interf_res:
-                        i_price, i_qty = interf_res
-                        pos.interf_in_flight = True 
-                        action_payload = ("INTERFERENCE", i_price, i_qty)
-
-            # ШАГ 2: Жесткий AWAIT Экзекьютора БЕЗ локера (чтобы избежать дедлока)
+            # --- 2. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
             if action_payload:
-                cmd = action_payload[0]
-                
-                if cmd == "EXIT":
-                    price, timeout = action_payload[1], action_payload[2]
-                    # СТРОГАЯ ПРОВЕРКА БУЛЕВОГО ЗНАЧЕНИЯ
-                    success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
-                    if not success:
-                        # В случае провала (False) сбрасываем цену, чтобы попробовать еще раз
-                        async with self._get_lock(pos_key):
-                            p = self.state.active_positions.get(pos_key)
-                            if p and not getattr(p, 'is_closed_by_exchange', False):
-                                p.current_close_price = 0.0
+                await self._payloader(action_payload, symbol, pos_key)
 
-                elif cmd == "INTERFERENCE":
-                    price, qty = action_payload[1], action_payload[2]
-                    res_qty = await self.executor.interf_bought(symbol, pos_key, qty, price)
-                    if not res_qty: # Провал скупки помех
-                        async with self._get_lock(pos_key):
-                            p = self.state.active_positions.get(pos_key)
-                            if p: p.interf_in_flight = False
+                # --- 3. СБРОС ИДЕМПОТЕНТА pos.current_close_price ---
+                async with self._get_lock(pos_key):
+                    pos = self.state.active_positions.get(pos_key)
+                    if pos and pos.exit_status == "NORMAL":
+                        pos.current_close_price = 0.0
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)
@@ -309,7 +344,7 @@ class TradingBot:
             # 1. Ордер отправили -- пометили пендинг (прямо в орке)
             async with self._get_lock(pos_key):
                 if pos_key not in self.state.active_positions:
-                    from CORE.models_fsm import ActivePosition
+                    # from CORE.models_fsm import ActivePosition # почему здесь?
                     self.state.active_positions[pos_key] = ActivePosition(
                         symbol=symbol, side=signal.side, pending_qty=0.0,
                         in_pending=True,   # ЯКОРЬ
@@ -334,14 +369,17 @@ class TradingBot:
                     if p:
                         p.in_pending = False
                         if not getattr(p, 'in_position', False):
-                            p.is_closed_by_exchange = True
+                            # Помечаем на отложенное удаление (ждем WS 5 секунд)
+                            p.marked_for_death_ts = time.time()
 
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
             async with self._get_lock(pos_key):
                 if pos_key in self.state.active_positions:
                     self.state.active_positions[pos_key].in_pending = False
-                    self.state.active_positions[pos_key].is_closed_by_exchange = True
+                    if not getattr(p, 'in_position', False):
+                        # Помечаем на отложенное удаление (ждем WS 5 секунд)
+                        p.marked_for_death_ts = time.time()
 
     async def _process_symbol_pipeline(self, snap: DepthTop):
         symbol = snap.symbol
@@ -371,20 +409,24 @@ class TradingBot:
             keys_to_check = list(self.state.active_positions.keys())
             for pos_key in keys_to_check:
                 async with self._get_lock(pos_key):
-                    pos = self.state.active_positions.get(pos_key)
+                    pos: "ActivePosition" = self.state.active_positions.get(pos_key)
                     if not pos: continue
+
+                    # --- НОВЫЙ БЛОК: СБОРЩИК ФАНТОМНЫХ ВХОДОВ ---
+                    if getattr(pos, 'marked_for_death_ts', 0) > 0:
+                        if pos.in_position:
+                            # WS догнал нас и налил позицию! Спасаем ее.
+                            pos.marked_for_death_ts = 0.0 
+                        elif time.time() - pos.marked_for_death_ts > 5.0:
+                            # Прошло 5 секунд, WS молчит. Это 100% фейл. Сносим.
+                            logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
+                            self.state.active_positions.pop(pos_key, None)
+                            asyncio.create_task(self.state.save())
+                            continue
+                    # ----------------------------------------------
 
                     if getattr(pos, 'is_closed_by_exchange', False):
                         if pos.entry_price > 0.0:
-                            if pos.in_extrime_mode: 
-                                semantic = "⚠️ Аварийный выход (Extrime Mode)"
-                                self.apply_loss_quarantine(pos.symbol)
-                            elif pos.in_breakeven_mode: 
-                                semantic = "🛡 Выход по безубытку (TTL)"
-                                self.state.consecutive_fails[pos.symbol] = 0
-                            else: 
-                                semantic = "🎯 Тейк-профит (Base Scenario)"
-                                self.state.consecutive_fails[pos.symbol] = 0
                             
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                             
@@ -394,10 +436,22 @@ class TradingBot:
                                 side=pos.side,
                                 entry_price=pos.entry_price,
                                 exit_price=exit_pr,
-                                qty=pos.current_qty # Используем объем позиции
+                                qty=pos.closed_qty # Используем объем позиции
                             )
 
                             emoji = "💵" if is_win else "🩸"
+
+                            # --- НОВАЯ FSM-ПРОВЕРКА ---
+                            if pos.last_exit_status == "EXTREME": 
+                                semantic = "⚠️ Аварийный выход (EXTREME Mode)"
+                                self.apply_loss_quarantine(pos.symbol)
+                            elif pos.last_exit_status == "BREAKEVEN": 
+                                semantic = "🛡 Выход по безубытку (TTL)"                                
+                                self.state.consecutive_fails[pos.symbol] = 0
+                            else: 
+                                semantic = "🎯 Тейк-профит (Base Scenario)" if is_win else "Ручное закрытие(?)"
+                                self.state.consecutive_fails[pos.symbol] = 0
+                            # --------------------------
 
                             if self.tg:
                                 msg = Reporters.exit_success(pos_key, semantic, exit_pr)
@@ -417,11 +471,16 @@ class TradingBot:
 
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.02)
                 continue
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
-            await asyncio.gather(*tasks, return_exceptions=True)
-            await asyncio.sleep(0.001)
+            await asyncio.gather(*tasks, return_exceptions=False)
+            await asyncio.sleep(0.02)
+
+    async def _on_ws_subscribe(self):
+        """Срабатывает при первом подключении и каждом успешном реконнекте WS"""
+        logger.info("🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...")
+        await self._recover_state()
 
     async def start(self):
         if getattr(self, '_is_running', False): return
@@ -468,7 +527,13 @@ class TradingBot:
         self._funding_task = asyncio.create_task(self.funding_manager.run())
         await asyncio.sleep(1)
         
-        self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
+        # self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
+        self._private_ws_task = asyncio.create_task(
+            self.private_ws.run(
+                self.ws_handler.process_phemex_message,
+                on_subscribe=self._on_ws_subscribe
+            )
+        )
 
         symbols = [s.symbol for s in symbols_info if s and s.symbol not in self.black_list]
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)

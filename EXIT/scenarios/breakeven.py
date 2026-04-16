@@ -36,21 +36,16 @@ class PositionTTLClose:
             return pos.avg_price * (1 + orient_pct / 100.0)
         return pos.avg_price * (1 - orient_pct / 100.0)
 
-    async def analyze(self, pos: ActivePosition, now: float) -> str | None:
+    async def scen_ttl_analyze(self, pos: ActivePosition, now: float) -> str | None: 
         if self.position_ttl in ("inf", None): return None
-
-        if pos.in_extrime_mode: return None
+        # if pos.exit_status == "EXTREME": return None # -- не обязательно так как детерминированно оркестратором.
         
-        if not pos.in_breakeven_mode and (now - pos.opened_at) >= self.position_ttl: # 
-            pos.breakeven_start_ts = now
-            pos.in_breakeven_mode = True
+        # 1. Если время жизни вышло, но мы еще не начали 'охоту'
+        if pos.breakeven_start_ts == 0 and (now - pos.opened_at) >= self.position_ttl: 
+            return "BREAKEVEN"
 
-            return "BREAKEVEN_TIMEOUT"
-
-        # Если Breakeven уже активен
-        # Ждём breakeven_wait_sec и переводим в Extrime — независимо от position_ttl.
-        if pos.in_breakeven_mode:
+        # 2. Если мы уже 'охотимся' (лимитка стоит), но время ожидания БУ вышло
+        if pos.breakeven_start_ts > 0:
             if pos.current_qty > 0.0 and now - pos.breakeven_start_ts >= self.breakeven_wait_sec:
-                pos.in_breakeven_mode = False  
-                return "EXTRIME_SCENARIO"
-            return None
+                return "BREAKEVEN_EXTRIME"
+        return None

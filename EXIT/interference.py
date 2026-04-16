@@ -25,12 +25,12 @@ class Interference:
                 if price > pos.base_target_price_100 and vol <= allowed_remains: return (price, vol)
         return None    
 
-    def analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> tuple[float, float] | None:
-        if not self.enable or pos.in_breakeven_mode or pos.in_extrime_mode:
+    def scen_interf_analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> tuple[float, float] | None:
+        if not self.enable:
             return None
             
         # ЗАМЕНА на min_notional
-        if pos.current_qty <= 0 or pos.interference_disabled:
+        if pos.current_qty <= 0:
             return None
 
         if (now - pos.opened_at) < self.stab_ttl: return None
@@ -43,14 +43,13 @@ class Interference:
         
         # ЗАМЕНА проверки лимита на min_notional_asset
         if allowed_remains <= 0.0: 
-            pos.interference_disabled = True
             return None
 
-        max_chunk_vol = pos.pending_qty * self.usual_vol_pct
         target = self._find_target(depth, pos, allowed_remains) 
 
         if target:
             price, _ = target
+            max_chunk_vol = pos.pending_qty * self.usual_vol_pct
             buy_qty = min(max_chunk_vol, allowed_remains)
             # Финальная проверка перед выстрелом
             if buy_qty <= 0.0: return None
