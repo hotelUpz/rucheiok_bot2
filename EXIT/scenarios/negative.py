@@ -37,13 +37,10 @@ class NegativeScenario:
         if is_negative:
             # Мы в просадке! Якорь перестал обновляться.
             # Считаем чистое абсолютное время с момента, как всё стало плохо.
-            # logger.debug("+is_negative")
-            # self.neg_flag = True
             if (now - pos.last_negative_check_ts) >= self.negative_ttl:
                 return "NEGATIVE_TIMEOUT"
         else:
             # Мы в плюсе (или спред нулевой). Подтягиваем якорь к текущему моменту.
-            # if self.neg_flag: logger.debug("-is_negative break")
             pos.last_negative_check_ts = now
 
         return None

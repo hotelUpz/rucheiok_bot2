@@ -18,6 +18,7 @@ from API.PHEMEX.ws_private import PhemexPrivateWS
 from API.BINANCE.ticker import BinanceTickerAPI
 from API.PHEMEX.ticker import PhemexTickerAPI
 from API.PHEMEX.funding import PhemexFunding
+from API.BINANCE.funding import BinanceFunding
 
 from ENTRY.signal_engine import SignalEngine
 from CORE.restorator import BotState
@@ -30,6 +31,8 @@ from EXIT.scenarios.negative import NegativeScenario
 from EXIT.scenarios.breakeven import PositionTTLClose
 from EXIT.interference import Interference
 from EXIT.extrime_close import ExtrimeClose
+from ENTRY.funding_manager import FundingManager
+from ANALYTICS.tracker import PerformanceTracker
 
 from c_log import UnifiedLogger
 from utils import get_config_summary
@@ -58,13 +61,15 @@ class TradingBot:
         self.bl_manager = BlackListManager(CFG_PATH, self.quota_asset)        
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
         
-        self.state = BotState(black_list=self.black_list)       
+        self.state = BotState(black_list=self.black_list)    
+        self.tracker = PerformanceTracker(self.state)   
         self._is_running = False
 
         self.phemex_sym_api = PhemexSymbols()
         self.binance_ticker_api = BinanceTickerAPI()
-        self.phemex_ticker_api = PhemexTickerAPI()
+        self.phemex_ticker_api = PhemexTickerAPI()        
         self.phemex_funding_api = PhemexFunding()
+        self.binance_funding_api = BinanceFunding()
         self.session = aiohttp.ClientSession()
 
         self.price_manager = PriceCacheManager(self.binance_ticker_api, self.phemex_ticker_api, upd_sec)
@@ -78,7 +83,13 @@ class TradingBot:
             os.getenv("TELEGRAM_CHAT_ID") or tg_cfg.get("chat_id", ""),
         ) if tg_cfg.get("enable") else None
 
-        self.signal_engine = SignalEngine(cfg["entry"], self.phemex_funding_api)
+        self.funding_manager = FundingManager(
+            cfg["pattern"],
+            self.phemex_funding_api,
+            self.binance_funding_api
+        )
+
+        self.signal_engine = SignalEngine(cfg["entry"], self.funding_manager)
 
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
@@ -305,6 +316,7 @@ class TradingBot:
                         in_position=False,
                         init_ask1=signal.init_ask1,
                         init_bid1=signal.init_bid1,
+                        mid_price=signal.mid_price,
                         base_target_price_100=signal.base_target_price_100
                     )
 
@@ -375,10 +387,30 @@ class TradingBot:
                                 self.state.consecutive_fails[pos.symbol] = 0
                             
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
+                            
+                            # === ДОБАВЛЯЕМ АНАЛИТИКУ ===
+                            net_pnl, is_win = self.tracker.register_trade(
+                                symbol=pos.symbol,
+                                side=pos.side,
+                                entry_price=pos.entry_price,
+                                exit_price=exit_pr,
+                                qty=pos.current_qty # Используем объем позиции
+                            )
+
+                            emoji = "💵" if is_win else "🩸"
+
                             if self.tg:
                                 msg = Reporters.exit_success(pos_key, semantic, exit_pr)
                                 asyncio.create_task(self.tg.send_message(msg))
-                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен.")
+                            # logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен.")
+
+                            # if self.tg:                            #     
+                            #     msg = Reporters.exit_success(pos_key, semantic, exit_pr)
+                            #     msg += f"\n\n{emoji} <b>Net PnL: {net_pnl:.4f} $</b>"
+                            #     # Можно раз в 10 сделок кидать полную стату: self.tracker.get_summary_text()
+                            #     asyncio.create_task(self.tg.send_message(msg))
+                                
+                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта. {emoji}: PnL: {net_pnl:.4f}$")
 
                         self.state.active_positions.pop(pos_key, None)
                         asyncio.create_task(self.state.save())
@@ -404,10 +436,37 @@ class TradingBot:
 
         await self._recover_state()
 
+        # ==========================================
+        # ИНИЦИАЛИЗАЦИЯ ФИНАНСОВОГО АУДИТА
+        # ==========================================
+        try:
+            if hasattr(self, 'tracker'):
+                # 1. Проверяем, есть ли уже сохраненный стартовый баланс
+                saved_start_balance = self.tracker.data.get("start_balance", 0.0)
+                
+                if saved_start_balance > 0:
+                    logger.info(f"💰 Стартовый баланс успешно загружен из стейта: {saved_start_balance:.2f} {self.quota_asset}")
+                else:
+                    # 2. Если пусто (самый первый запуск), делаем запрос к бирже
+                    logger.info("📡 Запрашиваем Equity с биржи для инициализации аудита...")
+                    usd_balance = await self.private_client.get_equity(self.quota_asset)
+                    
+                    self.tracker.set_initial_balance(usd_balance)
+                    logger.info(f"💰 Стартовый баланс зафиксирован: {usd_balance:.2f} {self.quota_asset}")
+                    
+                    # 3. Принудительно сохраняем стейт на диск, чтобы закрепить старт
+                    await self.state.save()
+                    
+        except Exception as e:
+            logger.error(f"❌ Не удалось получить/установить стартовый баланс: {e}")
+        # ==========================================
+
         logger.info("🔄 Прогрев кэша цен и фандинга...")
         await self.price_manager.warmup()
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
-        self._funding_task = asyncio.create_task(self.signal_engine.funding_filter.run())
+        await self._await_task(getattr(self, '_funding_task', None))
+        self._funding_task = asyncio.create_task(self.funding_manager.run())
+        await asyncio.sleep(1)
         
         self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
 
@@ -434,7 +493,7 @@ class TradingBot:
         logger.info("⏹ Остановка процессов...")
         if self.tg: await self.tg.send_message("⏹ Остановка процессов...")
         self.price_manager.stop()
-        self.signal_engine.funding_filter.stop()
+        self.funding_manager.stop()
         if self._stream: self._stream.stop()
         await self.private_ws.aclose()
         await self._await_task(getattr(self, '_price_updater_task', None))

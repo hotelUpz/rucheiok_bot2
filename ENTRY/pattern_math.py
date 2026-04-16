@@ -19,7 +19,8 @@ class EntrySignal:
     row_vol_usdt: float
     row_vol_asset: float
     base_target_price_100: float
-    
+    mid_price: float
+
     # Опциональные поля (с дефолтными значениями) ОБЯЗАТЕЛЬНО должны идти в конце
     b_price: Optional[float] = None
     p_price: Optional[float] = None
@@ -47,7 +48,7 @@ class StakanEntryPattern:
         
         self.desired_rate: float = self.cfg.get("header_to_bottom_desired_rate", 0.0)
         self.max_dist_rate: float = self.cfg.get("max_bid_ask_distance_rate", 0.0)
-        self.print_metrics()
+        # self.print_metrics()
 
     def print_metrics(self):
             print(f"--- [StakanEntryPattern Metrics] ---")
@@ -111,6 +112,8 @@ class StakanEntryPattern:
         if rate < self.desired_rate:
             return None
         
+        mid_price = (p1 + opp_p1) / 2
+        
         return EntrySignal(
             side=direction,
             price=p1,
@@ -122,6 +125,7 @@ class StakanEntryPattern:
             row_vol_usdt=vol_usdt,
             row_vol_asset=row_vol_asset,
             base_target_price_100=p2,
+            mid_price=mid_price,
             b_price=None,
             p_price=None,
             spread=None
