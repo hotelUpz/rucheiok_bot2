@@ -97,6 +97,7 @@ class OrderExecutor:
             resp = await self.client.place_limit_order(symbol, side, req_qty, price, phemex_pos_side)
             if resp.get("code") == 0:
                 order_id = resp.get("data", {}).get("orderID")
+                logger.debug(f"[{pos_key}] Скупка помехи прошла успешно!")
                 await asyncio.sleep(interf_timeout)
                 if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
                 async with self.tb._get_lock(pos_key):
@@ -110,45 +111,6 @@ class OrderExecutor:
         except Exception as e:
             logger.debug(f"[{pos_key}] Ошибка скупки помех: {e}")
         return None
-
-    # async def interf_bought(self, symbol: str, pos_key: str, qty: float, order_price: float, interf_timeout) -> Optional[float]:
-    #     """
-    #     Роль: скупка маленьких ордеров. Неудачи логируем. Допустимые остатки для скупки переосмысливаются в оркестраторе.
-    #     Возврат -- фактически исполненное количество ордера float | None
-    #     """
-    #     try:
-    #         spec = self.tb.symbol_specs.get(symbol)
-    #         if not spec: return None
-
-    #         price = round_step(order_price, spec.tick_size)
-    #         req_qty = round_step(qty, spec.lot_size)
-    #         if req_qty < spec.lot_size: return None
-
-    #         async with self.tb._get_lock(pos_key):
-    #             pos = self.tb.state.active_positions.get(pos_key)
-    #             if not pos: return None
-    #             pos_side_raw = pos.side
-    #             qty_before = pos.current_qty
-
-    #         side = "Buy" if pos_side_raw == "LONG" else "Sell"
-    #         phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
-
-    #         resp = await self.client.place_limit_order(symbol, side, req_qty, price, phemex_pos_side)
-    #         if resp.get("code") == 0:
-    #             order_id = resp.get("data", {}).get("orderID")
-    #             await asyncio.sleep(interf_timeout)
-    #             if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
-    #             async with self.tb._get_lock(pos_key):
-    #                 pos = self.tb.state.active_positions.get(pos_key)
-    #                 if not pos: return None
-    #                 pos_side_raw = pos.side
-    #                 if pos.current_qty:
-    #                     return abs(qty_before - pos.current_qty)
-    #         else:
-    #             logger.debug(f"[{pos_key}] Отказ скупки помехи: {resp}")
-    #     except Exception as e:
-    #         logger.debug(f"[{pos_key}] Ошибка скупки помех: {e}")
-    #     return None
 
     async def execute_entry(self, symbol: str, pos_key: str, signal: EntrySignal) -> bool:
         """
