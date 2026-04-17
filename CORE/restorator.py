@@ -51,15 +51,17 @@ class BotState:
         data = load_json(self.filepath, default={})
         if not data: return
         
-        # Обновляем словари in-place, чтобы не разорвать ссылки в памяти 
-        self.consecutive_fails.clear()
-        self.consecutive_fails.update(data.get("fails", {}))
+        # ИСПРАВЛЕНИЕ: Мягкое обновление. Мы не делаем .clear(), 
+        # чтобы реконнекты WS не затирали свежие фейлы живыми данными с диска.
+        for k, v in data.get("fails", {}).items():
+            if k not in self.consecutive_fails:
+                self.consecutive_fails[k] = v
+                
+        for k, v in data.get("quarantine", {}).items():
+            if k not in self.quarantine_until:
+                self.quarantine_until[k] = v
         
-        self.quarantine_until.clear()
-        self.quarantine_until.update(data.get("quarantine", {}))
-        
-        # Для аналитики используем только update, чтобы сохранить 
-        # дефолтные ключи, которые Трекер положил туда при инициализации
+        # Для аналитики используем update, чтобы сохранить дефолтные ключи Трекера
         self.analytics.update(data.get("analytics", {}))
         
         saved_positions = data.get("positions", {})

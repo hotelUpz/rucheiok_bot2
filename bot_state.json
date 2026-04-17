@@ -12,19 +12,22 @@
         "CLOUSDT": 0,
         "QQQUSDT": 0,
         "PRLUSDT": 0,
-        "TRIAUSDT": 0
+        "TRIAUSDT": 0,
+        "BARDUSDT": 0,
+        "BSBUSDT": 0,
+        "NAORISUSDT": 0
     },
     "quarantine": {},
     "analytics": {
         "start_balance": 10444.713980565613,
-        "current_balance": 10461.675697277611,
-        "max_balance": 10461.985751639611,
+        "current_balance": 10461.71488307964,
+        "max_balance": 10462.07648687604,
         "min_balance": 10444.713980565613,
-        "mdd_usd": 0.3100543620003009,
-        "mdd_pct": 0.002963628218970848,
-        "total_wins": 10,
-        "total_losses": 2,
-        "total_pnl": 16.96171671199983,
+        "mdd_usd": 0.7569419135725184,
+        "mdd_pct": 0.007235164829524738,
+        "total_wins": 11,
+        "total_losses": 4,
+        "total_pnl": 17.00090251402794,
         "symbols": {
             "GENIUSUSDT": {
                 "wins": 2,
@@ -65,6 +68,21 @@
                 "wins": 0,
                 "losses": 1,
                 "pnl": -0.3100543619998577
+            },
+            "BARDUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.4468875515719178
+            },
+            "BSBUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 0.8476771500000275
+            },
+            "NAORISUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.3616037963999999
             }
         },
         "history": [
@@ -151,6 +169,30 @@
                 "side": "SHORT",
                 "pnl": -0.3101,
                 "is_win": false
+            },
+            {
+                "ts": 1776438984.4198108,
+                "symbol": "BARDUSDT",
+                "side": "LONG",
+                "pnl": -0.4469,
+                "is_win": false,
+                "duration": "2.2m"
+            },
+            {
+                "ts": 1776442280.0926433,
+                "symbol": "BSBUSDT",
+                "side": "SHORT",
+                "pnl": 0.8477,
+                "is_win": true,
+                "duration": "35.6s"
+            },
+            {
+                "ts": 1776448567.1372929,
+                "symbol": "NAORISUSDT",
+                "side": "LONG",
+                "pnl": -0.3616,
+                "is_win": false,
+                "duration": "5.0m"
             }
         ]
     }

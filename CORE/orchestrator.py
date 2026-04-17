@@ -366,8 +366,15 @@ class TradingBot:
             
             if success:
                 self.state.consecutive_fails[symbol] = 0
+                self.state.quarantine_until.pop(symbol, None) # <--- ДОБАВЛЕНО
                 await self.state.save()
             else:
+            # success = await self.executor.execute_entry(symbol, pos_key, signal)
+            
+            # if success:
+            #     self.state.consecutive_fails[symbol] = 0
+            #     await self.state.save()
+            # else:
                 # ОРДЕР ПРОВАЛИЛСЯ -> Врубаем карантин и сносим позицию (GC убьет)
                 self.apply_entry_quarantine(symbol)
                 async with self._get_lock(pos_key):
@@ -451,6 +458,7 @@ class TradingBot:
 
                             # --- НОВАЯ FSM-ПРОВЕРКА (ЗАЩИТА ОТ ГОНОК) ---
                             # Если WS прилетел раньше, чем _payloader сохранил last_exit_status, мы берем актуальный exit_status!
+                            # --- НОВАЯ FSM-ПРОВЕРКА (ЗАЩИТА ОТ ГОНОК) ---
                             current_status = pos.exit_status if pos.exit_status in ("EXTREME", "BREAKEVEN") else pos.last_exit_status
                             
                             if current_status == "EXTREME": 
@@ -459,13 +467,31 @@ class TradingBot:
                             elif current_status == "BREAKEVEN": 
                                 semantic = "🛡 Выход по безубытку (TTL)"                                
                                 self.state.consecutive_fails[pos.symbol] = 0
+                                self.state.quarantine_until.pop(pos.symbol, None) # <--- ДОБАВЛЕНО
                             else: 
                                 semantic = "🎯 Тейк-профит" if is_win else "📉 Убыток (Ручное/Неизвестно)"
-                                # Жесткая защита: любой неидентифицированный минус — это фейл, монета идет в счетчик
+                                # Жесткая защита: любой неидентифицированный минус — это фейл
                                 if not is_win:
                                     self.apply_loss_quarantine(pos.symbol)
                                 else:
                                     self.state.consecutive_fails[pos.symbol] = 0
+                                    self.state.quarantine_until.pop(pos.symbol, None) # <--- ДОБАВЛЕНО
+                            # --------------------------
+                            # current_status = pos.exit_status if pos.exit_status in ("EXTREME", "BREAKEVEN") else pos.last_exit_status
+                            
+                            # if current_status == "EXTREME": 
+                            #     semantic = "⚠️ Аварийный выход (EXTREME Mode)"
+                            #     self.apply_loss_quarantine(pos.symbol)
+                            # elif current_status == "BREAKEVEN": 
+                            #     semantic = "🛡 Выход по безубытку (TTL)"                                
+                            #     self.state.consecutive_fails[pos.symbol] = 0
+                            # else: 
+                            #     semantic = "🎯 Тейк-профит" if is_win else "📉 Убыток (Ручное/Неизвестно)"
+                            #     # Жесткая защита: любой неидентифицированный минус — это фейл, монета идет в счетчик
+                            #     if not is_win:
+                            #         self.apply_loss_quarantine(pos.symbol)
+                            #     else:
+                            #         self.state.consecutive_fails[pos.symbol] = 0
                             # --------------------------
 
                             if self.tg:
