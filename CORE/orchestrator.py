@@ -302,6 +302,7 @@ class TradingBot:
                         be_price = self.scen_ttl.build_target_price(pos)
                         if be_price and pos.current_close_price != be_price:
                             pos.current_close_price = be_price
+                            logger.debug(f"[{pos_key}] Попытка закрыть в безубыток...")
                             action_payload = ("BREAKEVEN", be_price, self.breakeven_order_timeout_sec)
 
                     # 2. Если экстренных действий нет, ищем тейк-профит
@@ -311,6 +312,7 @@ class TradingBot:
                         if base_price and pos.current_close_price != base_price:
                             pos.exit_status = "HUNTING"
                             pos.current_close_price = base_price
+                            logger.debug(f"[{pos_key}] Попытка охоты...")
                             action_payload = ("HUNTING", base_price, self.base_order_timeout_sec) # это и есть охота.
 
                     # 3. Если и тейка нет, пробуем чистить стакан (Скупка помех)
@@ -322,6 +324,7 @@ class TradingBot:
                                 i_price, i_qty = interf_res
                                 pos.exit_status = "INTERFERENCE"
                                 pos.interf_in_flight = True
+                                logger.debug(f"[{pos_key}] Попытка скупки помех...")
                                 action_payload = ("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec)
 
             # --- 2. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
