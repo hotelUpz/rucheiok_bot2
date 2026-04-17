@@ -32,7 +32,7 @@ from EXIT.scenarios.breakeven import PositionTTLClose
 from EXIT.interference import Interference
 from EXIT.extrime_close import ExtrimeClose
 from ENTRY.funding_manager import FundingManager
-from ANALYTICS.tracker import PerformanceTracker
+from ANALYTICS.tracker import PerformanceTracker, format_duration
 
 from c_log import UnifiedLogger
 from utils import get_config_summary
@@ -431,11 +431,11 @@ class TradingBot:
                             asyncio.create_task(self.state.save())
                             continue
                     # ----------------------------------------------
-
                     if getattr(pos, 'is_closed_by_exchange', False):
                         if pos.entry_price > 0.0:
                             
                             exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
+                            duration_sec = time.time() - pos.opened_at
                             
                             # === ДОБАВЛЯЕМ АНАЛИТИКУ ===
                             net_pnl, is_win = self.tracker.register_trade(
@@ -443,38 +443,40 @@ class TradingBot:
                                 side=pos.side,
                                 entry_price=pos.avg_price if pos.avg_price > 0 else pos.entry_price,
                                 exit_price=exit_pr,
-                                qty=pos.max_realized_qty  # <--- ИДЕАЛЬНЫЙ ИСТОЧНИК ПРАВДЫ
+                                qty=pos.max_realized_qty,
+                                duration_sec=duration_sec
                             )
 
                             emoji = "💵" if is_win else "🩸"
 
-                            # --- НОВАЯ FSM-ПРОВЕРКА ---
-                            if pos.last_exit_status == "EXTREME": 
+                            # --- НОВАЯ FSM-ПРОВЕРКА (ЗАЩИТА ОТ ГОНОК) ---
+                            # Если WS прилетел раньше, чем _payloader сохранил last_exit_status, мы берем актуальный exit_status!
+                            current_status = pos.exit_status if pos.exit_status in ("EXTREME", "BREAKEVEN") else pos.last_exit_status
+                            
+                            if current_status == "EXTREME": 
                                 semantic = "⚠️ Аварийный выход (EXTREME Mode)"
                                 self.apply_loss_quarantine(pos.symbol)
-                            elif pos.last_exit_status == "BREAKEVEN": 
+                            elif current_status == "BREAKEVEN": 
                                 semantic = "🛡 Выход по безубытку (TTL)"                                
                                 self.state.consecutive_fails[pos.symbol] = 0
                             else: 
-                                semantic = "🎯 Тейк-профит (Base Scenario)" if is_win else "Ручное закрытие(?)"
-                                self.state.consecutive_fails[pos.symbol] = 0
+                                semantic = "🎯 Тейк-профит" if is_win else "📉 Убыток (Ручное/Неизвестно)"
+                                # Жесткая защита: любой неидентифицированный минус — это фейл, монета идет в счетчик
+                                if not is_win:
+                                    self.apply_loss_quarantine(pos.symbol)
+                                else:
+                                    self.state.consecutive_fails[pos.symbol] = 0
                             # --------------------------
 
                             if self.tg:
                                 msg = Reporters.exit_success(pos_key, semantic, exit_pr)
+                                msg += f"\n⏳ Время в сделке: {format_duration(duration_sec)}"
                                 asyncio.create_task(self.tg.send_message(msg))
-                            # logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен.")
-
-                            # if self.tg:                            #     
-                            #     msg = Reporters.exit_success(pos_key, semantic, exit_pr)
-                            #     msg += f"\n\n{emoji} <b>Net PnL: {net_pnl:.4f} $</b>"
-                            #     # Можно раз в 10 сделок кидать полную стату: self.tracker.get_summary_text()
-                            #     asyncio.create_task(self.tg.send_message(msg))
                                 
-                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта. {emoji}: PnL: {net_pnl:.4f}$")
+                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта. {emoji} PnL: {net_pnl:.4f}$ | Время: {format_duration(duration_sec)}")
 
                         self.state.active_positions.pop(pos_key, None)
-                        self.active_positions_locker.pop(pos_key, None) # <--- УБИРАЕМ МУСОР
+                        self.active_positions_locker.pop(pos_key, None) 
                         asyncio.create_task(self.state.save())
 
             current_snaps = list(self._latest_market_data.values())

@@ -1,18 +1,157 @@
 {
     "positions": {},
-    "fails": {},
+    "fails": {
+        "GENIUSUSDT": 0,
+        "CHIPUSDT": 0,
+        "HOMEUSDT": 0,
+        "PAYPUSDT": 0,
+        "RAVEUSDT": 0,
+        "TSTUSDT": 0,
+        "SPXUSDT": 0,
+        "FIGHTUSDT": 0,
+        "CLOUSDT": 0,
+        "QQQUSDT": 0,
+        "PRLUSDT": 0,
+        "TRIAUSDT": 0
+    },
     "quarantine": {},
     "analytics": {
-        "start_balance": 0.0,
-        "current_balance": 0.0,
-        "max_balance": 0.0,
-        "min_balance": 0.0,
-        "mdd_usd": 0.0,
-        "mdd_pct": 0.0,
-        "total_wins": 0,
-        "total_losses": 0,
-        "total_pnl": 0.0,
-        "symbols": {},
-        "history": []
+        "start_balance": 10444.713980565613,
+        "current_balance": 10461.675697277611,
+        "max_balance": 10461.985751639611,
+        "min_balance": 10444.713980565613,
+        "mdd_usd": 0.3100543620003009,
+        "mdd_pct": 0.002963628218970848,
+        "total_wins": 10,
+        "total_losses": 2,
+        "total_pnl": 16.96171671199983,
+        "symbols": {
+            "GENIUSUSDT": {
+                "wins": 2,
+                "losses": 1,
+                "pnl": 3.644798339999764
+            },
+            "PAYPUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 0.24427398000000158
+            },
+            "TSTUSDT": {
+                "wins": 2,
+                "losses": 0,
+                "pnl": 7.262169298000068
+            },
+            "SPXUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 0.9635340000000014
+            },
+            "FIGHTUSDT": {
+                "wins": 2,
+                "losses": 0,
+                "pnl": 0.11362987599999479
+            },
+            "QQQUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 3.604705139999907
+            },
+            "PRLUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 1.4386604399999494
+            },
+            "TRIAUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.3100543619998577
+            }
+        },
+        "history": [
+            {
+                "ts": 1776388574.3053424,
+                "symbol": "GENIUSUSDT",
+                "side": "SHORT",
+                "pnl": 1.1245,
+                "is_win": true
+            },
+            {
+                "ts": 1776389034.9232302,
+                "symbol": "PAYPUSDT",
+                "side": "SHORT",
+                "pnl": 0.2443,
+                "is_win": true
+            },
+            {
+                "ts": 1776393565.4332101,
+                "symbol": "GENIUSUSDT",
+                "side": "LONG",
+                "pnl": -0.0073,
+                "is_win": false
+            },
+            {
+                "ts": 1776399933.2258868,
+                "symbol": "TSTUSDT",
+                "side": "SHORT",
+                "pnl": 6.8473,
+                "is_win": true
+            },
+            {
+                "ts": 1776402213.7657974,
+                "symbol": "SPXUSDT",
+                "side": "SHORT",
+                "pnl": 0.9635,
+                "is_win": true
+            },
+            {
+                "ts": 1776404748.0231671,
+                "symbol": "FIGHTUSDT",
+                "side": "LONG",
+                "pnl": 0.0808,
+                "is_win": true
+            },
+            {
+                "ts": 1776412123.0006328,
+                "symbol": "TSTUSDT",
+                "side": "SHORT",
+                "pnl": 0.4149,
+                "is_win": true
+            },
+            {
+                "ts": 1776427081.2800214,
+                "symbol": "QQQUSDT",
+                "side": "LONG",
+                "pnl": 3.6047,
+                "is_win": true
+            },
+            {
+                "ts": 1776429325.336384,
+                "symbol": "PRLUSDT",
+                "side": "LONG",
+                "pnl": 1.4387,
+                "is_win": true
+            },
+            {
+                "ts": 1776435839.8466098,
+                "symbol": "GENIUSUSDT",
+                "side": "LONG",
+                "pnl": 2.5276,
+                "is_win": true
+            },
+            {
+                "ts": 1776435994.8291333,
+                "symbol": "FIGHTUSDT",
+                "side": "SHORT",
+                "pnl": 0.0329,
+                "is_win": true
+            },
+            {
+                "ts": 1776436322.8405492,
+                "symbol": "TRIAUSDT",
+                "side": "SHORT",
+                "pnl": -0.3101,
+                "is_win": false
+            }
+        ]
     }
 }

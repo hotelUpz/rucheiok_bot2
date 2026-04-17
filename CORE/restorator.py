@@ -51,9 +51,16 @@ class BotState:
         data = load_json(self.filepath, default={})
         if not data: return
         
-        self.consecutive_fails = data.get("fails", {})
-        self.quarantine_until = data.get("quarantine", {})
-        self.analytics = data.get("analytics", {})
+        # Обновляем словари in-place, чтобы не разорвать ссылки в памяти 
+        self.consecutive_fails.clear()
+        self.consecutive_fails.update(data.get("fails", {}))
+        
+        self.quarantine_until.clear()
+        self.quarantine_until.update(data.get("quarantine", {}))
+        
+        # Для аналитики используем только update, чтобы сохранить 
+        # дефолтные ключи, которые Трекер положил туда при инициализации
+        self.analytics.update(data.get("analytics", {}))
         
         saved_positions = data.get("positions", {})
         self.active_positions.clear()

@@ -38,3 +38,158 @@ Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
 2026-04-17 01:01:34 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
 2026-04-17 01:01:39 | INFO | bot | ⏹ Остановка процессов...
 2026-04-17 01:01:39 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-17 01:10:45 | INFO | bot | ▶️ Инициализация систем...
+2026-04-17 01:10:45 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Fund1(Phemex): <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Take):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-17 01:10:46 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 01:10:46 | INFO | bot | 📡 Запрашиваем Equity с биржи для инициализации аудита...
+2026-04-17 01:10:47 | INFO | bot | 💰 Стартовый баланс зафиксирован: 10441.25 USDT
+2026-04-17 01:10:47 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-17 01:10:48 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-17 01:10:49 | INFO | bot | 🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...
+2026-04-17 01:10:50 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 01:20:28 | ERROR | bot | [HOMEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-17 01:20:28 | WARNING | bot | [HOMEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-17 01:20:33 | DEBUG | bot | [HOMEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-17 01:56:39 | INFO | bot | [GENIUSUSDT_SHORT] ✅ Вход выполнен. Объем: 1321.0
+2026-04-17 01:56:49 | INFO | bot | [GENIUSUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 2.1334$
+2026-04-17 02:11:08 | INFO | bot | [CHIPUSDT_SHORT] ✅ Вход выполнен. Объем: 16143.0
+2026-04-17 02:11:39 | INFO | bot | [CHIPUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 0.9082$
+2026-04-17 02:39:31 | INFO | bot | ⏹ Остановка процессов...
+2026-04-17 02:39:31 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-17 02:39:54 | INFO | bot | ▶️ Инициализация систем...
+2026-04-17 02:39:54 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Fund1(Phemex): <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Take):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-17 02:39:55 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 02:39:55 | INFO | bot | 📡 Запрашиваем Equity с биржи для инициализации аудита...
+2026-04-17 02:39:56 | INFO | bot | 💰 Стартовый баланс зафиксирован: 10444.71 USDT
+2026-04-17 02:39:56 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-17 02:39:58 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-17 02:39:59 | INFO | bot | 🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...
+2026-04-17 02:40:00 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 04:10:02 | ERROR | bot | [RAVEUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-17 04:10:02 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-17 04:10:07 | DEBUG | bot | [RAVEUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-17 04:16:01 | INFO | bot | [GENIUSUSDT_SHORT] ✅ Вход выполнен. Объем: 430.0
+2026-04-17 04:16:14 | INFO | bot | [GENIUSUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 1.1245$
+2026-04-17 04:23:42 | INFO | bot | [PAYPUSDT_SHORT] ✅ Вход выполнен. Объем: 5.43
+2026-04-17 04:23:54 | INFO | bot | [PAYPUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 0.2443$
+2026-04-17 05:38:40 | INFO | bot | [GENIUSUSDT_LONG] ✅ Вход выполнен. Объем: 177.0
+2026-04-17 05:39:25 | INFO | bot | [GENIUSUSDT_LONG] 🛑 Позиция закрыта. 🩸: PnL: -0.0073$
+2026-04-17 07:25:09 | INFO | bot | [TSTUSDT_SHORT] ✅ Вход выполнен. Объем: 55492.0
+2026-04-17 07:25:33 | INFO | bot | [TSTUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 6.8473$
+2026-04-17 08:03:14 | INFO | bot | [SPXUSDT_SHORT] ✅ Вход выполнен. Объем: 1650.0
+2026-04-17 08:03:33 | INFO | bot | [SPXUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 0.9635$
+2026-04-17 08:45:20 | INFO | bot | [FIGHTUSDT_LONG] ✅ Вход выполнен. Объем: 88790.0
+2026-04-17 08:45:48 | INFO | bot | [FIGHTUSDT_LONG] 🛑 Позиция закрыта. 💵: PnL: 0.0808$
+2026-04-17 10:48:37 | INFO | bot | [TSTUSDT_SHORT] ✅ Вход выполнен. Объем: 3653.0
+2026-04-17 10:48:43 | INFO | bot | [TSTUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 0.4149$
+2026-04-17 11:24:38 | ERROR | bot | [CLOUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-17 11:24:38 | WARNING | bot | [CLOUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-17 11:24:43 | DEBUG | bot | [CLOUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-17 13:49:39 | INFO | bot | ⏹ Остановка процессов...
+2026-04-17 13:49:39 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-17 13:52:04 | INFO | bot | ▶️ Инициализация систем...
+2026-04-17 13:52:04 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>3000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Fund1(Phemex): <b>True</b> | Thresh: &gt;= <b>2.0%</b>
+Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Take):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-17 13:52:05 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 13:52:05 | INFO | bot | 💰 Стартовый баланс успешно загружен из стейта: 10444.71 USDT
+2026-04-17 13:52:05 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-17 13:52:07 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-17 13:52:08 | INFO | bot | 🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...
+2026-04-17 13:52:09 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-17 14:57:54 | INFO | bot | [QQQUSDT_LONG] ✅ Вход выполнен. Объем: 4.09
+2026-04-17 14:58:01 | INFO | bot | [QQQUSDT_LONG] 🛑 Позиция закрыта. 💵: PnL: 3.6047$
+2026-04-17 15:34:52 | INFO | bot | [PRLUSDT_LONG] ✅ Вход выполнен. Объем: 4809.0
+2026-04-17 15:35:25 | INFO | bot | [PRLUSDT_LONG] 🛑 Позиция закрыта. 💵: PnL: 1.4387$
+2026-04-17 17:22:24 | INFO | bot | [GENIUSUSDT_LONG] ✅ Вход выполнен. Объем: 3131.0
+2026-04-17 17:23:59 | INFO | bot | [GENIUSUSDT_LONG] 🛑 Позиция закрыта. 💵: PnL: 2.5276$
+2026-04-17 17:26:09 | INFO | bot | [FIGHTUSDT_SHORT] ✅ Вход выполнен. Объем: 17260.0
+2026-04-17 17:26:34 | DEBUG | bot | [FIGHTUSDT] Исключение отмены 8e5defd8-9763-4eba-999f-2d9dcfdec032: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-17 17:26:34 | INFO | bot | [FIGHTUSDT_SHORT] 🛑 Позиция закрыта. 💵: PnL: 0.0329$
+2026-04-17 17:31:01 | INFO | bot | [TRIAUSDT_SHORT] ✅ Вход выполнен. Объем: 63405.8
+2026-04-17 17:32:02 | DEBUG | bot | [TRIAUSDT] Исключение отмены 62603191-292f-4953-87e6-5d6dda6b3655: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-17 17:32:02 | INFO | bot | [TRIAUSDT_SHORT] 🛑 Позиция закрыта. 🩸: PnL: -0.3101$
+2026-04-17 17:44:39 | INFO | bot | ⏹ Остановка процессов...
+2026-04-17 17:44:39 | INFO | bot | 💾 Финальное сохранение стейта на диск...

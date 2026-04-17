@@ -98,7 +98,7 @@ class FundingManager:
                         if b_info:
                             self.last_diffs[sym] = abs(p_info.funding_rate - b_info.funding_rate)
 
-                logger.debug(f"🔄 Кэш Фандингов обновлен. Phemex: {len(self.phemex_cache)} монет, Binance: {len(self.binance_cache)} монет.")
+                # logger.debug(f"🔄 Кэш Фандингов обновлен. Phemex: {len(self.phemex_cache)} монет, Binance: {len(self.binance_cache)} монет.")
 
                 # 4. Передаем в математические блоки
                 self.filter1.process(self.phemex_cache, now_ms)

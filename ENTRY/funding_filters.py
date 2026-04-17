@@ -36,7 +36,7 @@ class FundingFilter1:
             if BUFFER_TIME <= time_left_sec <= self.skip_sec:
                 if abs(info.funding_rate) >= self.threshold:
                     current_blocked.add(sym)
-                    logger.debug(f"[{sym}] Фандинг 1 триггер: rate={info.funding_rate*100}%, time_left={time_left_sec:.1f}s")
+                    # logger.debug(f"[{sym}] Фандинг 1 триггер: rate={info.funding_rate*100}%, time_left={time_left_sec:.1f}s")
         
         self.blocked_symbols = current_blocked
         
@@ -82,15 +82,15 @@ class FundingFilter2:
             if BUFFER_TIME <= min_time_left <= self.skip_sec:
                 if diff >= self.diff_threshold:
                     current_blocked.add(sym)
-                    logger.debug(f"[{sym}] Фандинг 2 (Diff) триггер: diff={diff*100}%, min_time_left={min_time_left:.1f}s")
+                    # logger.debug(f"[{sym}] Фандинг 2 (Diff) триггер: diff={diff*100}%, min_time_left={min_time_left:.1f}s")
         
         self.blocked_symbols = current_blocked
         
         if current_blocked != self._last_blocked:
-            if current_blocked:
-                logger.info(f"⚖️ [Фандинг 2] Diff-Блок! Под запретом {len(current_blocked)} монет: {', '.join(list(current_blocked)[:5])}...")
-            elif self._last_blocked:
-                logger.info("⚖️ [Фандинг 2] Diff-Блок снят со всех монет.")
+            # if current_blocked:
+            #     # logger.info(f"⚖️ [Фандинг 2] Diff-Блок! Под запретом {len(current_blocked)} монет: {', '.join(list(current_blocked)[:5])}...")
+            # elif self._last_blocked:
+            #     # logger.info("⚖️ [Фандинг 2] Diff-Блок снят со всех монет.")
             self._last_blocked = current_blocked
 
     def is_allowed(self, symbol: str) -> bool:
