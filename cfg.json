@@ -44,7 +44,8 @@
         "STOUSDT",
         "ARIAUSDT",
         "NOMUSDT",
-        "SAHARAUSDT"
+        "SAHARAUSDT",
+        "ZETAUSDT"
     ],
     "quota_asset": "USDT",
     "risk": {
