@@ -15,11 +15,10 @@ logger = UnifiedLogger("negative")
 class NegativeScenario:
     def __init__(self, cfg: dict):
         self.cfg = cfg
-        self.enable = cfg.get("enable", True)
-        self.stab_neg = cfg.get("stabilization_ttl", 1.5)
-        self.negative_spread_pct = cfg.get("negative_spread_pct", 0)
-        self.negative_ttl = cfg.get("negative_ttl", 60)
-        # self.neg_flag = False
+        self.enable = cfg["enable"]
+        self.stab_neg = cfg["stabilization_ttl"]
+        self.negative_spread_pct = cfg["negative_spread_pct"]
+        self.negative_ttl = cfg["negative_ttl"]
 
     def scen_neg_analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> str | None:
         if not self.enable:

@@ -30,25 +30,26 @@ class EntrySignal:
 class StakanEntryPattern:
     def __init__(self, phemex_cfg: dict[str, Any]):
         self.cfg = phemex_cfg
-        self.enabled: bool = self.cfg.get("enable", True)
-        self.depth: int = self.cfg.get("depth", 8)
-        self.min_vol: Optional[float] = self.cfg.get("min_first_row_usdt_notional")
-        self.max_vol: Optional[float] = self.cfg.get("max_first_row_usdt_notional")
         
-        btm = self.cfg.get("bottom", {})
-        self.min_spr2: float = btm.get("min_spread_between_two_row_pct", 0.0)
-        self.min_spr3: float = btm.get("min_spread_between_three_row_pct", 0.0)
+        self.enabled: bool = self.cfg["enable"]
+        self.depth: int = self.cfg["depth"]
+        self.min_vol: Optional[float] = self.cfg["min_first_row_usdt_notional"]
+        self.max_vol: Optional[float] = self.cfg["max_first_row_usdt_notional"]
         
-        hdr = self.cfg.get("header", {})
-        self.roc_window: int = hdr.get("roc_window", 0)
-        self.max_one_roc: float = hdr.get("max_one_roc_pct", 0.0)
+        # Вложенные словари тоже берем жестко
+        btm = self.cfg["bottom"]
+        self.min_spr2: float = btm["min_spread_between_two_row_pct"]
+        self.min_spr3: float = btm["min_spread_between_three_row_pct"]
         
-        body = self.cfg.get("body", {})
-        self.sma_window: int = body.get("roc_sma_window", 0)
+        hdr = self.cfg["header"]
+        self.roc_window: int = hdr["roc_window"]
+        self.max_one_roc: float = hdr["max_one_roc_pct"]
         
-        self.desired_rate: float = self.cfg.get("header_to_bottom_desired_rate", 0.0)
-        self.max_dist_rate: float = self.cfg.get("max_bid_ask_distance_rate", 0.0)
-        # self.print_metrics()
+        body = self.cfg["body"]
+        self.sma_window: int = body["roc_sma_window"]
+        
+        self.desired_rate: float = self.cfg["header_to_bottom_desired_rate"]
+        self.max_dist_rate: float = self.cfg["max_bid_ask_distance_rate"]
 
     def print_metrics(self):
             print(f"--- [StakanEntryPattern Metrics] ---")

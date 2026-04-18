@@ -51,15 +51,19 @@ TRACKER_SLIPPAGE = 0.975
 class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
-        self.max_active_positions = self.cfg.get("app", {}).get("max_active_positions", 1)
-        self.quota_asset = self.cfg.get("quota_asset", "USDT")
         
-        self.signal_timeout_sec = self.cfg.get("entry", {}).get("signal_timeout_sec", 0.1)
-        self.hedge_mode = self.cfg.get("risk", {}).get("hedge_mode", False)
-        upd_sec = self.cfg.get("entry", {}).get("pattern", {}).get("binance", {}).get("update_prices_sec", 3.0)
+        # Прямой доступ: если структуры в конфиге нет, бот упадет
+        self.max_active_positions = self.cfg["app"]["max_active_positions"]
+        self.quota_asset = self.cfg["quota_asset"] # Обычно это база, лучше пусть падает
         
-        api_key = os.getenv("API_KEY") or self.cfg["credentials"].get("api_key", "")
-        api_secret = os.getenv("API_SECRET") or self.cfg["credentials"].get("api_secret", "")   
+        self.signal_timeout_sec = self.cfg["entry"]["signal_timeout_sec"]
+        self.hedge_mode = self.cfg["risk"]["hedge_mode"]
+        upd_sec = self.cfg["entry"]["pattern"]["binance"]["update_prices_sec"]
+        
+        # Лобовой доступ к API ключам
+        # Сначала проверяем ENV, если пусто — лезем в словарь без подстраховок
+        api_key = os.getenv("API_KEY") or self.cfg["credentials"]["api_key"]
+        api_secret = os.getenv("API_SECRET") or self.cfg["credentials"]["api_secret"]
 
         self.bl_manager = BlackListManager(CFG_PATH, self.quota_asset)        
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
@@ -79,20 +83,23 @@ class TradingBot:
         self.private_client = PhemexPrivateClient(api_key, api_secret, self.session)
         self.private_ws = PhemexPrivateWS(api_key, api_secret)
 
+        # Telegram: если включен, то ключи обязаны быть
         tg_cfg = self.cfg.get("tg", {})
-        from TG.tg_sender import TelegramSender
-        self.tg = TelegramSender(
-            os.getenv("TELEGRAM_TOKEN") or tg_cfg.get("token", ""),
-            os.getenv("TELEGRAM_CHAT_ID") or tg_cfg.get("chat_id", ""),
-        ) if tg_cfg.get("enable") else None
+        if tg_cfg.get("enable"):
+            from TG.tg_sender import TelegramSender
+            token = os.getenv("TELEGRAM_TOKEN") or tg_cfg["token"]
+            chat_id = os.getenv("TELEGRAM_CHAT_ID") or tg_cfg["chat_id"]
+            self.tg = TelegramSender(token, chat_id)
+        else:
+            self.tg = None
 
         self.funding_manager = FundingManager(
-            cfg.get("entry", {}).get("pattern", {}),
+            self.cfg["entry"]["pattern"], # Лобовой проброс
             self.phemex_funding_api,
             self.binance_funding_api
         )
 
-        self.signal_engine = SignalEngine(cfg["entry"], self.funding_manager)
+        self.signal_engine = SignalEngine(self.cfg["entry"], self.funding_manager)
 
         self._stream: PhemexStakanStream | None = None
         self._processing: Set[str] = set()
@@ -105,19 +112,21 @@ class TradingBot:
         self.ws_handler = WsInterpreter(state=self.state, active_positions_locker=self.active_positions_locker) 
         self.executor = OrderExecutor(self)
         
-        exit_cfg = self.cfg.get("exit", {})
-        scen_cfg = exit_cfg.get("scenarios", {})
+        # Блок Exit сценариев — теперь без .get() для вложенных структур
+        exit_cfg = self.cfg["exit"]
+        scen_cfg = exit_cfg["scenarios"]
         
-        self.scen_base = BaseScenario(scen_cfg.get("base", {}))
-        self.scen_neg = NegativeScenario(scen_cfg.get("negative", {}))
-        self.scen_ttl = PositionTTLClose(scen_cfg.get("breakeven_ttl_close", {}), self.active_positions_locker)
-        self.scen_interf = Interference(exit_cfg.get("interference", {}))
-        self.scen_extrime = ExtrimeClose(exit_cfg.get("extrime_close", {}))
+        self.scen_base = BaseScenario(scen_cfg["base"])
+        self.scen_neg = NegativeScenario(scen_cfg["negative"])
+        self.scen_ttl = PositionTTLClose(scen_cfg["breakeven_ttl_close"], self.active_positions_locker)
+        self.scen_interf = Interference(exit_cfg["interference"])
+        self.scen_extrime = ExtrimeClose(exit_cfg["extrime_close"])
 
-        self.base_order_timeout_sec = scen_cfg.get("base", {}).get("order_timeout_sec", 0.1)   
-        self.breakeven_order_timeout_sec = scen_cfg.get("breakeven_ttl_close", {}).get("order_timeout_sec", 0.1)     
-        self.interference_order_timeout_sec = exit_cfg.get("interference", {}).get("order_timeout_sec", 0.1)        
-        self.extrime_order_timeout_sec = exit_cfg.get("extrime_close", {}).get("order_timeout_sec", 0.1)        
+        # Тайм-ауты: если не указаны, упадет с KeyError
+        self.base_order_timeout_sec = scen_cfg["base"]["order_timeout_sec"]
+        self.breakeven_order_timeout_sec = scen_cfg["breakeven_ttl_close"]["order_timeout_sec"]
+        self.interference_order_timeout_sec = exit_cfg["interference"]["order_timeout_sec"]
+        self.extrime_order_timeout_sec = exit_cfg["extrime_close"]["order_timeout_sec"]      
 
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return

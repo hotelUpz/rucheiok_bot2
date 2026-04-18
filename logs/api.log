@@ -154,3 +154,41 @@
 2026-04-18 08:04:39 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
 2026-04-18 09:16:14 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
 2026-04-18 12:11:32 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 13:41:56 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-18 13:41:56 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-18 13:41:56 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-18 14:30:37 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-18 15:22:10 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 19 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-18 16:14:05 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-18 16:14:05 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-18 17:19:45 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-18 20:55:56 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-18 20:56:00 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-18 20:56:01 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND

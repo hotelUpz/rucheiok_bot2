@@ -12,23 +12,14 @@ if TYPE_CHECKING:
 logger = UnifiedLogger("base")
 
 class BaseScenario:
-    """
-    Основной сценарий охоты за TP.
-
-    Инвариант:
-    - Вычисляет виртуальный TP (virtual_tp) на основе current_target_rate.
-    - virtual_tp используется ТОЛЬКО как локальный порог сканирования стакана (depth).
-    - Возвращает ideal_target_price, который Оркестратор передает в Экзекьютор.
-    - Каждые shift_ttl секунд rate снижается на shift_demotion вплоть до min_target_rate.
-    """
     def __init__(self, cfg: dict):
         self.cfg = cfg
-        self.enable = cfg.get("enable", True)
-        self.stab_ttl = cfg.get("stabilization_ttl", 0.0)
-        self.target_rate = cfg.get("target_rate", 0.7)
-        self.shift_demotion = cfg.get("shift_demotion", 0.2)
-        self.min_target_rate = cfg.get("min_target_rate", 0.3)
-        self.shift_ttl = cfg.get("shift_ttl", 10.0)
+        self.enable = cfg["enable"] 
+        self.stab_ttl = cfg["stabilization_ttl"]
+        self.target_rate = cfg["target_rate"]
+        self.shift_demotion = cfg["shift_demotion"]
+        self.min_target_rate = cfg["min_target_rate"]
+        self.shift_ttl = cfg["shift_ttl"]
 
     def _calc_virtual_tp(self, pos: ActivePosition) -> float:
         """Вычисляет виртуальный TP без сайд-эффектов."""

@@ -29,17 +29,17 @@ class FundingManager:
         self.phemex_api = phemex_api
         self.binance_api = binance_api
         
-        # Инициализируем классы чистой математики
-        self.filter1 = FundingFilter1(cfg.get("funding_pattern1", {}))
-        self.filter2 = FundingFilter2(cfg.get("funding_pattern2", {}))
+        # Лобовой доступ к секциям паттернов фандинга
+        self.filter1 = FundingFilter1(cfg["funding_pattern1"])
+        self.filter2 = FundingFilter2(cfg["funding_pattern2"])
         
         # Логика включения живолупы
         self.enable_phemex = self.filter1.enable or self.filter2.enable
         self.enable_binance = self.filter2.enable
         
-        # Берем минимальный интервал из конфигураций
-        i1 = cfg.get("funding_pattern1", {}).get("check_interval_sec", 60)
-        i2 = cfg.get("funding_pattern2", {}).get("check_interval_sec", 60)
+        # Прямой доступ к интервалам
+        i1 = cfg["funding_pattern1"]["check_interval_sec"]
+        i2 = cfg["funding_pattern2"]["check_interval_sec"]
         self.interval = min(i1, i2) if self.enable_phemex else 60
 
         # O(1) Кэши объектов

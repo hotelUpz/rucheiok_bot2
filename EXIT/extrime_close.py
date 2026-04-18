@@ -14,11 +14,11 @@ logger = UnifiedLogger("exit")
 class ExtrimeClose:
     def __init__(self, cfg: dict):
         self.cfg = cfg
-        self.enable = cfg.get("enable", True)
-        self.retry_ttl = cfg.get("retry_ttl", 3)
-        self.retry_num = cfg.get("retry_num", "inf")
-        self.bid_to_ask_orientation = cfg.get("bid_to_ask_orientation", 0.0)
-        self.increase_fraction = cfg.get("increase_fraction", 2.5) / 100
+        self.enable = cfg["enable"]
+        self.retry_ttl = cfg["retry_ttl"]
+        self.retry_num = cfg["retry_num"]
+        self.bid_to_ask_orientation = cfg["bid_to_ask_orientation"]
+        self.increase_fraction = cfg["increase_fraction"] / 100.0
 
     def scen_extrime_analyze(self, depth: DepthTop, pos: ActivePosition, now: float) -> float | None:
         if not self.enable: return None

@@ -2,7 +2,7 @@
     "positions": {},
     "fails": {
         "GENIUSUSDT": 1,
-        "CHIPUSDT": 1,
+        "CHIPUSDT": 3,
         "HOMEUSDT": 0,
         "PAYPUSDT": 0,
         "RAVEUSDT": 0,
@@ -25,21 +25,22 @@
         "PROVEUSDT": 0,
         "ESPUSDT": 0,
         "AXLUSDT": 1,
-        "JSTUSDT": 0
+        "JSTUSDT": 0,
+        "API3USDT": 1
     },
     "quarantine": {
-        "HOMEUSDT": "1776507092.7959003"
+        "CHIPUSDT": "inf"
     },
     "analytics": {
         "start_balance": 10444.713980565613,
-        "current_balance": 10458.545284467957,
+        "current_balance": 10425.62049565019,
         "max_balance": 10462.17196898024,
-        "min_balance": 10444.713980565613,
-        "mdd_usd": 4.170578115721582,
-        "mdd_pct": 0.03986340626102415,
-        "total_wins": 24,
-        "total_losses": 11,
-        "total_pnl": 13.831303902345498,
+        "min_balance": 10425.62049565019,
+        "mdd_usd": 36.5514733300497,
+        "mdd_pct": 0.3493679270272253,
+        "total_wins": 26,
+        "total_losses": 15,
+        "total_pnl": -19.093484915422046,
         "symbols": {
             "GENIUSUSDT": {
                 "wins": 4,
@@ -87,9 +88,9 @@
                 "pnl": -0.4468875515719178
             },
             "BSBUSDT": {
-                "wins": 1,
-                "losses": 0,
-                "pnl": 0.8476771500000275
+                "wins": 2,
+                "losses": 1,
+                "pnl": 1.0506460586233146
             },
             "NAORISUSDT": {
                 "wins": 0,
@@ -97,9 +98,9 @@
                 "pnl": -0.3616037963999999
             },
             "WETUSDT": {
-                "wins": 7,
+                "wins": 8,
                 "losses": 1,
-                "pnl": 0.8748470281418903
+                "pnl": 2.503455129541898
             },
             "ZETAUSDT": {
                 "wins": 0,
@@ -113,8 +114,8 @@
             },
             "CHIPUSDT": {
                 "wins": 0,
-                "losses": 1,
-                "pnl": -0.8076801999999945
+                "losses": 3,
+                "pnl": -1.3787532999999716
             },
             "LABUSDT": {
                 "wins": 0,
@@ -130,6 +131,11 @@
                 "wins": 1,
                 "losses": 0,
                 "pnl": 0.09301893320000908
+            },
+            "API3USDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -34.18529272779086
             }
         },
         "history": [
@@ -400,6 +406,54 @@
                 "pnl": 0.093,
                 "is_win": true,
                 "duration": "24.6s"
+            },
+            {
+                "ts": 1776509469.6005156,
+                "symbol": "WETUSDT",
+                "side": "SHORT",
+                "pnl": 1.6286,
+                "is_win": true,
+                "duration": "33.9s"
+            },
+            {
+                "ts": 1776517774.0081613,
+                "symbol": "CHIPUSDT",
+                "side": "LONG",
+                "pnl": -0.5586,
+                "is_win": false,
+                "duration": "1.2m"
+            },
+            {
+                "ts": 1776522000.1719341,
+                "symbol": "BSBUSDT",
+                "side": "SHORT",
+                "pnl": -0.0783,
+                "is_win": false,
+                "duration": "50.7s"
+            },
+            {
+                "ts": 1776525773.7943635,
+                "symbol": "CHIPUSDT",
+                "side": "LONG",
+                "pnl": -0.0125,
+                "is_win": false,
+                "duration": "47.0s"
+            },
+            {
+                "ts": 1776526706.4815986,
+                "symbol": "BSBUSDT",
+                "side": "SHORT",
+                "pnl": 0.2812,
+                "is_win": true,
+                "duration": "26.3s"
+            },
+            {
+                "ts": 1776535108.284123,
+                "symbol": "API3USDT",
+                "side": "LONG",
+                "pnl": -34.1853,
+                "is_win": false,
+                "duration": "2.7m"
             }
         ]
     }

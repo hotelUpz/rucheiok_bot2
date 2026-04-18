@@ -30,26 +30,29 @@ def get_config_summary(cfg: dict) -> str:
     
     app = cfg.get("app", {})
     risk = cfg.get("risk", {})
+    
     lines.append("🎛 <b>[APP & RISK]</b>")
-    lines.append(f"Name: <b>{app.get('name', '')}</b> | Quota: <b>{cfg.get('quota_asset', '')}</b>")
-    lines.append(f"Max Positions: <b>{app.get('max_active_positions')}</b>")
+    lines.append(f"Name: <b>{app.get('name', 'N/A')}</b> | Quota: <b>{cfg.get('quota_asset', 'N/A')}</b>")
+    lines.append(f"Max Positions: <b>{app.get('max_active_positions', 'N/A')}</b>")
     
     lev_cfg = risk.get('leverage', {})
     lev_val = lev_cfg.get('val', 'N/A') if isinstance(lev_cfg, dict) else lev_cfg
     margin_mod = lev_cfg.get('margin_mode', 'N/A') if isinstance(lev_cfg, dict) else 'N/A'
     
     lines.append(f"Leverage: <b>{lev_val}x</b> | Margin Mode: <b>{margin_mod}</b>")
-    lines.append(f"Margin Size: <b>{risk.get('margin_size')}</b> | Notional Limit: <b>{risk.get('notional_limit')} USDT</b>")
-    lines.append(f"Margin Over Size: <b>{risk.get('margin_over_size_pct')}%</b>")
+    lines.append(f"Margin Size: <b>{risk.get('margin_size', 'N/A')}</b> | Notional Limit: <b>{risk.get('notional_limit', 'N/A')} USDT</b>")
+    lines.append(f"Margin Over Size: <b>{risk.get('margin_over_size_pct', 'N/A')}%</b>")
+    
     q = risk.get("quarantine", {})
-    lines.append(f"Quarantine: <b>{q.get('max_consecutive_fails')}</b> fails for <b>{q.get('quarantine_hours')}h</b>")
+    lines.append(f"Quarantine: <b>{q.get('max_consecutive_fails', 'N/A')}</b> fails for <b>{q.get('quarantine_hours', 'N/A')}h</b>")
     
     log = cfg.get("log", {})
     tg = cfg.get("tg", {})
     lines.append("\n📡 <b>[SYSTEM]</b>")
-    lines.append(f"TG Enabled: <b>{tg.get('enable')}</b>")
-    lines.append(f"Logs: D:{log.get('debug')} I:{log.get('info')} W:{log.get('warning')} E:{log.get('error')}")
+    lines.append(f"TG Enabled: <b>{tg.get('enable', 'N/A')}</b>")
+    lines.append(f"Logs: D:{log.get('debug', 'N/A')} I:{log.get('info', 'N/A')} W:{log.get('warning', 'N/A')} E:{log.get('error', 'N/A')}")
 
+    # Входные паттерны
     entry = cfg.get("entry", {}).get("pattern", {})
     ph = entry.get("phemex", {})
     binance = entry.get("binance", {})
@@ -57,31 +60,35 @@ def get_config_summary(cfg: dict) -> str:
     f2 = entry.get("funding_pattern2", {})
     
     lines.append("\n🎯 <b>[ENTRY PHEMEX]</b>")
-    lines.append(f"Enable: <b>{ph.get('enable')}</b> | Depth: <b>{ph.get('depth')}</b> | TTL: <b>{ph.get('pattern_ttl_sec')}s</b>")
+    lines.append(f"Enable: <b>{ph.get('enable', 'N/A')}</b> | Depth: <b>{ph.get('depth', 'N/A')}</b> | TTL: <b>{ph.get('pattern_ttl_sec', 'N/A')}s</b>")
+    
     hdr = ph.get("header", {})
     btm = ph.get("bottom", {})
-    lines.append(f"ROC Window: <b>{hdr.get('roc_window')}</b> | Max 1 ROC: <b>{hdr.get('max_one_roc_pct')}%</b>")
-    lines.append(f"Sprd 3 row: &gt;= <b>{btm.get('min_spread_between_three_row_pct')}%</b>")
+    lines.append(f"ROC Window: <b>{hdr.get('roc_window', 'N/A')}</b> | Max 1 ROC: <b>{hdr.get('max_one_roc_pct', 'N/A')}%</b>")
+    lines.append(f"Sprd 3 row: &gt;= <b>{btm.get('min_spread_between_three_row_pct', 'N/A')}%</b>")
     
     lines.append("\n🔶 <b>[ENTRY BINANCE & FUNDING]</b>")
-    lines.append(f"Binance: <b>{binance.get('enable')}</b> | Sprd: &gt;= <b>{binance.get('min_price_spread_rate')}%</b>")
-    lines.append(f"Fund1(Phemex): <b>{f1.get('enable')}</b> | Thresh: &gt;= <b>{f1.get('threshold_pct')}%</b>")
-    lines.append(f"Fund2(Diff): <b>{f2.get('enable')}</b> | Diff: &gt;= <b>{f2.get('diff_threshold_pct')}%</b>")
+    lines.append(f"Binance: <b>{binance.get('enable', 'N/A')}</b> | Sprd: &gt;= <b>{binance.get('min_price_spread_rate', 'N/A')}%</b>")
+    lines.append(f"Fund1(Phemex): <b>{f1.get('enable', 'N/A')}</b> | Thresh: &gt;= <b>{f1.get('threshold_pct', 'N/A')}%</b>")
+    lines.append(f"Fund2(Diff): <b>{f2.get('enable', 'N/A')}</b> | Diff: &gt;= <b>{f2.get('diff_threshold_pct', 'N/A')}%</b>")
 
+    # Сценарии выхода
     exit_cfg = cfg.get("exit", {})
     scen = exit_cfg.get("scenarios", {})
+    
     avg = scen.get("base", {})
     neg = scen.get("negative", {})
-    inter = exit_cfg.get("interference", {})
     ttl = scen.get("breakeven_ttl_close", {})
+    
+    inter = exit_cfg.get("interference", {})
     ext = exit_cfg.get("extrime_close", {})
     
     lines.append("\n🚪 <b>[EXIT SCENARIOS]</b>")
-    lines.append(f"<b>Base (Take):</b> {avg.get('enable', True)} | Stab TTL: <b>{avg.get('stabilization_ttl')}s</b>")
-    lines.append(f"<b>Negative:</b> {neg.get('enable')} | Neg Spread &lt;= <b>{neg.get('negative_spread_pct')}%</b> for <b>{neg.get('negative_ttl')}s</b>")
-    lines.append(f"<b>Interference:</b> {inter.get('enable')} | Usual Vol: <b>{inter.get('usual_vol_pct_to_init_size')}%</b>")
-    lines.append(f"<b>TTL Close:</b> {ttl.get('enable')} | TTL: <b>{ttl.get('position_ttl')}s</b> | Wait: <b>{ttl.get('breakeven_wait_sec')}s</b>")
-    lines.append(f"<b>Extrime:</b> {ext.get('enable')} | Retries: <b>{ext.get('retry_num')}</b> per <b>{ext.get('retry_ttl')}s</b>")
+    lines.append(f"<b>Base (Take):</b> {avg.get('enable', True)} | Stab TTL: <b>{avg.get('stabilization_ttl', 'N/A')}s</b>")
+    lines.append(f"<b>Negative:</b> {neg.get('enable', 'N/A')} | Neg Spread &lt;= <b>{neg.get('negative_spread_pct', 'N/A')}%</b> for <b>{neg.get('negative_ttl', 'N/A')}s</b>")
+    lines.append(f"<b>Interference:</b> {inter.get('enable', 'N/A')} | Usual Vol: <b>{inter.get('usual_vol_pct_to_init_size', 'N/A')}%</b>")
+    lines.append(f"<b>TTL Close:</b> {ttl.get('enable', 'N/A')} | TTL: <b>{ttl.get('position_ttl', 'N/A')}s</b> | Wait: <b>{ttl.get('breakeven_wait_sec', 'N/A')}s</b>")
+    lines.append(f"<b>Extrime:</b> {ext.get('enable', 'N/A')} | Retries: <b>{ext.get('retry_num', 'N/A')}</b> per <b>{ext.get('retry_ttl', 'N/A')}s</b>")
 
     return "\n".join(lines)
 

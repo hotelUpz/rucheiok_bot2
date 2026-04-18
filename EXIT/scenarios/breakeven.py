@@ -6,21 +6,13 @@ if TYPE_CHECKING:
 
 
 class PositionTTLClose:
-    """
-    Глобальный таймаут позиции.
-
-    Инвариант (двухэтапный):
-    1. После position_ttl секунд → TRIGGER_BREAKEVEN (ExitEngine переводит цель в БУ).
-    2. Если БУ-лимитка не закрыла позицию за breakeven_wait_sec → TRIGGER_EXTRIME.
-    Оба шага происходят ровно по одному разу благодаря флагу pos.in_breakeven_mode.
-    """
     def __init__(self, cfg: dict, active_positions_locker):
         self.cfg = cfg
-        self.enable = cfg.get("enable", True)
-        self.position_ttl = cfg.get("position_ttl", 600)
-        self.to_entry_orientation = float(cfg.get("to_entry_orientation", 0.0))
-        self.breakeven_wait_sec = float(cfg.get("breakeven_wait_sec", 0.0))
-        self.active_positions_locker = active_positions_locker # стата тут может мутироваться. Норм.
+        self.enable = cfg["enable"] 
+        self.position_ttl = cfg["position_ttl"]
+        self.to_entry_orientation = float(cfg["to_entry_orientation"])
+        self.breakeven_wait_sec = float(cfg["breakeven_wait_sec"])
+        self.active_positions_locker = active_positions_locker
 
     # def build_target_price(self, pos: ActivePosition) -> float:
     #     orient_pct = self.to_entry_orientation

@@ -21,20 +21,20 @@ if TYPE_CHECKING:
 class SignalEngine:
     def __init__(self, cfg: Dict[str, Any], funding_manager: 'FundingManager'):
         self.cfg = cfg
-        self.funding_manager = funding_manager  # Сохраняем менеджер
+        self.funding_manager = funding_manager  
+        
         self.phemex_cfg: Dict[str, Any] = cfg["pattern"]["phemex"]
         self.binance_cfg: Dict[str, Any] = cfg["pattern"]["binance"]
         
         self.pattern_math = StakanEntryPattern(self.phemex_cfg)
         
-        self.target_depth: int = self.phemex_cfg.get("depth", 8)
-        self.pattern_ttl: int = self.phemex_cfg.get("pattern_ttl_sec", 0)
+        self.target_depth: int = self.phemex_cfg["depth"]
+        self.pattern_ttl: int = self.phemex_cfg["pattern_ttl_sec"]
         
-        self.binance_enabled: bool = self.binance_cfg.get("enable", True)
-        self.min_price_spread_rate: float = abs(self.binance_cfg.get("min_price_spread_rate", 0.1))
-        self.spread_ttl: int = self.binance_cfg.get("spread_ttl_sec", 0)
+        self.binance_enabled: bool = self.binance_cfg["enable"]
+        self.min_price_spread_rate: float = abs(self.binance_cfg["min_price_spread_rate"])
+        self.spread_ttl: int = self.binance_cfg["spread_ttl_sec"]
         
-        # Внутренние таймеры для отслеживания удержания сигнала
         self._pattern_first_seen: Dict[str, float] = {}
         self._spread_first_seen: Dict[str, float] = {}
 

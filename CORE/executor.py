@@ -40,14 +40,18 @@ class OrderExecutor:
         self.client = tb.private_client
         self.cfg = tb.cfg
         
-        self.entry_timeout = self.cfg.get("entry", {}).get("entry_timeout_sec", 0.5)
+        # Лобовой доступ к параметрам входа
+        entry_cfg = self.cfg["entry"]
+        self.entry_timeout = entry_cfg["entry_timeout_sec"]
+        self.max_entry_retries = entry_cfg["max_place_order_retries"]
         
-        self.max_entry_retries = self.cfg.get("entry", {}).get("max_place_order_retries", 1)
-        self.max_exit_retries = self.cfg.get("exit", {}).get("max_place_order_retries", 1)
+        # Параметры выхода
+        self.max_exit_retries = self.cfg["exit"]["max_place_order_retries"]
         
-        risk = self.cfg.get("risk", {})
-        self.notional_limit = float(risk.get("notional_limit", 25.0))
-        self.margin_over_size_pct = float(risk.get("margin_over_size_pct", 1.0))
+        # Блок риска: если Notional или Margin не заданы, падает сразу
+        risk = self.cfg["risk"]
+        self.notional_limit = float(risk["notional_limit"])
+        self.margin_over_size_pct = float(risk["margin_over_size_pct"])
 
     async def cancel_all_orders(self, symbol: str) -> bool:
         try:

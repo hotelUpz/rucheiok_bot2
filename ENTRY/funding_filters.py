@@ -17,9 +17,9 @@ BUFFER_TIME = -10.0
 
 class FundingFilter1:
     def __init__(self, cfg: dict[str, Any]):
-        self.enable: bool = cfg.get("enable", False)
-        self.threshold: float = cfg.get("threshold_pct", 0.5) / 100.0
-        self.skip_sec: int = cfg.get("skip_before_counter_sec", 1800)
+        self.enable: bool = cfg["enable"]
+        self.threshold: float = cfg["threshold_pct"] / 100.0
+        self.skip_sec: int = cfg["skip_before_counter_sec"]
         
         self.blocked_symbols: Set[str] = set()
         self._last_blocked: Set[str] = set()
@@ -53,9 +53,9 @@ class FundingFilter1:
 
 class FundingFilter2:
     def __init__(self, cfg: dict[str, Any]):
-        self.enable: bool = cfg.get("enable", False)
-        self.diff_threshold: float = cfg.get("diff_threshold_pct", 0.05) / 100.0
-        self.skip_sec: int = cfg.get("skip_before_counter_sec", 1800)
+        self.enable: bool = cfg["enable"]
+        self.diff_threshold: float = cfg["diff_threshold_pct"] / 100.0
+        self.skip_sec: int = cfg["skip_before_counter_sec"]
         
         self.blocked_symbols: Set[str] = set()
         self._last_blocked: Set[str] = set()
