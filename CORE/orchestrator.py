@@ -46,7 +46,6 @@ logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
 CFG_PATH = BASE_DIR / "cfg.json"
 
-TRACKER_SLIPPAGE = 0.975
 
 class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
@@ -126,7 +125,9 @@ class TradingBot:
         self.base_order_timeout_sec = scen_cfg["base"]["order_timeout_sec"]
         self.breakeven_order_timeout_sec = scen_cfg["breakeven_ttl_close"]["order_timeout_sec"]
         self.interference_order_timeout_sec = exit_cfg["interference"]["order_timeout_sec"]
-        self.extrime_order_timeout_sec = exit_cfg["extrime_close"]["order_timeout_sec"]      
+        self.extrime_order_timeout_sec = exit_cfg["extrime_close"]["order_timeout_sec"]     
+        self.min_quarantine_threshold_usdt = -abs(self.cfg["risk"]["quarantine"]["min_quarantine_threshold_usdt"])
+        self.force_quarantine_threshold_usdt = -abs(self.cfg["risk"]["quarantine"]["force_quarantine_threshold_usdt"])
 
     async def _await_task(self, task: asyncio.Task | None):
         if not task: return
@@ -168,13 +169,17 @@ class TradingBot:
             logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {q_hours}ч (вход не удался).")
         asyncio.create_task(self.state.save())
 
-    def apply_loss_quarantine(self, symbol: str):
+    def apply_loss_quarantine(self, symbol: str, trade_pnl: float):
         q_cfg = self.cfg.get("risk", {}).get("quarantine", {})
         max_fails = q_cfg.get("max_consecutive_fails", 1)
         q_hours = q_cfg.get("quarantine_hours", "inf")
 
         self.state.consecutive_fails[symbol] = self.state.consecutive_fails.get(symbol, 0) + 1
-        if self.state.consecutive_fails[symbol] >= max_fails:
+        quarantine_condition = (
+            (self.state.consecutive_fails[symbol] >= max_fails and
+            trade_pnl <= self.min_quarantine_threshold_usdt) or (trade_pnl <= self.force_quarantine_threshold_usdt)
+        )
+        if quarantine_condition:
             if str(q_hours).lower() == "inf": self.state.quarantine_until[symbol] = "inf" 
             else: self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
             logger.warning(f"[{symbol}] 💀 Карантин ПОТЕРЬ: {self.state.consecutive_fails[symbol]} фейлов. Блокировка на {q_hours}ч.")

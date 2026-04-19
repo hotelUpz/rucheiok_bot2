@@ -5,114 +5,99 @@
 # import csv
 # from typing import Dict, Any, Tuple, TYPE_CHECKING
 
-# # Используем TYPE_CHECKING для избежания циклических импортов
 # if TYPE_CHECKING:
-#     from CORE.restorator import BotState # Замени на правильный импорт, если он другой
+#     from CORE.restorator import BotState 
 
+# def format_duration(seconds: float) -> str:
+#     """Хелпер: форматирует секунды в секунды или минуты."""
+#     if seconds < 60:
+#         return f"{seconds:.1f}s"
+#     return f"{seconds/60:.1f}m"
 
 # class PerformanceTracker:
 #     def __init__(self, state_manager: 'BotState', fee_rate: float = 0.0006) -> None:
-#         """
-#         fee_rate: 0.06% по умолчанию (типичная комиссия тейкера на Phemex/Binance).
-#         Можно настроить из конфига.
-#         """
 #         self.state = state_manager
 #         self.fee_rate: float = fee_rate
         
-#         # Инициализируем структуру в стейте, если запускаемся впервые
 #         if not hasattr(self.state, 'analytics') or not isinstance(getattr(self.state, 'analytics', None), dict):
 #             self.state.analytics = {}
             
 #         self.data: Dict[str, Any] = self.state.analytics
         
-#         # Заполняем дефолтные ключи, если их нет
 #         defaults: Dict[str, Any] = {
 #             "start_balance": 0.0,
 #             "current_balance": 0.0,
 #             "max_balance": 0.0,
 #             "min_balance": 0.0,
-#             "mdd_usd": 0.0,  # Max Drawdown $
-#             "mdd_pct": 0.0,  # Max Drawdown %
+#             "mdd_usd": 0.0,  
+#             "mdd_pct": 0.0,  
 #             "total_wins": 0,
 #             "total_losses": 0,
 #             "total_pnl": 0.0,
-#             "symbols": {},   # {"BTCUSDT": {"wins": 1, "losses": 0, "pnl": 5.5}}
-#             "history": []    # Очередь последних сделок (чтобы JSON не раздувался бесконечно)
+#             "symbols": {},   
+#             "history": []    
 #         }
 #         for k, v in defaults.items():
 #             if k not in self.data:
 #                 self.data[k] = v
 
-#         # --- ПРОФЕССИОНАЛЬНОЕ ХРАНИЛИЩЕ ИСТОРИИ (CSV Ledger) ---
 #         self.history_file = "logs/trade_history.csv"
 #         os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
         
-#         # Если файла нет, создаем и пишем заголовки колонок
 #         if not os.path.exists(self.history_file):
 #             try:
 #                 with open(self.history_file, "w", newline="", encoding="utf-8") as f:
 #                     writer = csv.writer(f)
 #                     writer.writerow([
 #                         "timestamp", "symbol", "side", "entry_price", 
-#                         "exit_price", "qty", "net_pnl", "is_win"
+#                         "exit_price", "qty", "net_pnl", "is_win", "duration"
 #                     ])
 #             except Exception:
-#                 pass # Защита от отсутствия прав на запись
+#                 pass 
 
 #     def set_initial_balance(self, actual_balance: float) -> None:
-#         """Вызывается на старте бота. Запишет начальный баланс только 1 раз."""
 #         if self.data["start_balance"] == 0.0 and actual_balance > 0:
 #             self.data["start_balance"] = actual_balance
 #             self.data["current_balance"] = actual_balance
 #             self.data["max_balance"] = actual_balance
 #             self.data["min_balance"] = actual_balance
 
-#     def register_trade(self, symbol: str, side: str, entry_price: float, exit_price: float, qty: float) -> Tuple[float, bool]:
-#         """Расчет после закрытия сделки. Возвращает (Net PnL, Is Win)"""
+#     def register_trade(self, symbol: str, side: str, entry_price: float, exit_price: float, qty: float, duration_sec: float = 0.0) -> Tuple[float, bool]:
 #         if entry_price <= 0 or exit_price <= 0 or qty <= 0:
 #             return 0.0, False
 
-#         # 1. Расчет Gross PnL
 #         direction: int = 1 if side == "LONG" else -1
 #         gross_pnl: float = (exit_price - entry_price) * qty * direction
         
-#         # 2. Вычет комиссий (за вход и выход)
 #         fee_cost: float = (entry_price * qty * self.fee_rate) + (exit_price * qty * self.fee_rate)
 #         net_pnl: float = gross_pnl - fee_cost
         
 #         is_win: bool = net_pnl > 0
 
-#         # 3. Обновляем Total
 #         self.data["total_wins"] += 1 if is_win else 0
 #         self.data["total_losses"] += 1 if not is_win else 0
 #         self.data["total_pnl"] += net_pnl
 
-#         # 4. Обновляем Баланс и Просадки
 #         if self.data["start_balance"] > 0:
 #             self.data["current_balance"] += net_pnl
 #             cb: float = self.data["current_balance"]
             
-#             # Фиксация нового исторического максимума (ATH)
 #             if cb > self.data["max_balance"]:
 #                 self.data["max_balance"] = cb
 #                 current_dd_usd: float = 0.0
 #                 current_dd_pct: float = 0.0
 #             else:
-#                 # Расчет текущей мгновенной просадки от пика депозита
 #                 current_dd_usd = self.data["max_balance"] - cb
 #                 current_dd_pct = (current_dd_usd / self.data["max_balance"]) * 100
 
-#             # Обновляем исторический минимум
 #             if cb < self.data["min_balance"]:
 #                 self.data["min_balance"] = cb
 
-#             # Обновляем рекорды максимальных просадок (MDD)
 #             if current_dd_usd > self.data["mdd_usd"]:
 #                 self.data["mdd_usd"] = current_dd_usd
 #             if current_dd_pct > self.data["mdd_pct"]:
 #                 self.data["mdd_pct"] = current_dd_pct
 
-#         # 5. По-символьная статистика
 #         if symbol not in self.data["symbols"]:
 #             self.data["symbols"][symbol] = {"wins": 0, "losses": 0, "pnl": 0.0}
         
@@ -121,34 +106,33 @@
 #         sym_stat["losses"] += 1 if not is_win else 0
 #         sym_stat["pnl"] += net_pnl
 
-#         # 6. Запись в историю (оперативный кэш, ограничен 100 записями)
+#         formatted_duration = format_duration(duration_sec)
+
 #         self.data["history"].append({
 #             "ts": time.time(),
 #             "symbol": symbol,
 #             "side": side,
 #             "pnl": round(net_pnl, 4),
-#             "is_win": is_win
+#             "is_win": is_win,
+#             "duration": formatted_duration
 #         })
         
 #         if len(self.data["history"]) > 100:
 #             self.data["history"].pop(0)
 
-#         # 7. ГЛУБОКАЯ ИСТОРИЯ: Append-only запись на диск
-#         # Выполняется за микросекунды, не блокирует асинхронный цикл, может хранить миллионы сделок
 #         try:
 #             with open(self.history_file, "a", newline="", encoding="utf-8") as f:
 #                 writer = csv.writer(f)
 #                 writer.writerow([
 #                     time.time(), symbol, side, entry_price, 
-#                     exit_price, qty, round(net_pnl, 4), is_win
+#                     exit_price, qty, round(net_pnl, 4), is_win, formatted_duration
 #                 ])
 #         except Exception:
-#             pass # Если не удалось записать, бот просто продолжит работу без краша
+#             pass 
 
 #         return net_pnl, is_win
 
 #     def get_summary_text(self) -> str:
-#         """Метод для генерации красивого отчета в Telegram"""
 #         total: int = self.data["total_wins"] + self.data["total_losses"]
 #         winrate: float = (self.data["total_wins"] / total * 100) if total > 0 else 0.0
 #         pnl: float = self.data["total_pnl"]
@@ -167,6 +151,7 @@
 #             text += f"📉 Max Просадка: {self.data['mdd_pct']:.2f}% (-{self.data['mdd_usd']:.2f} $)\n"
             
 #         return text
+
 
 from __future__ import annotations
 
@@ -218,9 +203,11 @@ class PerformanceTracker:
             try:
                 with open(self.history_file, "w", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
+                    # ДОБАВЛЕНЫ КОЛОНКИ: entry_usd, exit_usd
                     writer.writerow([
                         "timestamp", "symbol", "side", "entry_price", 
-                        "exit_price", "qty", "net_pnl", "is_win", "duration"
+                        "exit_price", "qty", "entry_usd", "exit_usd", 
+                        "net_pnl", "is_win", "duration"
                     ])
             except Exception:
                 pass 
@@ -235,6 +222,11 @@ class PerformanceTracker:
     def register_trade(self, symbol: str, side: str, entry_price: float, exit_price: float, qty: float, duration_sec: float = 0.0) -> Tuple[float, bool]:
         if entry_price <= 0 or exit_price <= 0 or qty <= 0:
             return 0.0, False
+
+        # --- РАСЧЕТ ДОЛЛАРОВОГО ОБЪЕМА ---
+        entry_usd: float = entry_price * qty
+        exit_usd: float = exit_price * qty
+        # ---------------------------------
 
         direction: int = 1 if side == "LONG" else -1
         gross_pnl: float = (exit_price - entry_price) * qty * direction
@@ -282,6 +274,8 @@ class PerformanceTracker:
             "ts": time.time(),
             "symbol": symbol,
             "side": side,
+            "entry_usd": round(entry_usd, 2),  # СОХРАНЯЕМ В СТЕЙТ
+            "exit_usd": round(exit_usd, 2),    # СОХРАНЯЕМ В СТЕЙТ
             "pnl": round(net_pnl, 4),
             "is_win": is_win,
             "duration": formatted_duration
@@ -295,7 +289,8 @@ class PerformanceTracker:
                 writer = csv.writer(f)
                 writer.writerow([
                     time.time(), symbol, side, entry_price, 
-                    exit_price, qty, round(net_pnl, 4), is_win, formatted_duration
+                    exit_price, qty, round(entry_usd, 2), round(exit_usd, 2), 
+                    round(net_pnl, 4), is_win, formatted_duration
                 ])
         except Exception:
             pass 

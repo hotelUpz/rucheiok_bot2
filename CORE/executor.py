@@ -167,7 +167,8 @@ class OrderExecutor:
                         async with self.tb._get_lock(pos_key):
                             pos = self.tb.state.active_positions.get(pos_key)
                             if pos and (pos.current_qty > 0 or getattr(pos, 'in_position', False)): 
-                                logger.info(f"[{pos_key}] ✅ Вход выполнен. Объем: {pos.current_qty}")
+                                entry_usd_vol = pos.current_qty * price # Считаем доллары
+                                logger.info(f"[{pos_key}] ✅ Вход выполнен. Объем: {pos.current_qty} (≈ {entry_usd_vol:.2f} $)")
                                 if self.tb.tg:
                                     msg = Reporters.entry_signal(symbol, signal, signal.b_price, signal.p_price)
                                     asyncio.create_task(self.tb.tg.send_message(msg))
@@ -251,6 +252,10 @@ class OrderExecutor:
                                     pos = self.tb.state.active_positions.get(pos_key)
                                     if pos and pos.close_order_id == new_order_id:
                                         pos.close_order_id = "" # Успешно отменили, сбрасываем ID
+                            else:
+                                # Позиция закрыта
+                                exit_usd_vol = qty * price # Считаем доллары
+                                logger.info(f"[{pos_key}] 🏁 Выход выполнен. Объем: {qty} (≈ {exit_usd_vol:.2f} $)")
                                 
                         return True
                     else:
@@ -263,57 +268,3 @@ class OrderExecutor:
         except Exception as e:
             logger.error(f"[{pos_key}] Глобальная ошибка execute_exit: {e}")
             return False
-
-    # async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
-    #     """
-    #     1. Берет количество ордера. Цена постатовки лимитного ордера - order_price.
-    #     2. Ставит ордер через await. Дожидается ответа в течение timeout_sec.
-    #     3. Если успех: отменяет остаток, возвращает True.
-    #        Если неуспех: ретрай, возвращает False.
-    #     """
-    #     try:
-    #         spec = self.tb.symbol_specs.get(symbol)
-    #         if not spec: return False
-
-    #         async with self.tb._get_lock(pos_key):
-    #             pos = self.tb.state.active_positions.get(pos_key)
-    #             if not pos or not getattr(pos, 'in_position', False) or pos.current_qty <= 0: 
-    #                 return False
-    #             qty = pos.current_qty
-    #             pos_side_raw = pos.side
-
-    #         price = round_step(order_price, spec.tick_size)
-    #         qty = round_step(qty, spec.lot_size)
-    #         if qty < spec.lot_size: return False
-
-    #         side = "Sell" if pos_side_raw == "LONG" else "Buy"
-    #         phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
-
-    #         for attempt in range(max(1, self.max_exit_retries)):
-    #             try:
-    #                 resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
-    #                 if resp.get("code") == 0:
-    #                     order_id = resp.get("data", {}).get("orderID")
-                            
-    #                     await asyncio.sleep(timeout_sec)
-                        
-    #                     if order_id: 
-    #                         curr_qty = 0.0
-    #                         async with self.tb._get_lock(pos_key):
-    #                             pos = self.tb.state.active_positions.get(pos_key)
-    #                             if pos: curr_qty = pos.current_qty
-                                
-    #                         if curr_qty > 0:
-    #                             await self.execute_cancel(symbol, phemex_pos_side, order_id)
-                                
-    #                     return True
-    #                 else:
-    #                     logger.warning(f"[{pos_key}] ❌ Ошибка выхода API: {resp}")
-    #             except Exception as e:
-    #                 logger.error(f"[{pos_key}] Исключение execute_exit: {e}")
-                
-    #         return False
-            
-    #     except Exception as e:
-    #         logger.error(f"[{pos_key}] Глобальная ошибка execute_exit: {e}")
-    #         return False

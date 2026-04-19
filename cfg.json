@@ -45,7 +45,8 @@
         "ARIAUSDT",
         "NOMUSDT",
         "SAHARAUSDT",
-        "ZETAUSDT"
+        "ZETAUSDT",
+        "API3USDT"
     ],
     "quota_asset": "USDT",
     "risk": {
@@ -57,17 +58,19 @@
             "margin_mode": 2
         },
         "margin_size": "row",
-        "notional_limit": 3000.0,
+        "notional_limit": 2000.0,
         "margin_over_size_pct": 1,
         "hedge_mode": false,
         "quarantine": {
+            "min_quarantine_threshold_usdt": -0.2,
+            "force_quarantine_threshold_usdt": -4.0,
             "max_consecutive_fails": 3,
             "quarantine_hours": "inf"
         }
     },
     "entry": {
         "signal_timeout_sec": 0.01,
-        "entry_timeout_sec": 0.35,
+        "entry_timeout_sec": 0.25,
         "max_place_order_retries": 1,
         "quarantine": {
             "quarantine_hours": 1
@@ -78,7 +81,7 @@
                 "enable": true,
                 "depth": 8,
                 "min_first_row_usdt_notional": 50,
-                "max_first_row_usdt_notional": 2900,
+                "max_first_row_usdt_notional": 1900,
                 "header": {
                     "roc_window": 3,
                     "max_one_roc_pct": 0.5
@@ -91,7 +94,7 @@
                     "min_spread_between_three_row_pct": 0.3
                 },
                 "header_to_bottom_desired_rate": 10,
-                "max_bid_ask_distance_rate": 0.5,
+                "max_bid_ask_distance_rate": 0.4,
                 "pattern_ttl_sec": 5
             },
             "binance": {
@@ -104,7 +107,7 @@
                 "enable": true,
                 "check_interval_sec": 60,
                 "skip_before_counter_sec": 1800,
-                "threshold_pct": 2.0
+                "threshold_pct": 1.5
             },
             "funding_pattern2": {
                 "enable": true,
@@ -119,7 +122,7 @@
         "scenarios": {
             "base": {
                 "enable": true,
-                "order_timeout_sec": 0.35,
+                "order_timeout_sec": 0.25,
                 "stabilization_ttl": 3,
                 "target_rate": 0.7,
                 "shift_demotion": 0.2,
@@ -130,11 +133,11 @@
                 "enable": true,
                 "stabilization_ttl": 1.5,
                 "negative_spread_pct": 0,
-                "negative_ttl": 30
+                "negative_ttl": 20
             },
             "breakeven_ttl_close": {
                 "enable": true,
-                "order_timeout_sec": 0.35,
+                "order_timeout_sec": 0.25,
                 "position_ttl": 300,
                 "breakeven_wait_sec": 2,
                 "to_entry_orientation": 0.0
@@ -143,14 +146,14 @@
         "interference": {
             "enable": true,
             "stabilization_ttl": 2.0,
-            "order_timeout_sec": 0.3,
+            "order_timeout_sec": 0.10,
             "usual_vol_pct_to_init_size": 3,
             "max_vol_pct_to_init_size": 9,
             "max_retries_per_level": 3
         },
         "extrime_close": {
             "enable": true,
-            "order_timeout_sec": 0.35,
+            "order_timeout_sec": 0.25,
             "retry_ttl": 3,
             "retry_num": "inf",
             "bid_to_ask_orientation": 0.0,

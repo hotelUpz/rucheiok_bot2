@@ -46,6 +46,11 @@ def get_config_summary(cfg: dict) -> str:
     q = risk.get("quarantine", {})
     lines.append(f"Quarantine: <b>{q.get('max_consecutive_fails', 'N/A')}</b> fails for <b>{q.get('quarantine_hours', 'N/A')}h</b>")
     
+    # Добавляем вывод новых порогов для карантина
+    min_q = q.get('min_quarantine_threshold_usdt', 'N/A')
+    force_q = q.get('force_quarantine_threshold_usdt', 'N/A')
+    lines.append(f"Q. Thresholds: Min <b>{min_q} USDT</b> | Force <b>{force_q} USDT</b>")
+    
     log = cfg.get("log", {})
     tg = cfg.get("tg", {})
     lines.append("\n📡 <b>[SYSTEM]</b>")
