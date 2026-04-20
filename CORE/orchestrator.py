@@ -462,7 +462,7 @@ class TradingBot:
                         if getattr(pos, 'is_closed_by_exchange', False):
                             if pos.entry_price > 0.0:
                                 
-                                exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else pos.avg_price
+                                exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.exit_price_hint or pos.avg_price)
                                 duration_sec = time.time() - pos.opened_at
                                 
                                 net_pnl, is_win = self.tracker.register_trade(

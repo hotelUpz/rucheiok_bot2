@@ -182,7 +182,8 @@ class OrderExecutor:
             initial_qty = 0.0
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
-                if pos: initial_qty = pos.current_qty
+                if pos:
+                    initial_qty = pos.current_qty
                 pos.pending_qty = qty
 
             side = "Buy" if signal.side == "LONG" else "Sell"
@@ -269,6 +270,12 @@ class OrderExecutor:
             if target_qty < spec.lot_size: return False
 
             side = "Sell" if pos_side_raw == "LONG" else "Buy"
+
+            # В методе execute_exit (перед отправкой ордера)
+            async with self.tb._get_lock(pos_key):
+                pos = self.tb.state.active_positions.get(pos_key)
+                if pos:
+                    pos.exit_price_hint = price  # <--- Сохраняем "намерение"
 
             # 4. Основной цикл постановки
             for attempt in range(max(1, self.max_exit_retries)):
