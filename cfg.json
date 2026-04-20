@@ -70,7 +70,7 @@
     },
     "entry": {
         "signal_timeout_sec": 0.01,
-        "entry_timeout_sec": 0.1,
+        "entry_timeout_sec": 0.5,
         "max_place_order_retries": 1,
         "quarantine": {
             "quarantine_hours": 1
