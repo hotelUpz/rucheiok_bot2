@@ -1,40 +1,5 @@
 {
-    "positions": {
-        "CRCLUSDT_LONG": {
-            "symbol": "CRCLUSDT",
-            "side": "LONG",
-            "in_pending": false,
-            "in_position": false,
-            "exit_status": "BREAKEVEN",
-            "last_exit_status": "BREAKEVEN",
-            "in_base_mode": true,
-            "is_closed_by_exchange": true,
-            "interf_in_flight": false,
-            "entry_price": 102.65,
-            "pending_price": 0.0,
-            "avg_price": 102.65,
-            "current_close_price": 102.65,
-            "realized_exit_price": 102.68,
-            "pending_qty": 0.64,
-            "current_qty": 0.0,
-            "closed_qty": 0.64,
-            "max_realized_qty": 0.64,
-            "interf_comulative_qty": 0.0,
-            "init_ask1": 102.65,
-            "init_bid1": 102.55,
-            "mid_price": 102.6,
-            "base_target_price_100": 103.02,
-            "current_target_rate": 0.3,
-            "close_order_id": "1b3c84b8-8271-4e20-b493-b67d65fa2b9d",
-            "opened_at": 1776626727.5783963,
-            "last_shift_ts": 1776626770.5971825,
-            "last_negative_check_ts": 1776627027.590041,
-            "breakeven_start_ts": 1776627027.590041,
-            "last_extrime_try_ts": 0.0,
-            "extrime_retries_count": 0,
-            "marked_for_death_ts": 0.0
-        }
-    },
+    "positions": {},
     "fails": {
         "GENIUSUSDT": 1,
         "CHIPUSDT": 3,
@@ -63,21 +28,24 @@
         "JSTUSDT": 0,
         "API3USDT": 1,
         "COPPERUSDT": 0,
-        "PIEVERSEUSDT": 0
+        "PIEVERSEUSDT": 0,
+        "CRCLUSDT": 1,
+        "HOODUSDT": 1,
+        "USELESSUSDT": 1
     },
     "quarantine": {
         "CHIPUSDT": "inf"
     },
     "analytics": {
         "start_balance": 10444.713980565613,
-        "current_balance": 10425.76359406227,
+        "current_balance": 10421.834591369066,
         "max_balance": 10462.17196898024,
-        "min_balance": 10425.62049565019,
-        "mdd_usd": 36.5514733300497,
-        "mdd_pct": 0.3493679270272253,
-        "total_wins": 27,
-        "total_losses": 16,
-        "total_pnl": -18.950386503342056,
+        "min_balance": 10421.834591369066,
+        "mdd_usd": 40.337377611173,
+        "mdd_pct": 0.38555452663912515,
+        "total_wins": 28,
+        "total_losses": 19,
+        "total_pnl": -22.879389196543382,
         "symbols": {
             "GENIUSUSDT": {
                 "wins": 4,
@@ -135,9 +103,9 @@
                 "pnl": -0.3616037963999999
             },
             "WETUSDT": {
-                "wins": 9,
+                "wins": 10,
                 "losses": 1,
-                "pnl": 2.7062002616218868
+                "pnl": 4.082346170021989
             },
             "ZETAUSDT": {
                 "wins": 0,
@@ -176,8 +144,18 @@
             },
             "CRCLUSDT": {
                 "wins": 0,
+                "losses": 2,
+                "pnl": -1.6102935220011771
+            },
+            "HOODUSDT": {
+                "wins": 0,
                 "losses": 1,
-                "pnl": -0.05964671999999928
+                "pnl": -0.7463434796002519
+            },
+            "USELESSUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -3.0081583199999953
             }
         },
         "history": [
@@ -516,6 +494,46 @@
                 "pnl": -0.0596,
                 "is_win": false,
                 "duration": "5.0m"
+            },
+            {
+                "ts": 1776635444.231332,
+                "symbol": "WETUSDT",
+                "side": "SHORT",
+                "entry_usd": 1311.89,
+                "exit_usd": 1308.94,
+                "pnl": 1.3761,
+                "is_win": true,
+                "duration": "50.0s"
+            },
+            {
+                "ts": 1776639952.841527,
+                "symbol": "CRCLUSDT",
+                "side": "LONG",
+                "entry_usd": 1050.68,
+                "exit_usd": 1050.39,
+                "pnl": -1.5506,
+                "is_win": false,
+                "duration": "5.2m"
+            },
+            {
+                "ts": 1776643459.3104913,
+                "symbol": "HOODUSDT",
+                "side": "SHORT",
+                "entry_usd": 106.14,
+                "exit_usd": 106.76,
+                "pnl": -0.7463,
+                "is_win": false,
+                "duration": "1.1m"
+            },
+            {
+                "ts": 1776646832.989353,
+                "symbol": "USELESSUSDT",
+                "side": "SHORT",
+                "entry_usd": 536.93,
+                "exit_usd": 539.29,
+                "pnl": -3.0082,
+                "is_win": false,
+                "duration": "5.3m"
             }
         ]
     }

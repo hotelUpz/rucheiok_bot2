@@ -2,6 +2,7 @@
 # FILE: CORE/orchestrator.py
 # ROLE: Главный оркестратор торговых процессов (Game Loop Pattern)
 # ============================================================
+
 from __future__ import annotations
 import asyncio
 import time
@@ -431,70 +432,75 @@ class TradingBot:
             keys_to_check = list(self.state.active_positions.keys())
             for pos_key in keys_to_check:
                 async with self._get_lock(pos_key):
-                    pos: "ActivePosition" = self.state.active_positions.get(pos_key)
-                    if not pos: continue
+                    try:
+                        pos: "ActivePosition" = self.state.active_positions.get(pos_key)
+                        if not pos: continue
 
-                    # --- НОВЫЙ БЛОК: СБОРЩИК ФАНТОМНЫХ ВХОДОВ ---
-                    if getattr(pos, 'marked_for_death_ts', 0) > 0:
-                        if pos.in_position:
-                            # WS догнал нас и налил позицию! Спасаем ее.
-                            pos.marked_for_death_ts = 0.0 
-                        elif time.time() - pos.marked_for_death_ts > 5.0:
-                            # Прошло 5 секунд, WS молчит. Это 100% фейл. Сносим.
-                            logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
-                            self.state.active_positions.pop(pos_key, None)
-                            self.active_positions_locker.pop(pos_key, None)
-                            asyncio.create_task(self.state.save())
-                            continue
-                    # ----------------------------------------------
-                    if getattr(pos, 'is_closed_by_exchange', False):
-                        if pos.entry_price > 0.0:
-                            
-                            exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
-                            duration_sec = time.time() - pos.opened_at
-                            
-                            # === ДОБАВЛЯЕМ АНАЛИТИКУ ===
-                            net_pnl, is_win = self.tracker.register_trade(
-                                symbol=pos.symbol,
-                                side=pos.side,
-                                entry_price=pos.avg_price if pos.avg_price > 0 else pos.entry_price,
-                                exit_price=exit_pr,
-                                qty=pos.max_realized_qty,
-                                duration_sec=duration_sec
-                            )
-
-                            emoji = "💵" if is_win else "🩸"
-
-                            # --- 1. ОПРЕДЕЛЯЕМ ПРИЧИНУ ДЛЯ ТЕЛЕГРАМА ---
-                            current_status = pos.exit_status if pos.exit_status in ("EXTREME", "BREAKEVEN") else pos.last_exit_status
-                            
-                            if current_status == "EXTREME": 
-                                semantic = "⚠️ Аварийный выход (EXTREME Mode)"
-                            elif current_status == "BREAKEVEN": 
-                                semantic = "🛡 Выход по безубытку (TTL)"                                
-                            else: 
-                                semantic = "🎯 Тейк-профит" if is_win else "📉 Убыток (Ручное/Неизвестно)"
-
-                            # --- 2. ЕДИНАЯ ЖЕЛЕЗОБЕТОННАЯ ЛОГИКА КАРАНТИНА ---
-                            # Решение принимается ИСКЛЮЧИТЕЛЬНО по реальному PnL
-                            if is_win:
-                                self.state.consecutive_fails[pos.symbol] = 0
-                                self.state.quarantine_until.pop(pos.symbol, None)
-                            else:
-                                # Любой минус (Экстрим, Ручной или Безубыток, съеденный комиссией) = ФЕЙЛ
-                                self.apply_loss_quarantine(pos.symbol)
-                            # -------------------------------------------------
-
-                            if self.tg:
-                                msg = Reporters.exit_success(pos_key, semantic, exit_pr)
-                                msg += f"\n⏳ Время в сделке: {format_duration(duration_sec)}"
-                                asyncio.create_task(self.tg.send_message(msg))
+                        # --- НОВЫЙ БЛОК: СБОРЩИК ФАНТОМНЫХ ВХОДОВ ---
+                        if getattr(pos, 'marked_for_death_ts', 0) > 0:
+                            if pos.in_position:
+                                # WS догнал нас и налил позицию! Спасаем ее.
+                                pos.marked_for_death_ts = 0.0 
+                            elif time.time() - pos.marked_for_death_ts > 5.0:
+                                # Прошло 5 секунд, WS молчит. Это 100% фейл. Сносим.
+                                logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
+                                self.state.active_positions.pop(pos_key, None)
+                                self.active_positions_locker.pop(pos_key, None)
+                                asyncio.create_task(self.state.save())
+                                continue
+                        # ----------------------------------------------
+                        if getattr(pos, 'is_closed_by_exchange', False):
+                            if pos.entry_price > 0.0:
                                 
-                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта. {emoji} PnL: {net_pnl:.4f}$ | Время: {format_duration(duration_sec)}")
+                                exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
+                                duration_sec = time.time() - pos.opened_at
+                                
+                                # === ДОБАВЛЯЕМ АНАЛИТИКУ ===
+                                net_pnl, is_win = self.tracker.register_trade(
+                                    symbol=pos.symbol,
+                                    side=pos.side,
+                                    entry_price=pos.avg_price if pos.avg_price > 0 else pos.entry_price,
+                                    exit_price=exit_pr,
+                                    qty=pos.max_realized_qty,
+                                    duration_sec=duration_sec
+                                )
 
-                        self.state.active_positions.pop(pos_key, None)
-                        self.active_positions_locker.pop(pos_key, None) 
-                        asyncio.create_task(self.state.save())
+                                emoji = "💵" if is_win else "🩸"
+
+                                # --- 1. ОПРЕДЕЛЯЕМ ПРИЧИНУ ДЛЯ ТЕЛЕГРАМА ---
+                                current_status = pos.exit_status if pos.exit_status in ("EXTREME", "BREAKEVEN") else pos.last_exit_status
+                                
+                                if current_status == "EXTREME": 
+                                    semantic = "⚠️ Аварийный выход (EXTREME Mode)"
+                                elif current_status == "BREAKEVEN": 
+                                    semantic = "🛡 Выход по безубытку (TTL)"                                
+                                else: 
+                                    semantic = "🎯 Тейк-профит" if is_win else "📉 Убыток (Ручное/Неизвестно)"
+
+                                # --- 2. ЕДИНАЯ ЖЕЛЕЗОБЕТОННАЯ ЛОГИКА КАРАНТИНА ---
+                                # Решение принимается ИСКЛЮЧИТЕЛЬНО по реальному PnL
+                                if is_win:
+                                    self.state.consecutive_fails[pos.symbol] = 0
+                                    self.state.quarantine_until.pop(pos.symbol, None)
+                                else:
+                                    # Любой минус (Экстрим, Ручной или Безубыток, съеденный комиссией) = ФЕЙЛ
+                                    self.apply_loss_quarantine(pos.symbol, net_pnl)
+                                # -------------------------------------------------
+
+                                if self.tg:
+                                    msg = Reporters.exit_success(pos_key, semantic, exit_pr)
+                                    msg += f"\n⏳ Время в сделке: {format_duration(duration_sec)}"
+                                    asyncio.create_task(self.tg.send_message(msg))
+                                    
+                                logger.info(f"[{pos_key}] 🛑 Позиция закрыта. {emoji} PnL: {net_pnl:.4f}$ | Время: {format_duration(duration_sec)}")
+
+                            self.state.active_positions.pop(pos_key, None)
+                            self.active_positions_locker.pop(pos_key, None) 
+                            asyncio.create_task(self.state.save())
+
+                    except Exception as e:
+                        # Ловим любые непредвиденные ошибки бизнес-логики, чтобы не уронить Game Loop
+                        logger.error(f"[{pos_key}] 💥 Критическая ошибка при обработке позиции в Game Loop: {e}\n{traceback.format_exc()}")
 
             current_snaps = list(self._latest_market_data.values())
             if not current_snaps:
@@ -553,8 +559,7 @@ class TradingBot:
         await self._await_task(getattr(self, '_funding_task', None))
         self._funding_task = asyncio.create_task(self.funding_manager.run())
         await asyncio.sleep(1)
-        
-        # self._private_ws_task = asyncio.create_task(self.private_ws.run(self.ws_handler.process_phemex_message))
+
         self._private_ws_task = asyncio.create_task(
             self.private_ws.run(
                 self.ws_handler.process_phemex_message,
