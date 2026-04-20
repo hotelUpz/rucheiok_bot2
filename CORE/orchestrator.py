@@ -264,7 +264,9 @@ class TradingBot:
                         if p:
                             p.exit_in_flight = False
                             p.last_exit_status = p.exit_status
-                            if p.exit_status in ("HUNTING", "INTERFERENCE"):
+                            
+                            # 👇 Эгоистичный сброс: HUNTING сбрасывает ТОЛЬКО HUNTING
+                            if p.exit_status == "HUNTING":
                                 p.exit_status = "NORMAL"
 
             elif cmd == "INTERFERENCE":
@@ -275,7 +277,9 @@ class TradingBot:
                     if not p or not p.in_position or p.current_qty <= 0:
                         if p:
                             p.interf_in_flight = False
-                            if p.exit_status in ("INTERFERENCE", "HUNTING"):
+                            
+                            # 👇 Эгоистичный сброс: INTERFERENCE сбрасывает ТОЛЬКО INTERFERENCE
+                            if p.exit_status == "INTERFERENCE":
                                 p.exit_status = "NORMAL"
                         return
 
@@ -288,14 +292,18 @@ class TradingBot:
                         p = self.state.active_positions.get(pos_key)
                         if p:
                             p.interf_in_flight = False
-                            p.exit_status = "NORMAL"
+                            
+                            # 👇 БАГФИКС (твой правильный): Сбрасываем ТОЛЬКО ЕСЛИ нас не перебил EXTREME или BREAKEVEN
+                            if p.exit_status == "INTERFERENCE":
+                                p.exit_status = "NORMAL"
+                                
                             if filled_qty is not None and filled_qty > 0:
                                 p.interf_comulative_qty += filled_qty
                                 max_rem = getattr(p, 'max_allowed_remains', 0.0)
                                 pct = (p.interf_comulative_qty / max_rem * 100) if max_rem > 0 else 0
                                 logger.info(f"[{pos_key}] Успешная скупка помех. Куплено: {filled_qty:.4f}. Cumulative: {p.interf_comulative_qty:.4f} ({pct:.1f}% лимита)")
 
-        # Параллельный запуск всех экшенов
+        # Параллельный запуск всех экшенов. gather дождется всех, но флаги снимутся асинхронно!
         tasks = [process_action(act) for act in action_payload]
         if tasks:
             results = await asyncio.gather(*tasks, return_exceptions=True)

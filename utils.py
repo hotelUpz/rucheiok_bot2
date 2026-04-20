@@ -33,7 +33,7 @@ def get_config_summary(cfg: dict) -> str:
     
     lines.append("🎛 <b>[APP & RISK]</b>")
     lines.append(f"Name: <b>{app.get('name', 'N/A')}</b> | Quota: <b>{cfg.get('quota_asset', 'N/A')}</b>")
-    lines.append(f"Max Positions: <b>{app.get('max_active_positions', 'N/A')}</b>")
+    lines.append(f"Max Positions: <b>{app.get('max_active_positions', 'N/A')}</b> | Hedge Mode: <b>{risk.get('hedge_mode', 'N/A')}</b>")
     
     lev_cfg = risk.get('leverage', {})
     lev_val = lev_cfg.get('val', 'N/A') if isinstance(lev_cfg, dict) else lev_cfg
@@ -46,7 +46,6 @@ def get_config_summary(cfg: dict) -> str:
     q = risk.get("quarantine", {})
     lines.append(f"Quarantine: <b>{q.get('max_consecutive_fails', 'N/A')}</b> fails for <b>{q.get('quarantine_hours', 'N/A')}h</b>")
     
-    # Добавляем вывод новых порогов для карантина
     min_q = q.get('min_quarantine_threshold_usdt', 'N/A')
     force_q = q.get('force_quarantine_threshold_usdt', 'N/A')
     lines.append(f"Q. Thresholds: Min <b>{min_q} USDT</b> | Force <b>{force_q} USDT</b>")
@@ -57,23 +56,31 @@ def get_config_summary(cfg: dict) -> str:
     lines.append(f"TG Enabled: <b>{tg.get('enable', 'N/A')}</b>")
     lines.append(f"Logs: D:{log.get('debug', 'N/A')} I:{log.get('info', 'N/A')} W:{log.get('warning', 'N/A')} E:{log.get('error', 'N/A')}")
 
-    # Входные паттерны
-    entry = cfg.get("entry", {}).get("pattern", {})
+    # Входные паттерны общие
+    entry_main = cfg.get("entry", {})
+    entry = entry_main.get("pattern", {})
+    lines.append("\n📥 <b>[ENTRY GENERAL]</b>")
+    lines.append(f"Sig Timeout: <b>{entry_main.get('signal_timeout_sec', 'N/A')}s</b> | Ord Timeout: <b>{entry_main.get('entry_timeout_sec', 'N/A')}s</b>")
+    lines.append(f"Max Retries: <b>{entry_main.get('max_place_order_retries', 'N/A')}</b> | Entry Qrntn: <b>{entry_main.get('quarantine', {}).get('quarantine_hours', 'N/A')}h</b>")
+
     ph = entry.get("phemex", {})
+    lines.append("\n🎯 <b>[ENTRY PHEMEX]</b>")
+    lines.append(f"Enable: <b>{ph.get('enable', 'N/A')}</b> | Depth: <b>{ph.get('depth', 'N/A')}</b> | TTL: <b>{ph.get('pattern_ttl_sec', 'N/A')}s</b>")
+    lines.append(f"Row1 Notional: <b>{ph.get('min_first_row_usdt_notional', 'N/A')} - {ph.get('max_first_row_usdt_notional', 'N/A')} USDT</b>")
+    
+    hdr = ph.get("header", {})
+    bdy = ph.get("body", {})
+    btm = ph.get("bottom", {})
+    lines.append(f"ROC Win: <b>{hdr.get('roc_window', 'N/A')}</b> (SMA: <b>{bdy.get('roc_sma_window', 'N/A')}</b>) | Max 1 ROC: <b>{hdr.get('max_one_roc_pct', 'N/A')}%</b>")
+    lines.append(f"Sprd 2 row: &gt;= <b>{btm.get('min_spread_between_two_row_pct', 'N/A')}%</b> | 3 row: &gt;= <b>{btm.get('min_spread_between_three_row_pct', 'N/A')}%</b>")
+    lines.append(f"Hdr/Btm Rate: <b>{ph.get('header_to_bottom_desired_rate', 'N/A')}</b> | Max Bid/Ask Dist: <b>{ph.get('max_bid_ask_distance_rate', 'N/A')}</b>")
+    
     binance = entry.get("binance", {})
     f1 = entry.get("funding_pattern1", {})
     f2 = entry.get("funding_pattern2", {})
-    
-    lines.append("\n🎯 <b>[ENTRY PHEMEX]</b>")
-    lines.append(f"Enable: <b>{ph.get('enable', 'N/A')}</b> | Depth: <b>{ph.get('depth', 'N/A')}</b> | TTL: <b>{ph.get('pattern_ttl_sec', 'N/A')}s</b>")
-    
-    hdr = ph.get("header", {})
-    btm = ph.get("bottom", {})
-    lines.append(f"ROC Window: <b>{hdr.get('roc_window', 'N/A')}</b> | Max 1 ROC: <b>{hdr.get('max_one_roc_pct', 'N/A')}%</b>")
-    lines.append(f"Sprd 3 row: &gt;= <b>{btm.get('min_spread_between_three_row_pct', 'N/A')}%</b>")
-    
     lines.append("\n🔶 <b>[ENTRY BINANCE & FUNDING]</b>")
     lines.append(f"Binance: <b>{binance.get('enable', 'N/A')}</b> | Sprd: &gt;= <b>{binance.get('min_price_spread_rate', 'N/A')}%</b>")
+    lines.append(f"Binance Upd: <b>{binance.get('update_prices_sec', 'N/A')}s</b> | Sprd TTL: <b>{binance.get('spread_ttl_sec', 'N/A')}s</b>")
     lines.append(f"Fund1(Phemex): <b>{f1.get('enable', 'N/A')}</b> | Thresh: &gt;= <b>{f1.get('threshold_pct', 'N/A')}%</b>")
     lines.append(f"Fund2(Diff): <b>{f2.get('enable', 'N/A')}</b> | Diff: &gt;= <b>{f2.get('diff_threshold_pct', 'N/A')}%</b>")
 
@@ -81,19 +88,25 @@ def get_config_summary(cfg: dict) -> str:
     exit_cfg = cfg.get("exit", {})
     scen = exit_cfg.get("scenarios", {})
     
+    lines.append("\n🚪 <b>[EXIT GENERAL]</b>")
+    lines.append(f"Max Retries: <b>{exit_cfg.get('max_place_order_retries', 'N/A')}</b> | Min Order Life: <b>{exit_cfg.get('min_order_life_sec', 'N/A')}s</b>")
+
     avg = scen.get("base", {})
     neg = scen.get("negative", {})
     ttl = scen.get("breakeven_ttl_close", {})
-    
     inter = exit_cfg.get("interference", {})
     ext = exit_cfg.get("extrime_close", {})
     
-    lines.append("\n🚪 <b>[EXIT SCENARIOS]</b>")
-    lines.append(f"<b>Base (Take):</b> {avg.get('enable', True)} | Stab TTL: <b>{avg.get('stabilization_ttl', 'N/A')}s</b>")
+    lines.append("\n📦 <b>[EXIT SCENARIOS]</b>")
+    lines.append(f"<b>Base (Take):</b> {avg.get('enable', True)} | Rate: <b>{avg.get('target_rate', 'N/A')}</b> (Min: <b>{avg.get('min_target_rate', 'N/A')}</b>)")
+    lines.append(f"Base Shift: Demotion <b>{avg.get('shift_demotion', 'N/A')}</b> per <b>{avg.get('shift_ttl', 'N/A')}s</b> | Stab TTL: <b>{avg.get('stabilization_ttl', 'N/A')}s</b>")
     lines.append(f"<b>Negative:</b> {neg.get('enable', 'N/A')} | Neg Spread &lt;= <b>{neg.get('negative_spread_pct', 'N/A')}%</b> for <b>{neg.get('negative_ttl', 'N/A')}s</b>")
-    lines.append(f"<b>Interference:</b> {inter.get('enable', 'N/A')} | Usual Vol: <b>{inter.get('usual_vol_pct_to_init_size', 'N/A')}%</b>")
+    lines.append(f"<b>Interference:</b> {inter.get('enable', 'N/A')} | Vol: <b>{inter.get('usual_vol_pct_to_init_size', 'N/A')}% - {inter.get('max_vol_pct_to_init_size', 'N/A')}%</b>")
+    lines.append(f"Interference Lvl Retries: <b>{inter.get('max_retries_per_level', 'N/A')}</b> | Stab TTL: <b>{inter.get('stabilization_ttl', 'N/A')}s</b>")
     lines.append(f"<b>TTL Close:</b> {ttl.get('enable', 'N/A')} | TTL: <b>{ttl.get('position_ttl', 'N/A')}s</b> | Wait: <b>{ttl.get('breakeven_wait_sec', 'N/A')}s</b>")
+    lines.append(f"TTL Orient: <b>{ttl.get('to_entry_orientation', 'N/A')}</b>")
     lines.append(f"<b>Extrime:</b> {ext.get('enable', 'N/A')} | Retries: <b>{ext.get('retry_num', 'N/A')}</b> per <b>{ext.get('retry_ttl', 'N/A')}s</b>")
+    lines.append(f"Extrime Incr Frac: <b>{ext.get('increase_fraction', 'N/A')}</b> | Orient: <b>{ext.get('bid_to_ask_orientation', 'N/A')}</b>")
 
     return "\n".join(lines)
 
