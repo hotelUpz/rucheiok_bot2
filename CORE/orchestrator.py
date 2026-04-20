@@ -199,7 +199,13 @@ class TradingBot:
 
             keys_to_remove = [k for k in list(self.state.active_positions.keys()) if k not in exchange_positions]
             for k in keys_to_remove:
-                self.state.active_positions.pop(k, None)
+                pos = self.state.active_positions.get(k)
+                
+                # 👇 БАГФИКС: Мягкое удаление для спасения аналитики
+                if pos and pos.in_position:
+                    pos.is_closed_by_exchange = True # Отдаем на растерзание Game Loop
+                else:
+                    self.state.active_positions.pop(k, None) # Удаляем только пустые/фантомные
 
             for pos_key, ex_data in exchange_positions.items():
                 if pos_key in self.state.active_positions:
@@ -258,7 +264,7 @@ class TradingBot:
                         if p:
                             p.exit_in_flight = False
                             p.last_exit_status = p.exit_status
-                            if p.exit_status == "HUNTING":
+                            if p.exit_status in ("HUNTING", "INTERFERENCE"):
                                 p.exit_status = "NORMAL"
 
             elif cmd == "INTERFERENCE":
@@ -269,7 +275,8 @@ class TradingBot:
                     if not p or not p.in_position or p.current_qty <= 0:
                         if p:
                             p.interf_in_flight = False
-                            p.exit_status = "NORMAL"
+                            if p.exit_status in ("INTERFERENCE", "HUNTING"):
+                                p.exit_status = "NORMAL"
                         return
 
                 try:
