@@ -7,7 +7,7 @@ from __future__ import annotations
 import asyncio
 import time
 import traceback
-from typing import Dict, Any, Set, TYPE_CHECKING
+from typing import Dict, Any, Set, TYPE_CHECKING, List, Tuple
 import os
 import aiohttp
 from pathlib import Path
@@ -280,58 +280,63 @@ class TradingBot:
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         now = time.time()
         
-        for pos_key in (long_key, short_key):
-            action_payload = None
+        action_payload: List[Tuple] = []
+
+        for pos_key in (long_key, short_key):            
 
             async with self._get_lock(pos_key):
                 pos = self.state.active_positions.get(pos_key)
                 if not pos or not pos.in_position or pos.current_qty <= 0:
                     continue
 
-                # --- 1. СЕТЕВАЯ БЛОКИРОВКА ---
-                if pos.exit_status in ("HUNTING", "INTERFERENCE"):
-                    continue
+                # # --- 1. СЕТЕВАЯ БЛОКИРОВКА ---
+                # if pos.exit_status in ("HUNTING", "INTERFERENCE"):
+                #     continue
                 
                 # ---  ---
-                else:
-                    is_extrime = pos.exit_status == "EXTREME"
+                # else:
+                is_extrime = pos.exit_status == "EXTREME"
 
-                    ttl_res = None
-                    if not is_extrime: ttl_res = await self.scen_ttl.scen_ttl_analyze(pos, now)
+                ttl_res = None
+                if not is_extrime: ttl_res = await self.scen_ttl.scen_ttl_analyze(pos, now)
 
-                    # 1. Сначала Extrime / Breakeven                    
-                    if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or\
-                        self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
-                        pos.exit_status = "EXTREME"
+                # 1. Сначала Extrime / Breakeven                    
+                if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or\
+                    self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
+                    pos.exit_status = "EXTREME"
 
-                        ext_price = self.scen_extrime.scen_extrime_analyze(snap, pos, now)
-                        if ext_price and pos.current_close_price != ext_price:
-                            pos.current_close_price = ext_price
-                            pos.last_extrime_try_ts = now
-                            pos.extrime_retries_count += 1
-                            action_payload = ("EXTREME", ext_price, self.extrime_order_timeout_sec)
+                    ext_price = self.scen_extrime.scen_extrime_analyze(snap, pos, now)
+                    if ext_price and pos.current_close_price != ext_price:
+                        pos.current_close_price = ext_price
+                        pos.last_extrime_try_ts = now
+                        pos.extrime_retries_count += 1
+                        action_payload = [("EXTREME", ext_price, self.extrime_order_timeout_sec, pos_key)]
 
-                    elif ttl_res == "BREAKEVEN":
-                        pos.exit_status = "BREAKEVEN"
-                        pos.breakeven_start_ts = now
-                        be_price = self.scen_ttl.build_target_price(pos)
-                        if be_price and pos.current_close_price != be_price:
-                            pos.current_close_price = be_price
-                            logger.debug(f"[{pos_key}] Попытка закрыть в безубыток...")
-                            action_payload = ("BREAKEVEN", be_price, self.breakeven_order_timeout_sec)
+                        continue
 
-                    # 2. Если экстренных действий нет, ищем тейк-профит
-                    if not action_payload and pos.exit_status not in ("EXTREME", "BREAKEVEN"):
-                        # Базовый Тейк-Профит === Охота.
-                        base_price = self.scen_base.scen_base_analyze(snap, pos, now)
-                        if base_price and pos.current_close_price != base_price:
-                            pos.exit_status = "HUNTING"
-                            pos.current_close_price = base_price
-                            logger.debug(f"[{pos_key}] Попытка охоты...")
-                            action_payload = ("HUNTING", base_price, self.base_order_timeout_sec) # это и есть охота.
+                elif ttl_res == "BREAKEVEN":
+                    pos.exit_status = "BREAKEVEN"
+                    pos.breakeven_start_ts = now
+                    be_price = self.scen_ttl.build_target_price(pos)
+                    if be_price and pos.current_close_price != be_price:
+                        pos.current_close_price = be_price
+                        logger.debug(f"[{pos_key}] Попытка закрыть в безубыток...")
+                        action_payload = [("BREAKEVEN", be_price, self.breakeven_order_timeout_sec, pos_key)]
+
+                        continue
+
+                # 2. Если экстренных действий нет, ищем тейк-профит
+                if pos.exit_status not in ("EXTREME", "BREAKEVEN"):
+                    # Базовый Тейк-Профит === Охота.
+                    base_price = self.scen_base.scen_base_analyze(snap, pos, now)
+                    if base_price and pos.current_close_price != base_price:
+                        pos.exit_status = "HUNTING"
+                        pos.current_close_price = base_price
+                        logger.debug(f"[{pos_key}] Попытка охоты...")
+                        action_payload.append(("HUNTING", base_price, self.base_order_timeout_sec, pos_key)) #
 
                     # 3. Если и тейка нет, пробуем чистить стакан (Скупка помех)
-                    if not action_payload and not pos.interf_in_flight:                    
+                    if not pos.interf_in_flight:                    
                         # Запрос на Скупку Помех
                         if not pos.interf_in_flight:
                             interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
@@ -340,11 +345,11 @@ class TradingBot:
                                 pos.exit_status = "INTERFERENCE"
                                 pos.interf_in_flight = True
                                 logger.debug(f"[{pos_key}] Попытка скупки помех...")
-                                action_payload = ("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec)
+                                action_payload.append(("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec, pos_key))
 
             # --- 2. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
             if action_payload:
-                await self._payloader(action_payload, symbol, pos_key)
+                await self._payloader(action_payload, symbol, pos_key) # здесь надо дождаться завершения всех внутренних задач.
 
                 # --- 3. СБРОС ИДЕМПОТЕНТА pos.current_close_price ---
                 async with self._get_lock(pos_key):
