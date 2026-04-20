@@ -241,67 +241,56 @@ class TradingBot:
     
     # --- СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
     async def _payloader(self, action_payload: List[Tuple], symbol: str) -> None:
-        """
-        Асинхронный параллельный исполнитель сетевых запросов.
-        Обеспечивает независимую работу Hedge-режима (LONG и SHORT) без блокировок.
-        """
+        
         async def process_action(action: Tuple):
             cmd = action[0]
 
             if cmd in ("EXTREME", "BREAKEVEN", "HUNTING"):
                 price, timeout, pos_key = action[1], action[2], action[3]
-                success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
-
-                async with self._get_lock(pos_key):
-                    p = self.state.active_positions.get(pos_key)
-                    if p:
-                        p.last_exit_status = p.exit_status
-                        
-                        if p.exit_status == "HUNTING":
-                            p.exit_status = "NORMAL"
-                            
-                        # Откат идемпотенции, если биржа отбила запрос (таймаут сети и тд)
-                        if not success and p.exit_status in ("EXTREME", "BREAKEVEN"):
-                            logger.debug(f"[{pos_key}] Откат идемпотентности из-за ошибки сети при '{cmd}'. Сброс current_close_price.")
-                            p.current_close_price = 0.0
+                
+                try:
+                    # Уходим в сеть (вне лока)
+                    success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
+                finally:
+                    # ГАРАНТИРОВАННО снимаем флаг полета после возврата управления
+                    async with self._get_lock(pos_key):
+                        p = self.state.active_positions.get(pos_key)
+                        if p:
+                            p.exit_in_flight = False
+                            p.last_exit_status = p.exit_status
+                            if p.exit_status == "HUNTING":
+                                p.exit_status = "NORMAL"
 
             elif cmd == "INTERFERENCE":
                 price, qty, interf_timeout, pos_key = action[1], action[2], action[3], action[4]
 
-                # Защитная проверка: позиция могла закрыться или умереть во время других операций
                 async with self._get_lock(pos_key):
                     p = self.state.active_positions.get(pos_key)
                     if not p or not p.in_position or p.current_qty <= 0:
                         if p:
                             p.interf_in_flight = False
                             p.exit_status = "NORMAL"
-                        logger.debug(f"[{pos_key}] Отмена INTERFERENCE: позиция уже закрыта или отсутствует.")
                         return
 
-                # СЕТЕВОЙ ВЫЗОВ (вне лока)
-                filled_qty = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout)
+                try:
+                    # Уходим в сеть (вне лока)
+                    filled_qty = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout)
+                finally:
+                    # ГАРАНТИРОВАННО обрабатываем результат и снимаем флаг
+                    async with self._get_lock(pos_key):
+                        p = self.state.active_positions.get(pos_key)
+                        if p:
+                            p.interf_in_flight = False
+                            p.exit_status = "NORMAL"
+                            if filled_qty is not None and filled_qty > 0:
+                                p.interf_comulative_qty += filled_qty
+                                max_rem = getattr(p, 'max_allowed_remains', 0.0)
+                                pct = (p.interf_comulative_qty / max_rem * 100) if max_rem > 0 else 0
+                                logger.info(f"[{pos_key}] Успешная скупка помех. Куплено: {filled_qty:.4f}. Cumulative: {p.interf_comulative_qty:.4f} ({pct:.1f}% лимита)")
 
-                # Обработка результатов скупки
-                async with self._get_lock(pos_key):
-                    p = self.state.active_positions.get(pos_key)
-                    if p:
-                        p.interf_in_flight = False
-                        p.exit_status = "NORMAL"
-                        if filled_qty is not None and filled_qty > 0:
-                            p.interf_comulative_qty += filled_qty
-                            # max_allowed_remains уже есть в стейте, используем его для красивого лога
-                            max_rem = getattr(p, 'max_allowed_remains', 0.0)
-                            pct = (p.interf_comulative_qty / max_rem * 100) if max_rem > 0 else 0
-                            logger.info(f"[{pos_key}] Успешная скупка помех. Куплено: {filled_qty:.4f}. Cumulative: {p.interf_comulative_qty:.4f} ({pct:.1f}% лимита)")
-                        elif filled_qty is not None and filled_qty == 0:
-                            logger.debug(f"[{pos_key}] Ордер на скупку (INTERFERENCE) не исполнился (таймаут или отказ).")
-                        else:
-                            logger.error(f"[{pos_key}] Ошибка при выполнении скупки помех (interf_bought вернул None).")
-
-        # Запускаем все собранные экшены параллельно! (Особенно важно для Hedge Mode)
+        # Параллельный запуск всех экшенов
         tasks = [process_action(act) for act in action_payload]
         if tasks:
-            # return_exceptions=True не даст одной упавшей таске (ошибке сети) убить вторую
             results = await asyncio.gather(*tasks, return_exceptions=True)
             for res in results:
                 if isinstance(res, Exception):
@@ -310,8 +299,6 @@ class TradingBot:
     # --- ЛОГИКА АНАЛИЗА И ВЫХОДА ---
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         now = time.time()
-        
-        # Общий массив действий для обеих позиций (LONG/SHORT)
         actions_to_execute: List[Tuple] = []
 
         for pos_key in (long_key, short_key):
@@ -323,76 +310,64 @@ class TradingBot:
                 is_extrime = pos.exit_status == "EXTREME"
                 is_breakeven = pos.exit_status == "BREAKEVEN"
 
-                # Анализ TTL (может инициировать как BREAKEVEN, так и EXTREME)
                 ttl_res = None
                 if not is_extrime:
                     ttl_res = await self.scen_ttl.scen_ttl_analyze(pos, now)
 
                 # 1. ПРИОРИТЕТ 1: EXTREME
-                # Эскалация: если позиция уже в EXTREME, либо TTL просрочен фатально, либо негативный сценарий сработал
                 if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or \
                    self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
                     
                     pos.exit_status = "EXTREME"
-                    ext_price = self.scen_extrime.scen_extrime_analyze(snap, pos, now)
-                    
-                    if ext_price and pos.current_close_price != ext_price:
-                        pos.current_close_price = ext_price
-                        pos.last_extrime_try_ts = now
-                        pos.extrime_retries_count += 1
-                        actions_to_execute.append(("EXTREME", ext_price, self.extrime_order_timeout_sec, pos_key))
-                    
-                    continue # ЖЕСТКИЙ СКИП: добиваем EXTREME, остальное не смотрим
+                    # Если сеть не занята выходом — бьем
+                    if not pos.exit_in_flight:
+                        ext_price = self.scen_extrime.scen_extrime_analyze(snap, pos, now)
+                        if ext_price:
+                            pos.exit_in_flight = True
+                            pos.last_extrime_try_ts = now
+                            pos.extrime_retries_count += 1
+                            actions_to_execute.append(("EXTREME", ext_price, self.extrime_order_timeout_sec, pos_key))
+                    continue # ЖЕСТКИЙ СКИП
 
                 # 2. ПРИОРИТЕТ 2: BREAKEVEN
-                # Если позиция уже спасается в б/у или только что получила сигнал от TTL
                 elif is_breakeven or ttl_res == "BREAKEVEN":
                     
                     pos.exit_status = "BREAKEVEN"
                     if not getattr(pos, 'breakeven_start_ts', None):
                         pos.breakeven_start_ts = now
                         
-                    be_price = self.scen_ttl.build_target_price(pos)
-                    
-                    if be_price and pos.current_close_price != be_price:
-                        pos.current_close_price = be_price
-                        logger.debug(f"[{pos_key}] Попытка закрыть позицию в безубыток (BREAKEVEN)...")
-                        actions_to_execute.append(("BREAKEVEN", be_price, self.breakeven_order_timeout_sec, pos_key))
-                    
-                    continue # ЖЕСТКИЙ СКИП: добиваем BREAKEVEN, никаких охот и скупок
+                    if not pos.exit_in_flight:
+                        be_price = self.scen_ttl.build_target_price(pos)
+                        if be_price:
+                            pos.exit_in_flight = True
+                            logger.debug(f"[{pos_key}] Попытка закрыть позицию в безубыток (BREAKEVEN)...")
+                            actions_to_execute.append(("BREAKEVEN", be_price, self.breakeven_order_timeout_sec, pos_key))
+                    continue # ЖЕСТКИЙ СКИП
 
-                # 3. НОРМАЛЬНЫЙ РЕЖИМ: Охота (HUNTING) и Скупка (INTERFERENCE)
+                # 3. НОРМАЛЬНЫЙ РЕЖИМ: Охота (HUNTING)
                 hunting_added = False
-                base_price = self.scen_base.scen_base_analyze(snap, pos, now)
+                if not pos.exit_in_flight:
+                    base_price = self.scen_base.scen_base_analyze(snap, pos, now)
+                    if base_price:
+                        pos.exit_status = "HUNTING"
+                        pos.exit_in_flight = True
+                        logger.debug(f"[{pos_key}] Попытка охоты (HUNTING)...")
+                        actions_to_execute.append(("HUNTING", base_price, self.base_order_timeout_sec, pos_key))
+                        hunting_added = True
 
-                if base_price and pos.current_close_price != base_price:
-                    pos.exit_status = "HUNTING"
-                    pos.current_close_price = base_price
-                    logger.debug(f"[{pos_key}] Попытка охоты (HUNTING)...")
-                    actions_to_execute.append(("HUNTING", base_price, self.base_order_timeout_sec, pos_key))
-                    hunting_added = True
-
-                # Взаимоисключение: в рамках одного тика мы не отправляем одновременно и тейк, и скупку.
+                # 4. СКУПКА (INTERFERENCE) - Полностью независимый сетевой поток
                 if not hunting_added and not pos.interf_in_flight:
                     interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
                     if interf_res:
                         i_price, i_qty = interf_res
                         pos.exit_status = "INTERFERENCE"
                         pos.interf_in_flight = True
-                        logger.debug(f"[{pos_key}] Попытка скупки помех (INTERFERENCE) по цене {i_price} объем {i_qty}...")
+                        logger.debug(f"[{pos_key}] Попытка скупки помех (INTERFERENCE)...")
                         actions_to_execute.append(("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec, pos_key))
 
         # --- СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
         if actions_to_execute:
             await self._payloader(actions_to_execute, symbol)
-
-        # Сброс идемпотента после завершения сети
-        if actions_to_execute:
-            for pos_key in (long_key, short_key):
-                async with self._get_lock(pos_key):
-                    pos = self.state.active_positions.get(pos_key)
-                    if pos and pos.exit_status == "NORMAL":
-                        pos.current_close_price = 0.0
 
     async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
         b_price, p_price = self.price_manager.get_prices(symbol)
@@ -487,7 +462,7 @@ class TradingBot:
                         if getattr(pos, 'is_closed_by_exchange', False):
                             if pos.entry_price > 0.0:
                                 
-                                exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
+                                exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else pos.avg_price
                                 duration_sec = time.time() - pos.opened_at
                                 
                                 net_pnl, is_win = self.tracker.register_trade(

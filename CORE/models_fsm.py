@@ -29,12 +29,12 @@ class ActivePosition:
     
     in_base_mode: bool = False
     is_closed_by_exchange: bool = False  
+    exit_in_flight: bool = False         # <-- НОВЫЙ ФЛАГ: Сетевой запрос выхода в процессе
     interf_in_flight: bool = False       # Оставляем как отдельный асинхронный лок для скупки помех     
     
     entry_price: float = 0.0             
     pending_price: float = 0.0           
-    avg_price: float = 0.0               
-    current_close_price: float = 0.0     
+    avg_price: float = 0.0                
     realized_exit_price: float = 0.0     
     
     pending_qty: float = 0.0             
