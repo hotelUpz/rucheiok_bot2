@@ -38,12 +38,13 @@ class Interference:
 
         if not check_is_negative(pos, depth, self.negative_spread_pct):
             return None
-        
-        if not pos.max_allowed_remains:
-            # pos.max_allowed_remains = pos.pending_qty * self.max_vol_pct # -- в этом есть есть логика, но \
-            pos.max_allowed_remains = pos.current_qty * self.max_vol_pct # -- наверное так точнее.       
 
-        # Фиксированный лимит (посчитан один раз при входе, не зависит от текущего pending_qty)
+        # Лимит должен быть уже проставлен в execute_entry.
+        # Если по какой-то причине нет (восстановление после краша) — считаем здесь как fallback,
+        # но это единственный случай мутации стейта в этом методе.
+        if pos.max_allowed_remains <= 0.0:
+            return None  # Не пускаем скупку пока лимит не проставлен
+
         allowed_remains = pos.max_allowed_remains - pos.interf_comulative_qty
         if allowed_remains <= 0.0:
             return None
@@ -53,8 +54,6 @@ class Interference:
             return None
 
         price, _ = target
-
-        # Размер чанка выводим из того же фиксированного лимита, а не из живого pending_qty
         max_chunk_vol = pos.max_allowed_remains * (self.usual_vol_pct / self.max_vol_pct)
         buy_qty = min(max_chunk_vol, allowed_remains)
 

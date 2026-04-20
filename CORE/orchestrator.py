@@ -41,7 +41,6 @@ from utils import get_config_summary
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
     from ENTRY.pattern_math import EntrySignal
-    # from CORE.models_fsm import ActivePosition
 
 logger = UnifiedLogger("bot")
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,16 +51,13 @@ class TradingBot:
     def __init__(self, cfg: Dict[str, Any]):
         self.cfg = cfg
         
-        # Прямой доступ: если структуры в конфиге нет, бот упадет
         self.max_active_positions = self.cfg["app"]["max_active_positions"]
-        self.quota_asset = self.cfg["quota_asset"] # Обычно это база, лучше пусть падает
+        self.quota_asset = self.cfg["quota_asset"]
         
         self.signal_timeout_sec = self.cfg["entry"]["signal_timeout_sec"]
         self.hedge_mode = self.cfg["risk"]["hedge_mode"]
         upd_sec = self.cfg["entry"]["pattern"]["binance"]["update_prices_sec"]
         
-        # Лобовой доступ к API ключам
-        # Сначала проверяем ENV, если пусто — лезем в словарь без подстраховок
         api_key = os.getenv("API_KEY") or self.cfg["credentials"]["api_key"]
         api_secret = os.getenv("API_SECRET") or self.cfg["credentials"]["api_secret"]
 
@@ -83,7 +79,6 @@ class TradingBot:
         self.private_client = PhemexPrivateClient(api_key, api_secret, self.session)
         self.private_ws = PhemexPrivateWS(api_key, api_secret)
 
-        # Telegram: если включен, то ключи обязаны быть
         tg_cfg = self.cfg.get("tg", {})
         if tg_cfg.get("enable"):
             from TG.tg_sender import TelegramSender
@@ -94,7 +89,7 @@ class TradingBot:
             self.tg = None
 
         self.funding_manager = FundingManager(
-            self.cfg["entry"]["pattern"], # Лобовой проброс
+            self.cfg["entry"]["pattern"],
             self.phemex_funding_api,
             self.binance_funding_api
         )
@@ -112,7 +107,6 @@ class TradingBot:
         self.ws_handler = WsInterpreter(state=self.state, active_positions_locker=self.active_positions_locker) 
         self.executor = OrderExecutor(self)
         
-        # Блок Exit сценариев — теперь без .get() для вложенных структур
         exit_cfg = self.cfg["exit"]
         scen_cfg = exit_cfg["scenarios"]
         
@@ -122,7 +116,6 @@ class TradingBot:
         self.scen_interf = Interference(exit_cfg["interference"])
         self.scen_extrime = ExtrimeClose(exit_cfg["extrime_close"])
 
-        # Тайм-ауты: если не указаны, упадет с KeyError
         self.base_order_timeout_sec = scen_cfg["base"]["order_timeout_sec"]
         self.breakeven_order_timeout_sec = scen_cfg["breakeven_ttl_close"]["order_timeout_sec"]
         self.interference_order_timeout_sec = exit_cfg["interference"]["order_timeout_sec"]
@@ -228,7 +221,6 @@ class TradingBot:
         working_symbols = set()
         has_long, has_short = False, False
         
-        # 2. Счетчик активных позиций считает на выбор по флагу in_position or in_pending
         for pos_key, pos in self.state.active_positions.items():
             if pos.in_position or pos.in_pending:
                 working_symbols.add(pos.symbol)
@@ -248,64 +240,73 @@ class TradingBot:
         return True
     
     # --- СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
-    async def _payloader(self, action_payload: list[tuple], symbol: str) -> None:     
+    async def _payloader(self, action_payload: list[tuple], symbol: str) -> None:
 
         for action in action_payload:
             cmd = action[0]
-            
+
             if cmd in ("EXTREME", "BREAKEVEN", "HUNTING"):
                 price, timeout, pos_key = action[1], action[2], action[3]
-                success = await self.executor.execute_exit(symbol, pos_key, price, timeout) # await если в списке нет INTERFERENCE. В противном случае тоже через задачу. То есть охоту будем совмещать со скупкой помех параллельно.
-                
+                success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
+
                 async with self._get_lock(pos_key):
                     p = self.state.active_positions.get(pos_key)
                     if p:
                         p.last_exit_status = p.exit_status
-                        if p.exit_status == "HUNTING": p.exit_status = "NORMAL"
-                        # --- НОВАЯ ЛОГИКА: ОТКАТ ПРИ СЕТЕВОЙ ОШИБКЕ ---
+                        if p.exit_status == "HUNTING":
+                            p.exit_status = "NORMAL"
                         if not success and p.exit_status in ("EXTREME", "BREAKEVEN"):
                             logger.debug(f"[{pos_key}] Откат идемпотентности из-за ошибки сети. Retry...")
-                            p.current_close_price = 0.0 
-                        # ----------------------------------------------
+                            p.current_close_price = 0.0
 
             elif cmd == "INTERFERENCE":
                 price, qty, interf_timeout, pos_key = action[1], action[2], action[3], action[4]
-                # success = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout) # меняем на задачник.
-                success = asyncio.create_task((self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout))) # будем дожаидаться булевого события вместо ожидания возврата
-                
+
+                # Защитная проверка: позиция могла закрыться во время предыдущего HUNTING в том же payload.
+                # Без этой проверки в hedge-режиме interf_bought откроет новую позицию в ту же сторону.
+                async with self._get_lock(pos_key):
+                    p = self.state.active_positions.get(pos_key)
+                    if not p or not p.in_position or p.current_qty <= 0:
+                        # Позиция уже мертва — сбрасываем флаг и выходим
+                        if p:
+                            p.interf_in_flight = False
+                            p.exit_status = "NORMAL"
+                        continue
+
+                # Ждём реального результата — только так можно корректно обновить cumulative
+                filled_qty = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout)
+
                 async with self._get_lock(pos_key):
                     p = self.state.active_positions.get(pos_key)
                     if p:
-                        p.exit_status = "NORMAL" # Скупка завершена, возвращаемся в мониторинг
                         p.interf_in_flight = False
-                        if success: p.interf_comulative_qty += qty
-    
+                        p.exit_status = "NORMAL"
+                        if filled_qty is not None and filled_qty > 0:
+                            p.interf_comulative_qty += filled_qty
+                            pct = p.interf_comulative_qty / p.max_allowed_remains * 100 if p.max_allowed_remains > 0 else 0
+                            logger.debug(f"[{pos_key}] Cumulative скупок: {p.interf_comulative_qty:.4f} ({pct:.1f}% лимита)")
+
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         now = time.time()
-        
-        action_payload: List[Tuple] = []
 
-        for pos_key in (long_key, short_key):            
+        for pos_key in (long_key, short_key):
+            # БАГ-ФИX 1: action_payload локален для каждой позиции — объявляем внутри цикла.
+            # Если объявить снаружи и не сбрасывать, LONG-payload утечёт в итерацию SHORT.
+            action_payload: List[Tuple] = []
 
             async with self._get_lock(pos_key):
                 pos = self.state.active_positions.get(pos_key)
                 if not pos or not pos.in_position or pos.current_qty <= 0:
                     continue
 
-                # # --- 1. СЕТЕВАЯ БЛОКИРОВКА ---
-                # if pos.exit_status in ("HUNTING", "INTERFERENCE"):
-                #     continue
-                
-                # ---  ---
-                # else:
                 is_extrime = pos.exit_status == "EXTREME"
 
                 ttl_res = None
                 if not is_extrime: ttl_res = await self.scen_ttl.scen_ttl_analyze(pos, now)
 
-                # 1. Сначала Extrime / Breakeven                    
-                if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or\
-                    self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
+                # 1. Сначала Extrime / Breakeven
+                if is_extrime or ttl_res == "BREAKEVEN_EXTRIME" or \
+                        self.scen_neg.scen_neg_analyze(snap, pos, now) == "NEGATIVE_TIMEOUT":
                     pos.exit_status = "EXTREME"
 
                     ext_price = self.scen_extrime.scen_extrime_analyze(snap, pos, now)
@@ -314,7 +315,6 @@ class TradingBot:
                         pos.last_extrime_try_ts = now
                         pos.extrime_retries_count += 1
                         action_payload = [("EXTREME", ext_price, self.extrime_order_timeout_sec, pos_key)]
-
                         continue
 
                 elif ttl_res == "BREAKEVEN":
@@ -325,36 +325,38 @@ class TradingBot:
                         pos.current_close_price = be_price
                         logger.debug(f"[{pos_key}] Попытка закрыть в безубыток...")
                         action_payload = [("BREAKEVEN", be_price, self.breakeven_order_timeout_sec, pos_key)]
-
                         continue
 
-                # 2. Если экстренных действий нет, ищем тейк-профит
+                # 2. Охота за тейком
                 if pos.exit_status not in ("EXTREME", "BREAKEVEN"):
-                    # Базовый Тейк-Профит === Охота.
                     base_price = self.scen_base.scen_base_analyze(snap, pos, now)
+                    hunting_added = False
+
                     if base_price and pos.current_close_price != base_price:
                         pos.exit_status = "HUNTING"
                         pos.current_close_price = base_price
                         logger.debug(f"[{pos_key}] Попытка охоты...")
-                        action_payload.append(("HUNTING", base_price, self.base_order_timeout_sec, pos_key)) #
+                        action_payload.append(("HUNTING", base_price, self.base_order_timeout_sec, pos_key))
+                        hunting_added = True
 
-                    # 3. Если и тейка нет, пробуем чистить стакан (Скупка помех)
-                    if not pos.interf_in_flight:                    
-                        # Запрос на Скупку Помех
-                        if not pos.interf_in_flight:
-                            interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
-                            if interf_res:
-                                i_price, i_qty = interf_res
-                                pos.exit_status = "INTERFERENCE"
-                                pos.interf_in_flight = True
-                                logger.debug(f"[{pos_key}] Попытка скупки помех...")
-                                action_payload.append(("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec, pos_key))
+                    # БАГ-ФИX 2+3: HUNTING и INTERFERENCE взаимоисключающие в одном тике.
+                    # Если оба попадают в payload, exit_status перезаписывается "INTERFERENCE" и
+                    # сброс статуса после HUNTING в _payloader ломается. Плюс INTERFERENCE может
+                    # стрельнуть на уже закрытой позиции (после успешного HUNTING).
+                    if not hunting_added and not pos.interf_in_flight:
+                        interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
+                        if interf_res:
+                            i_price, i_qty = interf_res
+                            pos.exit_status = "INTERFERENCE"
+                            pos.interf_in_flight = True
+                            logger.debug(f"[{pos_key}] Попытка скупки помех...")
+                            action_payload.append(("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec, pos_key))
 
-            # --- 2. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
+            # --- СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
             if action_payload:
-                await self._payloader(action_payload, symbol) # здесь надо дождаться завершения всех внутренних задач.
+                await self._payloader(action_payload, symbol)
 
-                # --- 3. СБРОС ИДЕМПОТЕНТА pos.current_close_price ---
+                # Сброс идемпотента после завершения всех сетевых операций
                 async with self._get_lock(pos_key):
                     pos = self.state.active_positions.get(pos_key)
                     if pos and pos.exit_status == "NORMAL":
@@ -373,13 +375,11 @@ class TradingBot:
         self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
 
         try:            
-            # 1. Ордер отправили -- пометили пендинг (прямо в орке)
             async with self._get_lock(pos_key):
                 if pos_key not in self.state.active_positions:
-                    # from CORE.models_fsm import ActivePosition # почему здесь?
                     self.state.active_positions[pos_key] = ActivePosition(
                         symbol=symbol, side=signal.side, pending_qty=0.0,
-                        in_pending=True,   # ЯКОРЬ
+                        in_pending=True,
                         in_position=False,
                         init_ask1=signal.init_ask1,
                         init_bid1=signal.init_bid1,
@@ -387,27 +387,24 @@ class TradingBot:
                         base_target_price_100=signal.base_target_price_100
                     )
 
-            # СТРОГИЙ AWAIT И ПРОВЕРКА БУЛЕВОГО ЗНАЧЕНИЯ (Решение принимает Генерал)
             success = await self.executor.execute_entry(symbol, pos_key, signal)
             
             if success:
                 await self.state.save()
             else:
-                # ОРДЕР ПРОВАЛИЛСЯ -> Врубаем карантин и сносим позицию (GC убьет)
                 self.apply_entry_quarantine(symbol)
                 async with self._get_lock(pos_key):
                     p = self.state.active_positions.get(pos_key)
                     if p:
                         p.in_pending = False
                         if not getattr(p, 'in_position', False):
-                            # Помечаем на отложенное удаление (ждем WS 5 секунд)
                             p.marked_for_death_ts = time.time()
 
         except Exception as e:
             logger.error(f"[{pos_key}] Ошибка постановки входа: {e}")
             async with self._get_lock(pos_key):
                 if pos_key in self.state.active_positions:
-                    p = self.state.active_positions[pos_key] #
+                    p = self.state.active_positions[pos_key]
                     p.in_pending = False
                     if not getattr(p, 'in_position', False):
                         p.marked_for_death_ts = time.time()
@@ -444,26 +441,23 @@ class TradingBot:
                         pos: "ActivePosition" = self.state.active_positions.get(pos_key)
                         if not pos: continue
 
-                        # --- НОВЫЙ БЛОК: СБОРЩИК ФАНТОМНЫХ ВХОДОВ ---
+                        # --- СБОРЩИК ФАНТОМНЫХ ВХОДОВ ---
                         if getattr(pos, 'marked_for_death_ts', 0) > 0:
                             if pos.in_position:
-                                # WS догнал нас и налил позицию! Спасаем ее.
                                 pos.marked_for_death_ts = 0.0 
                             elif time.time() - pos.marked_for_death_ts > 5.0:
-                                # Прошло 5 секунд, WS молчит. Это 100% фейл. Сносим.
                                 logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
                                 self.state.active_positions.pop(pos_key, None)
                                 self.active_positions_locker.pop(pos_key, None)
                                 asyncio.create_task(self.state.save())
                                 continue
-                        # ----------------------------------------------
+
                         if getattr(pos, 'is_closed_by_exchange', False):
                             if pos.entry_price > 0.0:
                                 
                                 exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
                                 duration_sec = time.time() - pos.opened_at
                                 
-                                # === ДОБАВЛЯЕМ АНАЛИТИКУ ===
                                 net_pnl, is_win = self.tracker.register_trade(
                                     symbol=pos.symbol,
                                     side=pos.side,
@@ -475,7 +469,6 @@ class TradingBot:
 
                                 emoji = "💵" if is_win else "🩸"
 
-                                # --- 1. ОПРЕДЕЛЯЕМ ПРИЧИНУ ДЛЯ ТЕЛЕГРАМА ---
                                 current_status = pos.exit_status if pos.exit_status in ("EXTREME", "BREAKEVEN") else pos.last_exit_status
                                 
                                 if current_status == "EXTREME": 
@@ -485,15 +478,11 @@ class TradingBot:
                                 else: 
                                     semantic = "🎯 Тейк-профит" if is_win else "📉 Убыток (Ручное/Неизвестно)"
 
-                                # --- 2. ЕДИНАЯ ЖЕЛЕЗОБЕТОННАЯ ЛОГИКА КАРАНТИНА ---
-                                # Решение принимается ИСКЛЮЧИТЕЛЬНО по реальному PnL
                                 if is_win:
                                     self.state.consecutive_fails[pos.symbol] = 0
                                     self.state.quarantine_until.pop(pos.symbol, None)
                                 else:
-                                    # Любой минус (Экстрим, Ручной или Безубыток, съеденный комиссией) = ФЕЙЛ
                                     self.apply_loss_quarantine(pos.symbol, net_pnl)
-                                # -------------------------------------------------
 
                                 if self.tg:
                                     msg = Reporters.exit_success(pos_key, semantic, exit_pr)
@@ -507,7 +496,6 @@ class TradingBot:
                             asyncio.create_task(self.state.save())
 
                     except Exception as e:
-                        # Ловим любые непредвиденные ошибки бизнес-логики, чтобы не уронить Game Loop
                         logger.error(f"[{pos_key}] 💥 Критическая ошибка при обработке позиции в Game Loop: {e}\n{traceback.format_exc()}")
 
             current_snaps = list(self._latest_market_data.values())
@@ -541,20 +529,16 @@ class TradingBot:
         # ==========================================
         try:
             if hasattr(self, 'tracker'):
-                # 1. Проверяем, есть ли уже сохраненный стартовый баланс
                 saved_start_balance = self.tracker.data.get("start_balance", 0.0)
                 
                 if saved_start_balance > 0:
                     logger.info(f"💰 Стартовый баланс успешно загружен из стейта: {saved_start_balance:.2f} {self.quota_asset}")
                 else:
-                    # 2. Если пусто (самый первый запуск), делаем запрос к бирже
                     logger.info("📡 Запрашиваем Equity с биржи для инициализации аудита...")
                     usd_balance = await self.private_client.get_equity(self.quota_asset)
                     
                     self.tracker.set_initial_balance(usd_balance)
                     logger.info(f"💰 Стартовый баланс зафиксирован: {usd_balance:.2f} {self.quota_asset}")
-                    
-                    # 3. Принудительно сохраняем стейт на диск, чтобы закрепить старт
                     await self.state.save()
                     
         except Exception as e:

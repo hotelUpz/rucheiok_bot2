@@ -213,6 +213,10 @@ class OrderExecutor:
                             if pos and (pos.current_qty > 0 or getattr(pos, 'in_position', False)): 
                                 entry_usd_vol = pos.current_qty * price # Считаем доллары
                                 logger.info(f"[{pos_key}] ✅ Вход выполнен. Объем: {pos.current_qty} (≈ {entry_usd_vol:.2f} $)")
+
+                                if pos.max_allowed_remains == 0.0:
+                                    pos.max_allowed_remains = pos.pending_qty * self.tb.scen_interf.max_vol_pct        
+
                                 if self.tb.tg:
                                     msg = Reporters.entry_signal(symbol, signal, signal.b_price, signal.p_price)
                                     asyncio.create_task(self.tb.tg.send_message(msg))
