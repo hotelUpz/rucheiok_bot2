@@ -248,34 +248,37 @@ class TradingBot:
         return True
     
     # --- СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
-    async def _payloader(self, action_payload: tuple, symbol: str, pos_key: str) -> None:       
-        cmd = action_payload[0]
-        
-        if cmd in ("EXTREME", "BREAKEVEN", "HUNTING"):
-            price, timeout = action_payload[1], action_payload[2]
-            success = await self.executor.execute_exit(symbol, pos_key, price, timeout)
-            
-            async with self._get_lock(pos_key):
-                p = self.state.active_positions.get(pos_key)
-                if p:
-                    p.last_exit_status = p.exit_status
-                    if p.exit_status == "HUNTING": p.exit_status = "NORMAL"
-                    # --- НОВАЯ ЛОГИКА: ОТКАТ ПРИ СЕТЕВОЙ ОШИБКЕ ---
-                    if not success and p.exit_status in ("EXTREME", "BREAKEVEN"):
-                        logger.debug(f"[{pos_key}] Откат идемпотентности из-за ошибки сети. Retry...")
-                        p.current_close_price = 0.0 
-                    # ----------------------------------------------
+    async def _payloader(self, action_payload: list[tuple], symbol: str) -> None:     
 
-        elif cmd == "INTERFERENCE":
-            price, qty, interf_timeout = action_payload[1], action_payload[2], action_payload[3]
-            success = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout)
+        for action in action_payload:
+            cmd = action[0]
             
-            async with self._get_lock(pos_key):
-                p = self.state.active_positions.get(pos_key)
-                if p:
-                    p.exit_status = "NORMAL" # Скупка завершена, возвращаемся в мониторинг
-                    p.interf_in_flight = False
-                    if success: p.interf_comulative_qty += qty
+            if cmd in ("EXTREME", "BREAKEVEN", "HUNTING"):
+                price, timeout, pos_key = action[1], action[2], action[3]
+                success = await self.executor.execute_exit(symbol, pos_key, price, timeout) # await если в списке нет INTERFERENCE. В противном случае тоже через задачу. То есть охоту будем совмещать со скупкой помех параллельно.
+                
+                async with self._get_lock(pos_key):
+                    p = self.state.active_positions.get(pos_key)
+                    if p:
+                        p.last_exit_status = p.exit_status
+                        if p.exit_status == "HUNTING": p.exit_status = "NORMAL"
+                        # --- НОВАЯ ЛОГИКА: ОТКАТ ПРИ СЕТЕВОЙ ОШИБКЕ ---
+                        if not success and p.exit_status in ("EXTREME", "BREAKEVEN"):
+                            logger.debug(f"[{pos_key}] Откат идемпотентности из-за ошибки сети. Retry...")
+                            p.current_close_price = 0.0 
+                        # ----------------------------------------------
+
+            elif cmd == "INTERFERENCE":
+                price, qty, interf_timeout, pos_key = action[1], action[2], action[3], action[4]
+                # success = await self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout) # меняем на задачник.
+                success = asyncio.create_task((self.executor.interf_bought(symbol, pos_key, qty, price, interf_timeout))) # будем дожаидаться булевого события вместо ожидания возврата
+                
+                async with self._get_lock(pos_key):
+                    p = self.state.active_positions.get(pos_key)
+                    if p:
+                        p.exit_status = "NORMAL" # Скупка завершена, возвращаемся в мониторинг
+                        p.interf_in_flight = False
+                        if success: p.interf_comulative_qty += qty
     
     async def _evaluate_exit_scenarios(self, snap: DepthTop, symbol: str, long_key: str, short_key: str) -> None:
         now = time.time()
@@ -349,7 +352,7 @@ class TradingBot:
 
             # --- 2. СЕТЕВЫЕ ОПЕРАЦИИ (ВНЕ ЛОКА) ---
             if action_payload:
-                await self._payloader(action_payload, symbol, pos_key) # здесь надо дождаться завершения всех внутренних задач.
+                await self._payloader(action_payload, symbol) # здесь надо дождаться завершения всех внутренних задач.
 
                 # --- 3. СБРОС ИДЕМПОТЕНТА pos.current_close_price ---
                 async with self._get_lock(pos_key):

@@ -42,6 +42,7 @@ class ActivePosition:
     closed_qty: float = 0.0 
     max_realized_qty: float = 0.0        
     interf_comulative_qty: float = 0.0 
+    max_allowed_remains: float = 0.0  # Считается один раз при входе (максимальное количество при скупе).
     
     init_ask1: float = 0.0
     init_bid1: float = 0.0

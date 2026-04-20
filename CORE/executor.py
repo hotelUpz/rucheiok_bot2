@@ -48,10 +48,41 @@ class OrderExecutor:
         # Параметры выхода
         self.max_exit_retries = self.cfg["exit"]["max_place_order_retries"]
         
+        # Минимальный тайминг жизни ордера (чтобы дать бирже шанс налить)
+        self.min_order_life_sec = self.cfg.get("exit", {}).get("min_order_life_sec", 0.05)
+        
         # Блок риска: если Notional или Margin не заданы, падает сразу
         risk = self.cfg["risk"]
         self.notional_limit = float(risk["notional_limit"])
         self.margin_over_size_pct = float(risk["margin_over_size_pct"])
+
+    async def _smart_wait(self, pos_key: str, initial_qty: float, timeout_sec: float, min_wait_sec: float) -> None:
+        """
+        Безопасная утилита умного поллинга. 
+        Ждет минимальное время, а затем каждые 10мс проверяет изменение объема позиции.
+        Если объем изменился (или позиция закрылась) — досрочно вырывается из петли.
+        """
+        start_ts = time.time()
+        
+        # 1. Обязательный минимальный таймаут (чтобы ордер успел встать в стакан)
+        if min_wait_sec > 0:
+            await asyncio.sleep(min_wait_sec)
+            
+        # 2. Петля поллинга с шагом 10 мс
+        poll_step = 0.01 
+        while time.time() - start_ts < timeout_sec:
+            async with self.tb._get_lock(pos_key):
+                pos = self.tb.state.active_positions.get(pos_key)
+                
+                # Если позиции уже нет (успела закрыться) — выходим
+                if not pos:
+                    break
+                
+                # Если текущий объем перестал быть равен стартовому (налили частично или полностью) — выходим
+                if pos.current_qty != initial_qty:
+                    break
+                    
+            await asyncio.sleep(poll_step)
 
     async def cancel_all_orders(self, symbol: str) -> bool:
         try:
@@ -90,10 +121,12 @@ class OrderExecutor:
             req_qty = round_step(qty, spec.lot_size)
             if req_qty < spec.lot_size: return None
 
+            initial_qty = 0.0
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
                 if not pos: return None
                 pos_side_raw = pos.side
+                initial_qty = pos.current_qty
 
             side = "Buy" if pos_side_raw == "LONG" else "Sell"
             phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
@@ -101,9 +134,16 @@ class OrderExecutor:
             resp = await self.client.place_limit_order(symbol, side, req_qty, price, phemex_pos_side)
             if resp.get("code") == 0:
                 order_id = resp.get("data", {}).get("orderID")
-                logger.debug(f"[{pos_key}] Скупка помехи прошла успешно!")
-                await asyncio.sleep(interf_timeout)
-                if order_id: await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                usdt_vol = req_qty * price
+                logger.debug(f"[{pos_key}] Скупка помехи прошла успешно! Объем: {req_qty} (≈ {usdt_vol:.2f} $)")
+                
+                # Умное ожидание вместо глупого слипа
+                await self._smart_wait(pos_key, initial_qty, interf_timeout, self.min_order_life_sec)
+                
+                # Отмена остатка — fire-and-forget, не блокируем основной поток
+                if order_id:
+                    asyncio.create_task(self.execute_cancel(symbol, phemex_pos_side, order_id))
+
                 async with self.tb._get_lock(pos_key):
                     pos = self.tb.state.active_positions.get(pos_key)
                     if not pos: return None
@@ -139,8 +179,10 @@ class OrderExecutor:
                 logger.warning(f"[{pos_key}] Qty {qty} меньше лота {spec.lot_size}. Пропуск.")
                 return False
             
+            initial_qty = 0.0
             async with self.tb._get_lock(pos_key):
                 pos = self.tb.state.active_positions.get(pos_key)
+                if pos: initial_qty = pos.current_qty
                 pos.pending_qty = qty
 
             side = "Buy" if signal.side == "LONG" else "Sell"
@@ -151,7 +193,9 @@ class OrderExecutor:
                     resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
                     if resp.get("code") == 0:
                         order_id = resp.get("data", {}).get("orderID")
-                        await asyncio.sleep(self.entry_timeout)
+                        
+                        # Умное ожидание вместо глупого слипа
+                        await self._smart_wait(pos_key, initial_qty, self.entry_timeout, self.min_order_life_sec)
                         
                         if order_id: 
                             curr_qty = 0.0
@@ -159,9 +203,9 @@ class OrderExecutor:
                                 pos = self.tb.state.active_positions.get(pos_key)
                                 if pos: curr_qty = pos.current_qty
                             
-                            # Если частичное исполнение или вообще ноль - отменяем остаток
+                            # Если частичное исполнение или вообще ноль — отменяем остаток fire-and-forget
                             if curr_qty < qty:
-                                await self.execute_cancel(symbol, phemex_pos_side, order_id)
+                                asyncio.create_task(self.execute_cancel(symbol, phemex_pos_side, order_id))
                         
                         # Проверяем, налило ли хоть что-то
                         async with self.tb._get_lock(pos_key):
@@ -189,7 +233,7 @@ class OrderExecutor:
     async def execute_exit(self, symbol: str, pos_key: str, order_price: float, timeout_sec: float) -> bool:
         """
         1. Безопасно отменяет предыдущий лимитный ордер закрытия (если он завис из-за обрыва сети).
-        2. Ставит новый ордер и ждет timeout_sec.
+        2. Ставит новый ордер и ждет timeout_sec через умный поллинг.
         3. Если позиция не закрылась полностью — отменяет остаток.
         """
         try:
@@ -207,9 +251,9 @@ class OrderExecutor:
 
             phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
             
-            # 2. УБИВАЕМ СТАРЫЙ ОРДЕР (разблокируем маржу для нового ордера)
+            # 2. УБИВАЕМ СТАРЫЙ ОРДЕР fire-and-forget (разблокируем маржу для нового ордера)
             if old_order_id:
-                await self.execute_cancel(symbol, phemex_pos_side, old_order_id)
+                asyncio.create_task(self.execute_cancel(symbol, phemex_pos_side, old_order_id))
                 # Очищаем память от старого ордера
                 async with self.tb._get_lock(pos_key):
                     pos = self.tb.state.active_positions.get(pos_key)
@@ -217,15 +261,15 @@ class OrderExecutor:
 
             # 3. Подготовка к постановке нового ордера
             price = round_step(order_price, spec.tick_size)
-            qty = round_step(qty, spec.lot_size)
-            if qty < spec.lot_size: return False
+            target_qty = round_step(qty, spec.lot_size)
+            if target_qty < spec.lot_size: return False
 
             side = "Sell" if pos_side_raw == "LONG" else "Buy"
 
             # 4. Основной цикл постановки
             for attempt in range(max(1, self.max_exit_retries)):
                 try:
-                    resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
+                    resp = await self.client.place_limit_order(symbol, side, target_qty, price, phemex_pos_side)
                     if resp.get("code") == 0:
                         new_order_id = resp.get("data", {}).get("orderID")
                         
@@ -235,8 +279,8 @@ class OrderExecutor:
                                 pos = self.tb.state.active_positions.get(pos_key)
                                 if pos: pos.close_order_id = new_order_id
                             
-                        # Ждем исполнения
-                        await asyncio.sleep(timeout_sec)
+                        # Умное ожидание вместо глупого слипа
+                        await self._smart_wait(pos_key, qty, timeout_sec, self.min_order_life_sec)
                         
                         # 5. Проверка исполнения после паузы
                         if new_order_id: 
@@ -246,16 +290,16 @@ class OrderExecutor:
                                 if pos: curr_qty = pos.current_qty
                                 
                             if curr_qty > 0:
-                                # Позиция всё еще висит -> отменяем лимитку
-                                await self.execute_cancel(symbol, phemex_pos_side, new_order_id)
+                                # Позиция всё еще висит -> отменяем лимитку fire-and-forget
+                                asyncio.create_task(self.execute_cancel(symbol, phemex_pos_side, new_order_id))
                                 async with self.tb._get_lock(pos_key):
                                     pos = self.tb.state.active_positions.get(pos_key)
                                     if pos and pos.close_order_id == new_order_id:
                                         pos.close_order_id = "" # Успешно отменили, сбрасываем ID
                             else:
                                 # Позиция закрыта
-                                exit_usd_vol = qty * price # Считаем доллары
-                                logger.info(f"[{pos_key}] 🏁 Выход выполнен. Объем: {qty} (≈ {exit_usd_vol:.2f} $)")
+                                exit_usd_vol = target_qty * price # Считаем доллары
+                                logger.info(f"[{pos_key}] 🏁 Выход выполнен. Объем: {target_qty} (≈ {exit_usd_vol:.2f} $)")
                                 
                         return True
                     else:
