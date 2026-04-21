@@ -942,3 +942,56 @@ Extrime Incr Frac: <b>5.0</b> | Orient: <b>0.0</b>
 2026-04-21 17:45:11 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
 2026-04-21 19:45:39 | INFO | bot | ⏹ Остановка процессов...
 2026-04-21 19:45:39 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-21 19:56:30 | INFO | bot | ▶️ Инициализация систем...
+2026-04-21 19:56:30 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b> | Hedge Mode: <b>False</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>2</b> fails for <b>infh</b>
+Q. Thresholds: Min <b>-0.2 USDT</b> | Force <b>-4.0 USDT</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+📥 <b>[ENTRY GENERAL]</b>
+Sig Timeout: <b>0.01s</b> | Ord Timeout: <b>0.5s</b>
+Max Retries: <b>1</b> | Entry Qrntn: <b>1h</b>
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+Row1 Notional: <b>50 - 950 USDT</b>
+ROC Win: <b>3</b> (SMA: <b>5</b>) | Max 1 ROC: <b>0.5%</b>
+Sprd 2 row: &gt;= <b>0.25%</b> | 3 row: &gt;= <b>0.3%</b>
+Hdr/Btm Rate: <b>10</b> | Max Bid/Ask Dist: <b>0.4</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Binance Upd: <b>1.1s</b> | Sprd TTL: <b>2s</b>
+Fund1(Phemex): <b>True</b> | Thresh: &gt;= <b>1.0%</b>
+Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
+
+🚪 <b>[EXIT GENERAL]</b>
+Max Retries: <b>1</b> | Min Order Life: <b>0.05s</b>
+
+📦 <b>[EXIT SCENARIOS]</b>
+<b>Base (Take):</b> True | Rate: <b>0.7</b> (Min: <b>0.3</b>)
+Base Shift: Demotion <b>0.2</b> per <b>20s</b> | Stab TTL: <b>0s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Vol: <b>3% - 9%</b>
+Interference Lvl Retries: <b>3</b> | Stab TTL: <b>2.0s</b>
+<b>TTL Close:</b> True | TTL: <b>300s</b> | Wait: <b>2s</b>
+TTL Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+Extrime Incr Frac: <b>5.0</b> | Orient: <b>0.0</b>
+2026-04-21 19:56:32 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-21 19:56:32 | INFO | bot | 💰 Стартовый баланс успешно загружен из стейта: 10444.71 USDT
+2026-04-21 19:56:32 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-21 19:56:35 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-21 19:56:36 | INFO | bot | 🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...
+2026-04-21 19:56:37 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-21 21:09:10 | INFO | bot | ⏹ Остановка процессов...
+2026-04-21 21:09:11 | INFO | bot | 💾 Финальное сохранение стейта на диск...
