@@ -31,21 +31,25 @@
         "PIEVERSEUSDT": 0,
         "CRCLUSDT": 1,
         "HOODUSDT": 1,
-        "USELESSUSDT": 1
+        "USELESSUSDT": 1,
+        "DUSDT": 0,
+        "PROMUSDT": 0,
+        "HIGHUSDT": 0,
+        "INTCUSDT": 1
     },
     "quarantine": {
         "CHIPUSDT": "inf"
     },
     "analytics": {
         "start_balance": 10444.713980565613,
-        "current_balance": 10421.834591369066,
+        "current_balance": 10425.470778347066,
         "max_balance": 10462.17196898024,
         "min_balance": 10421.834591369066,
         "mdd_usd": 40.337377611173,
         "mdd_pct": 0.38555452663912515,
-        "total_wins": 28,
-        "total_losses": 19,
-        "total_pnl": -22.879389196543382,
+        "total_wins": 32,
+        "total_losses": 20,
+        "total_pnl": -19.243202218543413,
         "symbols": {
             "GENIUSUSDT": {
                 "wins": 4,
@@ -156,6 +160,26 @@
                 "wins": 0,
                 "losses": 1,
                 "pnl": -3.0081583199999953
+            },
+            "DUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 3.2996354379999735
+            },
+            "PROMUSDT": {
+                "wins": 2,
+                "losses": 0,
+                "pnl": 0.7548033799999992
+            },
+            "HIGHUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 0.4231257600000173
+            },
+            "INTCUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.841377600000019
             }
         },
         "history": [
@@ -534,6 +558,56 @@
                 "pnl": -3.0082,
                 "is_win": false,
                 "duration": "5.3m"
+            },
+            {
+                "ts": 1776725288.9822443,
+                "symbol": "DUSDT",
+                "side": "LONG",
+                "entry_usd": 879.33,
+                "exit_usd": 883.69,
+                "pnl": 3.2996,
+                "is_win": true,
+                "duration": "21.0s"
+            },
+            {
+                "ts": 1776729824.7082658,
+                "symbol": "PROMUSDT",
+                "side": "SHORT",
+                "entry_usd": 59.88,
+                "exit_usd": 59.58,
+                "pnl": 0.2209,
+                "is_win": true,
+                "duration": "9.4s"
+            },
+            {
+                "ts": 1776761876.4585228,
+                "symbol": "HIGHUSDT",
+                "side": "LONG",
+                "entry_usd": 149.09,
+                "exit_usd": 149.7,
+                "pnl": 0.4231,
+                "is_win": true,
+                "duration": "9.5s"
+            },
+            {
+                "ts": 1776766362.578371,
+                "symbol": "PROMUSDT",
+                "side": "SHORT",
+                "entry_usd": 154.04,
+                "exit_usd": 153.32,
+                "pnl": 0.5339,
+                "is_win": true,
+                "duration": "20.3s"
+            },
+            {
+                "ts": 1776781486.0366166,
+                "symbol": "INTCUSDT",
+                "side": "SHORT",
+                "entry_usd": 280.9,
+                "exit_usd": 281.4,
+                "pnl": -0.8414,
+                "is_win": false,
+                "duration": "3.3m"
             }
         ]
     }

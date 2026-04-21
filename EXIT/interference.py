@@ -16,6 +16,7 @@ class Interference:
         self.usual_vol_pct = cfg["usual_vol_pct_to_init_size"] / 100.0
         self.max_vol_pct = cfg["max_vol_pct_to_init_size"] / 100.0
         self.negative_spread_pct = 0.0 #
+        self.min_notional_usdt = 6.0
 
     def _find_target(self, depth: DepthTop, pos: ActivePosition, allowed_remains: float) -> tuple[float, float] | None:
         if pos.side == "LONG":
@@ -41,9 +42,13 @@ class Interference:
 
         # Лимит должен быть уже проставлен в execute_entry.
         # Если по какой-то причине нет (восстановление после краша) — считаем здесь как fallback,
-        # но это единственный случай мутации стейта в этом методе.
         if pos.max_allowed_remains <= 0.0:
-            return None  # Не пускаем скупку пока лимит не проставлен
+            # При восстановлении pending_qty может быть 0, поэтому тут берем current_qty (она уже полная с биржи)
+            backup_qty = pos.pending_qty if pos.pending_qty > 0 else pos.current_qty
+            pos.max_allowed_remains = backup_qty * self.max_vol_pct
+            
+            if pos.max_allowed_remains <= 0.0:
+                return None
 
         allowed_remains = pos.max_allowed_remains - pos.interf_comulative_qty
         if allowed_remains <= 0.0:
@@ -57,7 +62,9 @@ class Interference:
         max_chunk_vol = pos.max_allowed_remains * (self.usual_vol_pct / self.max_vol_pct)
         buy_qty = min(max_chunk_vol, allowed_remains)
 
-        if buy_qty <= 0.0:
+        min_qty_asset = self.min_notional_usdt / price  # Переводим 6$ в количество монет
+
+        if buy_qty <= min_qty_asset:
             return None
 
         return price, buy_qty

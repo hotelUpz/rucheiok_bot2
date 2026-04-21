@@ -814,3 +814,131 @@ Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
 2026-04-20 04:00:32 | INFO | bot | [USELESSUSDT_SHORT] 🛑 Позиция закрыта. 🩸 PnL: -3.0082$ | Время: 5.3m
 2026-04-20 04:21:41 | INFO | bot | ⏹ Остановка процессов...
 2026-04-20 04:21:41 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-20 23:31:50 | INFO | bot | ▶️ Инициализация систем...
+2026-04-20 23:31:50 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b> | Hedge Mode: <b>False</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>2</b> fails for <b>infh</b>
+Q. Thresholds: Min <b>-0.2 USDT</b> | Force <b>-4.0 USDT</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+📥 <b>[ENTRY GENERAL]</b>
+Sig Timeout: <b>0.01s</b> | Ord Timeout: <b>0.5s</b>
+Max Retries: <b>1</b> | Entry Qrntn: <b>1h</b>
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+Row1 Notional: <b>50 - 950 USDT</b>
+ROC Win: <b>3</b> (SMA: <b>5</b>) | Max 1 ROC: <b>0.5%</b>
+Sprd 2 row: &gt;= <b>0.25%</b> | 3 row: &gt;= <b>0.3%</b>
+Hdr/Btm Rate: <b>10</b> | Max Bid/Ask Dist: <b>0.4</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Binance Upd: <b>1.1s</b> | Sprd TTL: <b>2s</b>
+Fund1(Phemex): <b>True</b> | Thresh: &gt;= <b>1.0%</b>
+Fund2(Diff): <b>True</b> | Diff: &gt;= <b>0.05%</b>
+
+🚪 <b>[EXIT GENERAL]</b>
+Max Retries: <b>1</b> | Min Order Life: <b>0.05s</b>
+
+📦 <b>[EXIT SCENARIOS]</b>
+<b>Base (Take):</b> True | Rate: <b>0.7</b> (Min: <b>0.3</b>)
+Base Shift: Demotion <b>0.2</b> per <b>20s</b> | Stab TTL: <b>0s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Vol: <b>3% - 9%</b>
+Interference Lvl Retries: <b>3</b> | Stab TTL: <b>2.0s</b>
+<b>TTL Close:</b> True | TTL: <b>300s</b> | Wait: <b>2s</b>
+TTL Orient: <b>0.0</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+Extrime Incr Frac: <b>5.0</b> | Orient: <b>0.0</b>
+2026-04-20 23:31:50 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-20 23:31:50 | INFO | bot | 💰 Стартовый баланс успешно загружен из стейта: 10444.71 USDT
+2026-04-20 23:31:50 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-20 23:31:52 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-20 23:31:53 | INFO | bot | 🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...
+2026-04-20 23:31:54 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-21 00:03:33 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 00:03:33 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 00:03:38 | DEBUG | bot | [RAVEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 01:19:40 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 01:19:40 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 01:19:45 | DEBUG | bot | [RAVEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 01:47:47 | INFO | bot | [DUSDT_LONG] ✅ Вход выполнен. Объем: 87149.0 (≈ 879.33 $)
+2026-04-21 01:47:48 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:47:55 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:01 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:06 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:06 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:07 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:07 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:08 | DEBUG | bot | [DUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 01:48:08 | INFO | bot | [DUSDT_LONG] 🏁 Выход выполнен. Объем: 34769.0 (≈ 352.56 $)
+2026-04-21 01:48:08 | INFO | bot | [DUSDT_LONG] 🛑 Позиция закрыта. 💵 PnL: 3.2996$ | Время: 21.0s
+2026-04-21 03:03:35 | INFO | bot | [PROMUSDT_SHORT] ✅ Вход выполнен. Объем: 26.6 (≈ 59.88 $)
+2026-04-21 03:03:44 | DEBUG | bot | [PROMUSDT_SHORT] Попытка охоты (HUNTING)...
+2026-04-21 03:03:44 | INFO | bot | [PROMUSDT_SHORT] 🏁 Выход выполнен. Объем: 26.6 (≈ 59.58 $)
+2026-04-21 03:03:44 | INFO | bot | [PROMUSDT_SHORT] 🛑 Позиция закрыта. 💵 PnL: 0.2209$ | Время: 9.4s
+2026-04-21 04:13:02 | ERROR | bot | [COPPERUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 04:13:02 | WARNING | bot | [COPPERUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 04:13:07 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 06:22:19 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 06:22:19 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 06:22:24 | DEBUG | bot | [RAVEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 07:23:38 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 07:23:38 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 07:23:43 | DEBUG | bot | [RAVEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 08:49:32 | ERROR | bot | [COPPERUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 08:49:32 | WARNING | bot | [COPPERUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 08:49:37 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 09:13:12 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 09:13:12 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 09:13:17 | DEBUG | bot | [RAVEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 09:46:18 | ERROR | bot | [TOWNSUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 09:46:18 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 09:46:23 | DEBUG | bot | [TOWNSUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 10:04:47 | ERROR | bot | [COPPERUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 10:04:47 | WARNING | bot | [COPPERUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 10:04:52 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 11:07:44 | ERROR | bot | [COPPERUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 11:07:44 | WARNING | bot | [COPPERUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 11:07:49 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 11:10:54 | ERROR | bot | [RAVEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 11:10:54 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 11:10:59 | DEBUG | bot | [RAVEUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 11:57:47 | INFO | bot | [HIGHUSDT_LONG] ✅ Вход выполнен. Объем: 502.0 (≈ 149.09 $)
+2026-04-21 11:57:56 | DEBUG | bot | [HIGHUSDT_LONG] Попытка охоты (HUNTING)...
+2026-04-21 11:57:56 | INFO | bot | [HIGHUSDT_LONG] 🏁 Выход выполнен. Объем: 502.0 (≈ 149.55 $)
+2026-04-21 11:57:56 | INFO | bot | [HIGHUSDT_LONG] 🛑 Позиция закрыта. 💵 PnL: 0.4231$ | Время: 9.5s
+2026-04-21 12:09:17 | ERROR | bot | [TOWNSUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 12:09:17 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 12:09:22 | DEBUG | bot | [TOWNSUSDT_LONG] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 13:12:22 | INFO | bot | [PROMUSDT_SHORT] ✅ Вход выполнен. Объем: 65.3 (≈ 154.04 $)
+2026-04-21 13:12:28 | DEBUG | bot | [PROMUSDT_SHORT] Попытка охоты (HUNTING)...
+2026-04-21 13:12:42 | DEBUG | bot | [PROMUSDT_SHORT] Попытка охоты (HUNTING)...
+2026-04-21 13:12:42 | INFO | bot | [PROMUSDT_SHORT] 🏁 Выход выполнен. Объем: 5.9 (≈ 13.87 $)
+2026-04-21 13:12:42 | INFO | bot | [PROMUSDT_SHORT] 🛑 Позиция закрыта. 💵 PnL: 0.5339$ | Время: 20.3s
+2026-04-21 14:24:03 | ERROR | bot | [RAVEUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 14:24:03 | WARNING | bot | [RAVEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 14:24:08 | DEBUG | bot | [RAVEUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 15:44:17 | ERROR | bot | [TOWNSUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 15:44:17 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 15:44:21 | ERROR | bot | [COPPERUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 15:44:21 | WARNING | bot | [COPPERUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 15:44:22 | DEBUG | bot | [TOWNSUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 15:44:26 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 17:21:30 | INFO | bot | [INTCUSDT_SHORT] ✅ Вход выполнен. Объем: 4.2 (≈ 280.90 $)
+2026-04-21 17:24:46 | INFO | bot | [INTCUSDT_SHORT] 🏁 Выход выполнен. Объем: 2.66 (≈ 178.27 $)
+2026-04-21 17:24:46 | INFO | bot | [INTCUSDT_SHORT] 🛑 Позиция закрыта. 🩸 PnL: -0.8414$ | Время: 3.3m
+2026-04-21 17:45:06 | ERROR | bot | [COPPERUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 17:45:06 | WARNING | bot | [COPPERUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-21 17:45:11 | DEBUG | bot | [COPPERUSDT_SHORT] 🗑 Удаление фантомной позиции (no WS fill).
+2026-04-21 19:45:39 | INFO | bot | ⏹ Остановка процессов...
+2026-04-21 19:45:39 | INFO | bot | 💾 Финальное сохранение стейта на диск...

@@ -249,3 +249,35 @@
 2026-04-20 03:30:01 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
 2026-04-20 03:30:01 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
 2026-04-20 03:30:02 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 17 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:52 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-20 23:31:53 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-20 23:31:53 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-20 23:31:53 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-21 00:03:33 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 01:19:40 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 04:13:02 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 06:22:19 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 07:23:38 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 08:49:32 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 09:13:12 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 09:46:18 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 10:04:47 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 11:07:44 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 11:10:54 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 12:09:17 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 14:24:03 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 15:44:17 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 15:44:21 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-21 17:45:06 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY

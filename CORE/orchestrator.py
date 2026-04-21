@@ -277,10 +277,6 @@ class TradingBot:
                     if not p or not p.in_position or p.current_qty <= 0:
                         if p:
                             p.interf_in_flight = False
-                            
-                            # 👇 Эгоистичный сброс: INTERFERENCE сбрасывает ТОЛЬКО INTERFERENCE
-                            if p.exit_status == "INTERFERENCE":
-                                p.exit_status = "NORMAL"
                         return
 
                 try:
@@ -292,10 +288,7 @@ class TradingBot:
                         p = self.state.active_positions.get(pos_key)
                         if p:
                             p.interf_in_flight = False
-                            
-                            # 👇 БАГФИКС (твой правильный): Сбрасываем ТОЛЬКО ЕСЛИ нас не перебил EXTREME или BREAKEVEN
-                            if p.exit_status == "INTERFERENCE":
-                                p.exit_status = "NORMAL"
+                            # exit_status больше не сбрасываем, так как мы его не устанавливали
                                 
                             if filled_qty is not None and filled_qty > 0:
                                 p.interf_comulative_qty += filled_qty
@@ -360,7 +353,6 @@ class TradingBot:
                     continue # ЖЕСТКИЙ СКИП
 
                 # 3. НОРМАЛЬНЫЙ РЕЖИМ: Охота (HUNTING)
-                hunting_added = False
                 if not pos.exit_in_flight:
                     base_price = self.scen_base.scen_base_analyze(snap, pos, now)
                     if base_price:
@@ -368,14 +360,13 @@ class TradingBot:
                         pos.exit_in_flight = True
                         logger.debug(f"[{pos_key}] Попытка охоты (HUNTING)...")
                         actions_to_execute.append(("HUNTING", base_price, self.base_order_timeout_sec, pos_key))
-                        hunting_added = True
 
-                # 4. СКУПКА (INTERFERENCE) - Полностью независимый сетевой поток
-                if not hunting_added and not pos.interf_in_flight:
+                # 4. СКУПКА (INTERFERENCE) - Истинный параллельный поток
+                if not pos.interf_in_flight:
                     interf_res = self.scen_interf.scen_interf_analyze(snap, pos, now)
                     if interf_res:
                         i_price, i_qty = interf_res
-                        pos.exit_status = "INTERFERENCE"
+                        # ВАЖНО: Больше не трогаем pos.exit_status! Скупка - это не выход.
                         pos.interf_in_flight = True
                         logger.debug(f"[{pos_key}] Попытка скупки помех (INTERFERENCE)...")
                         actions_to_execute.append(("INTERFERENCE", i_price, i_qty, self.interference_order_timeout_sec, pos_key))
