@@ -64,6 +64,49 @@ class PerformanceTracker:
             self.data["current_balance"] = actual_balance
             self.data["max_balance"] = actual_balance
             self.data["min_balance"] = actual_balance
+        # При каждом запуске пересчитываем max_profit и mdd из истории
+        self._recalc_from_history()
+
+    def _recalc_from_history(self) -> None:
+        """Пересчитывает max_profit и mdd по полной истории сделок.
+        Вызывается при старте, чтобы восстановить корректные значения из bot_state."""
+        history = self.data.get("history", [])
+        start_balance = self.data.get("start_balance", 0.0)
+        if not history or start_balance <= 0:
+            return
+
+        running_balance = start_balance
+        peak_balance = start_balance
+        max_profit_usd = self.data.get("max_profit_usd", 0.0)
+        max_profit_pct = self.data.get("max_profit_pct", 0.0)
+        mdd_usd = self.data.get("mdd_usd", 0.0)
+        mdd_pct = self.data.get("mdd_pct", 0.0)
+
+        for trade in history:
+            pnl = trade.get("pnl", 0.0)
+            running_balance += pnl
+
+            if running_balance > peak_balance:
+                peak_balance = running_balance
+
+            profit_usd = running_balance - start_balance
+            profit_pct = (profit_usd / start_balance) * 100
+            if profit_usd > max_profit_usd:
+                max_profit_usd = profit_usd
+            if profit_pct > max_profit_pct:
+                max_profit_pct = profit_pct
+
+            dd_usd = peak_balance - running_balance
+            dd_pct = (dd_usd / peak_balance) * 100 if peak_balance > 0 else 0.0
+            if dd_usd > mdd_usd:
+                mdd_usd = dd_usd
+            if dd_pct > mdd_pct:
+                mdd_pct = dd_pct
+
+        self.data["max_profit_usd"] = round(max_profit_usd, 4)
+        self.data["max_profit_pct"] = round(max_profit_pct, 6)
+        self.data["mdd_usd"] = round(mdd_usd, 6)
+        self.data["mdd_pct"] = round(mdd_pct, 6)
 
     def register_trade(self, symbol: str, side: str, entry_price: float, exit_price: float, qty: float, duration_sec: float = 0.0) -> Tuple[float, bool]:
         if entry_price <= 0 or exit_price <= 0 or qty <= 0:
@@ -90,20 +133,12 @@ class PerformanceTracker:
             self.data["current_balance"] += net_pnl
             cb: float = self.data["current_balance"]
             
+            # Инициализируем переменные просадки перед ветвлением
+            current_dd_usd: float = 0.0
+            current_dd_pct: float = 0.0
+            
             if cb > self.data["max_balance"]:
                 self.data["max_balance"] = cb
-                current_dd_usd: float = 0.0
-                current_dd_pct: float = 0.0
-                
-                # --- РАСЧЕТ МАКСИМАЛЬНОЙ ПРИБЫЛИ (PERFORMANCE) ---
-                profit_usd = cb - self.data["start_balance"]
-                profit_pct = (profit_usd / self.data["start_balance"]) * 100
-                
-                if profit_usd > self.data["max_profit_usd"]:
-                    self.data["max_profit_usd"] = profit_usd
-                if profit_pct > self.data["max_profit_pct"]:
-                    self.data["max_profit_pct"] = profit_pct
-                # -------------------------------------------------
             else:
                 current_dd_usd = self.data["max_balance"] - cb
                 current_dd_pct = (current_dd_usd / self.data["max_balance"]) * 100
@@ -115,6 +150,15 @@ class PerformanceTracker:
                 self.data["mdd_usd"] = current_dd_usd
             if current_dd_pct > self.data["mdd_pct"]:
                 self.data["mdd_pct"] = current_dd_pct
+
+            # --- РАСЧЕТ МАКСИМАЛЬНОЙ ПРИБЫЛИ (всегда, независимо от нового макс.) ---
+            profit_usd = cb - self.data["start_balance"]
+            profit_pct = (profit_usd / self.data["start_balance"]) * 100
+            if profit_usd > self.data["max_profit_usd"]:
+                self.data["max_profit_usd"] = round(profit_usd, 4)
+            if profit_pct > self.data["max_profit_pct"]:
+                self.data["max_profit_pct"] = round(profit_pct, 6)
+            # --------------------------------------------------------------------------
 
         if symbol not in self.data["symbols"]:
             self.data["symbols"][symbol] = {"wins": 0, "losses": 0, "pnl": 0.0}

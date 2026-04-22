@@ -546,11 +546,14 @@ class TradingBot:
                 
                 if saved_start_balance > 0:
                     logger.info(f"💰 Стартовый баланс успешно загружен из стейта: {saved_start_balance:.2f} {self.quota_asset}")
+                    # Всегда пересчитываем max_profit и mdd из истории при рестарте
+                    self.tracker._recalc_from_history()
+                    await self.state.save()
                 else:
                     logger.info("📡 Запрашиваем Equity с биржи для инициализации аудита...")
                     usd_balance = await self.private_client.get_equity(self.quota_asset)
                     
-                    self.tracker.set_initial_balance(usd_balance)
+                    self.tracker.set_initial_balance(usd_balance)  # внутри тоже вызывает _recalc_from_history
                     logger.info(f"💰 Стартовый баланс зафиксирован: {usd_balance:.2f} {self.quota_asset}")
                     await self.state.save()
                     

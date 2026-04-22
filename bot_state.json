@@ -42,14 +42,16 @@
     },
     "analytics": {
         "start_balance": 10444.713980565613,
-        "current_balance": 10425.470778347066,
+        "current_balance": 10426.641213707066,
         "max_balance": 10462.17196898024,
         "min_balance": 10421.834591369066,
-        "mdd_usd": 40.337377611173,
-        "mdd_pct": 0.38555452663912515,
-        "total_wins": 32,
+        "mdd_usd": 40.3374,
+        "mdd_pct": 0.385555,
+        "max_profit_usd": 17.4581,
+        "max_profit_pct": 0.167148,
+        "total_wins": 33,
         "total_losses": 20,
-        "total_pnl": -19.243202218543413,
+        "total_pnl": -18.072766858543332,
         "symbols": {
             "GENIUSUSDT": {
                 "wins": 4,
@@ -167,9 +169,9 @@
                 "pnl": 3.2996354379999735
             },
             "PROMUSDT": {
-                "wins": 2,
+                "wins": 3,
                 "losses": 0,
-                "pnl": 0.7548033799999992
+                "pnl": 1.925238740000081
             },
             "HIGHUSDT": {
                 "wins": 1,
@@ -608,6 +610,16 @@
                 "pnl": -0.8414,
                 "is_win": false,
                 "duration": "3.3m"
+            },
+            {
+                "ts": 1776813254.9734566,
+                "symbol": "PROMUSDT",
+                "side": "LONG",
+                "entry_usd": 812.56,
+                "exit_usd": 814.71,
+                "pnl": 1.1704,
+                "is_win": true,
+                "duration": "40.3s"
             }
         ]
     }
