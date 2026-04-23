@@ -584,3 +584,15 @@
 2026-04-21 21:10:05 | INFO | entry | 🔄 Менеджер Фандингов запущен (Интервал: 60с). Binance API включен: True
 2026-04-22 02:43:07 | INFO | entry | 🔄 Менеджер Фандингов запущен (Интервал: 60с). Binance API включен: True
 2026-04-22 02:46:12 | INFO | entry | 🔄 Менеджер Фандингов запущен (Интервал: 60с). Binance API включен: True
+2026-04-22 03:11:21 | INFO | entry | 🔄 Менеджер Фандингов запущен (Интервал: 60с). Binance API включен: True
+2026-04-22 06:08:58 | ERROR | entry | ❌ Ошибка в Менеджере Фандингов: Phemex funding failed: /contract-biz/public/real-funding-rates params={'symbol': 'ALL', 'pageNum': 1, 'pageSize': 200} err=Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-22 18:46:45 | INFO | entry | 🔄 Менеджер Фандингов запущен (Интервал: 60с). Binance API включен: True
+2026-04-22 18:47:38 | INFO | entry | 🔄 Менеджер Фандингов запущен (Интервал: 60с). Binance API включен: True
+2026-04-23 06:30:55 | INFO | entry | 💸 [Фандинг 1] Блок Phemex! Под запретом 1 монет: SPKUSDT...
+2026-04-23 07:00:22 | INFO | entry | 💸 [Фандинг 1] Блок снят со всех монет.
+2026-04-23 08:30:39 | ERROR | entry | ❌ Ошибка в Менеджере Фандингов: Binance funding failed: /fapi/v1/premiumIndex params=None err=
+2026-04-23 08:31:41 | ERROR | entry | ❌ Ошибка в Менеджере Фандингов: Phemex funding failed: /contract-biz/public/real-funding-rates params={'symbol': 'ALL', 'pageNum': 1, 'pageSize': 200} err=Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-23 10:30:39 | INFO | entry | 💸 [Фандинг 1] Блок Phemex! Под запретом 1 монет: SPKUSDT...
+2026-04-23 11:00:13 | INFO | entry | 💸 [Фандинг 1] Блок снят со всех монет.
+2026-04-23 14:58:49 | INFO | entry | 💸 [Фандинг 1] Блок Phemex! Под запретом 1 монет: KATUSDT...
+2026-04-23 15:00:51 | INFO | entry | 💸 [Фандинг 1] Блок снят со всех монет.

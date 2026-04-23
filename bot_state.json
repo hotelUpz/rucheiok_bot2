@@ -29,29 +29,34 @@
         "API3USDT": 1,
         "COPPERUSDT": 0,
         "PIEVERSEUSDT": 0,
-        "CRCLUSDT": 1,
+        "CRCLUSDT": 2,
         "HOODUSDT": 1,
         "USELESSUSDT": 1,
         "DUSDT": 0,
         "PROMUSDT": 0,
         "HIGHUSDT": 0,
-        "INTCUSDT": 1
+        "INTCUSDT": 1,
+        "EDUUSDT": 1,
+        "TSLAUSDT": 1,
+        "COINUSDT": 1
     },
     "quarantine": {
-        "CHIPUSDT": "inf"
+        "CHIPUSDT": "inf",
+        "CRCLUSDT": "inf",
+        "COINUSDT": "inf"
     },
     "analytics": {
         "start_balance": 10444.713980565613,
-        "current_balance": 10426.641213707066,
+        "current_balance": 10418.846239355065,
         "max_balance": 10462.17196898024,
-        "min_balance": 10421.834591369066,
-        "mdd_usd": 40.3374,
-        "mdd_pct": 0.385555,
+        "min_balance": 10418.846239355065,
+        "mdd_usd": 43.32572962517406,
+        "mdd_pct": 0.41411792650352575,
         "max_profit_usd": 17.4581,
         "max_profit_pct": 0.167148,
-        "total_wins": 33,
-        "total_losses": 20,
-        "total_pnl": -18.072766858543332,
+        "total_wins": 38,
+        "total_losses": 24,
+        "total_pnl": -25.867741210543322,
         "symbols": {
             "GENIUSUSDT": {
                 "wins": 4,
@@ -79,9 +84,9 @@
                 "pnl": 0.11362987599999479
             },
             "QQQUSDT": {
-                "wins": 2,
+                "wins": 3,
                 "losses": 0,
-                "pnl": 4.872039540000042
+                "pnl": 5.063712160000037
             },
             "PRLUSDT": {
                 "wins": 1,
@@ -150,8 +155,8 @@
             },
             "CRCLUSDT": {
                 "wins": 0,
-                "losses": 2,
-                "pnl": -1.6102935220011771
+                "losses": 3,
+                "pnl": -4.835068522001194
             },
             "HOODUSDT": {
                 "wins": 0,
@@ -169,9 +174,9 @@
                 "pnl": 3.2996354379999735
             },
             "PROMUSDT": {
-                "wins": 3,
+                "wins": 6,
                 "losses": 0,
-                "pnl": 1.925238740000081
+                "pnl": 5.384880080000114
             },
             "HIGHUSDT": {
                 "wins": 1,
@@ -182,6 +187,21 @@
                 "wins": 0,
                 "losses": 1,
                 "pnl": -0.841377600000019
+            },
+            "EDUUSDT": {
+                "wins": 1,
+                "losses": 1,
+                "pnl": -0.6334713520000212
+            },
+            "TSLAUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.27057696
+            },
+            "COINUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -7.317464999999979
             }
         },
         "history": [
@@ -620,6 +640,96 @@
                 "pnl": 1.1704,
                 "is_win": true,
                 "duration": "40.3s"
+            },
+            {
+                "ts": 1776829535.2717764,
+                "symbol": "PROMUSDT",
+                "side": "LONG",
+                "entry_usd": 842.23,
+                "exit_usd": 844.76,
+                "pnl": 1.5127,
+                "is_win": true,
+                "duration": "46.0s"
+            },
+            {
+                "ts": 1776830458.8790898,
+                "symbol": "PROMUSDT",
+                "side": "LONG",
+                "entry_usd": 719.75,
+                "exit_usd": 721.9,
+                "pnl": 1.2826,
+                "is_win": true,
+                "duration": "40.3s"
+            },
+            {
+                "ts": 1776831268.5935755,
+                "symbol": "PROMUSDT",
+                "side": "LONG",
+                "entry_usd": 494.26,
+                "exit_usd": 495.52,
+                "pnl": 0.6643,
+                "is_win": true,
+                "duration": "1.0m"
+            },
+            {
+                "ts": 1776833159.6270108,
+                "symbol": "EDUUSDT",
+                "side": "SHORT",
+                "entry_usd": 59.54,
+                "exit_usd": 59.45,
+                "pnl": 0.018,
+                "is_win": true,
+                "duration": "40.4s"
+            },
+            {
+                "ts": 1776840553.7263763,
+                "symbol": "CRCLUSDT",
+                "side": "SHORT",
+                "entry_usd": 748.65,
+                "exit_usd": 750.97,
+                "pnl": -3.2248,
+                "is_win": false,
+                "duration": "5.7m"
+            },
+            {
+                "ts": 1776853593.9653358,
+                "symbol": "TSLAUSDT",
+                "side": "LONG",
+                "entry_usd": 225.48,
+                "exit_usd": 225.48,
+                "pnl": -0.2706,
+                "is_win": false,
+                "duration": "5.0m"
+            },
+            {
+                "ts": 1776903381.214331,
+                "symbol": "QQQUSDT",
+                "side": "SHORT",
+                "entry_usd": 111.02,
+                "exit_usd": 110.69,
+                "pnl": 0.1917,
+                "is_win": true,
+                "duration": "5.2s"
+            },
+            {
+                "ts": 1776946778.4106486,
+                "symbol": "COINUSDT",
+                "side": "SHORT",
+                "entry_usd": 607.1,
+                "exit_usd": 613.68,
+                "pnl": -7.3175,
+                "is_win": false,
+                "duration": "2.5m"
+            },
+            {
+                "ts": 1776947853.3113503,
+                "symbol": "EDUUSDT",
+                "side": "LONG",
+                "entry_usd": 171.29,
+                "exit_usd": 170.84,
+                "pnl": -0.6514,
+                "is_win": false,
+                "duration": "1.3m"
             }
         ]
     }
