@@ -109,7 +109,12 @@ class PerformanceTracker:
         self.data["mdd_pct"] = round(mdd_pct, 6)
 
     def register_trade(self, symbol: str, side: str, entry_price: float, exit_price: float, qty: float, duration_sec: float = 0.0) -> Tuple[float, bool]:
+        from c_log import UnifiedLogger
+        _l = UnifiedLogger("tracker_debug")
+        _l.debug(f"DEBUG: register_trade called for {symbol} | side: {side} | entry: {entry_price} | exit: {exit_price} | qty: {qty}")
+
         if entry_price <= 0 or exit_price <= 0 or qty <= 0:
+            _l.warning(f"DEBUG: register_trade SKIPPED due to zero values: entry={entry_price}, exit={exit_price}, qty={qty}")
             return 0.0, False
 
         # --- РАСЧЕТ ДОЛЛАРОВОГО ОБЪЕМА ---

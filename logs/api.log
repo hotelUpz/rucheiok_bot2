@@ -16,3 +16,58 @@
 2026-04-24 11:04:56 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
 2026-04-24 11:13:03 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
 2026-04-24 11:21:23 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 20 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:28:21 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-24 12:28:21 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-24 12:28:21 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 20 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:17 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:18 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-24 12:29:18 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:29:18 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-24 12:29:18 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 12:36:29 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 13:07:09 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:21 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 13:39:21 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-04-24 13:39:21 | INFO | api | 🌐 Stakan WS подключен: на 20 монет.
+2026-04-24 13:39:21 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-04-24 13:39:21 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-04-24 13:39:22 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-04-24 14:38:34 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 14:39:36 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 16:06:01 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 16:37:02 | ERROR | api | API Request Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-24 17:19:27 | ERROR | api | API Request Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY

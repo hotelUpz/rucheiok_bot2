@@ -83,6 +83,8 @@ class TradingBot:
             os.getenv("TELEGRAM_TOKEN") or tg_cfg.get("token", ""),
             os.getenv("TELEGRAM_CHAT_ID") or tg_cfg.get("chat_id", ""),
         ) if tg_cfg.get("enable") else None
+        
+        self.enable_trade_reports = tg_cfg.get("enable_trade_reports", True)
 
         # Чат отчетов разработчика
         report_id = os.getenv("REPORT_CHAT_ID")
@@ -379,40 +381,45 @@ class TradingBot:
                     if not pos: continue
 
                     if getattr(pos, 'is_closed_by_exchange', False):
-                        if pos.entry_price > 0.0:
-                            if getattr(pos, 'in_extrime_mode', False): 
-                                semantic = "⚠️ Аварийный выход (Extrime Mode)"
-                            elif getattr(pos, 'in_breakeven_mode', False): 
-                                semantic = "🛡 Выход по безубытку (TTL)"
-                            else: 
-                                semantic = "🎯 Тейк-профит (Base Scenario)"
-                            
-                            exit_pr = pos.exit_price_hint or pos.avg_price
+                        entry_pr = pos.avg_price or pos.entry_price or pos.pending_price
+                        exit_pr = pos.realized_exit_price or pos.exit_price_hint or entry_pr
+                        
+                        if entry_pr > 0.0 and pos.max_qty > 0:
                             duration_sec = time.time() - pos.opened_at
                             
                             net_pnl, is_win = self.tracker.register_trade(
                                 symbol=pos.symbol,
                                 side=pos.side,
-                                entry_price=pos.pending_price,
+                                entry_price=entry_pr,
                                 exit_price=exit_pr,
-                                qty=pos.current_qty,
+                                qty=pos.max_qty,
                                 duration_sec=duration_sec
                             )
 
+                            # --- УЛУЧШЕННАЯ СЕМАНТИКА ВЫХОДА ---
                             if is_win:
+                                emoji = "💵"
+                                if getattr(pos, 'in_extrime_mode', False): semantic = "✅ Аварийный выход (Profit)"
+                                elif getattr(pos, 'in_breakeven_mode', False): semantic = "🛡 Выход по безубытку (Profit)"
+                                else: semantic = "🎯 Тейк-профит (Base)"
+                                
                                 self.state.consecutive_fails[pos.symbol] = 0
                                 self.state.quarantine_until.pop(pos.symbol, None)
-                                emoji = "💵"
                             else:
+                                emoji = "🩸"
+                                if getattr(pos, 'in_extrime_mode', False): semantic = "💀 Аварийный СТОП (Loss)"
+                                elif getattr(pos, 'in_breakeven_mode', False): semantic = "🛡 Безубыток/Минус (TTL)"
+                                else: semantic = "❌ Закрыто в МИНУС (Base)"
+                                
                                 if net_pnl < -0.5:
                                     self.apply_loss_quarantine(pos.symbol, net_pnl)
-                                emoji = "🩸"
 
-                            if self.tg:
+                            if self.tg and self.enable_trade_reports:
                                 msg = Reporters.exit_success(pos_key, semantic, exit_pr)
                                 msg += f"\n💰 PnL: <b>{net_pnl:.2f}$</b> {emoji}"
                                 msg += f"\n⏳ Длительность: {format_duration(duration_sec)}"
                                 asyncio.create_task(self.tg.send_message(msg))
+
                             logger.info(f"[{pos_key}] 🛑 Позиция закрыта. PnL: {net_pnl:.4f}$. Стейт очищен.")
 
                         self.state.active_positions.pop(pos_key, None)

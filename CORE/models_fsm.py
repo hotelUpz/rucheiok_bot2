@@ -38,6 +38,7 @@ class ActivePosition:
     
     pending_qty: float = 0.0             
     current_qty: float = 0.0             
+    max_qty: float = 0.0                 # Пиковый объем позиции (для аналитики)
     interf_comulative_qty: float = 0.0 
     
     init_ask1: float = 0.0
@@ -144,6 +145,7 @@ class WsInterpreter:
 
                 if size > 0:
                     pos.current_qty = size
+                    pos.max_qty = max(pos.max_qty, size)
                     # 3. При исполнении ставим флаг in_position = True а in_pending сразу в false.
                     pos.in_position = True
                     pos.in_pending = False

@@ -92,7 +92,10 @@ def load_json(filepath: str, default: Any = None) -> Any:
         return default if default is not None else {}
 
 def save_json_safe(filepath: str, data: Any) -> None:
-    tmp_file = f"{filepath}.{os.getpid()}.tmp"
+    import threading
+    import random
+    # Используем PID + ID потока + рандом, чтобы избежать коллизий при конкурентной записи
+    tmp_file = f"{filepath}.{os.getpid()}.{threading.get_ident()}.{random.randint(0, 999999)}.tmp"
     for attempt in range(3):
         try:
             with open(tmp_file, "w", encoding="utf-8") as f:

@@ -161,7 +161,7 @@ class OrderExecutor:
                             pos = self.tb.state.active_positions.get(pos_key)
                             if pos and (pos.current_qty > 0 or getattr(pos, 'in_position', False)): 
                                 logger.info(f"[{pos_key}] ✅ Вход выполнен. Объем: {pos.current_qty}")
-                                if self.tb.tg:
+                                if self.tb.tg and self.tb.enable_trade_reports:
                                     msg = Reporters.entry_signal(symbol, signal, signal.b_price, signal.p_price)
                                     asyncio.create_task(self.tb.tg.send_message(msg))
                                 return True

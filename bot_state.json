@@ -10,12 +10,12 @@
         "AIAUSDT": 0,
         "STABLEUSDT": 0,
         "HOMEUSDT": 0,
-        "ACUUSDT": 1
+        "ACUUSDT": 0,
+        "SPORTFUNUSDT": 0,
+        "PLTRUSDT": 0
     },
     "quarantine": {
-        "BOBUSDT": "1777021983.2385137",
-        "HOMEUSDT": "1777022483.822161",
-        "ACUUSDT": "inf"
+        "BOBUSDT": "1777043967.633417"
     },
     "analytics": {
         "start_balance": 10530.266714025258,

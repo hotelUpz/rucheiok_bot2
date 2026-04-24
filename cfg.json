@@ -9,6 +9,7 @@
     },
     "tg": {
         "enable": true,
+        "enable_trade_reports": false,
         "token": "",
         "chat_id": ""
     },
