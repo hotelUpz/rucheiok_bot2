@@ -389,7 +389,7 @@ class TradingBot:
                 continue
             tasks = [self._process_symbol_pipeline(snap) for snap in current_snaps]
             await asyncio.gather(*tasks, return_exceptions=True)
-            await asyncio.sleep(0.001)
+            await asyncio.sleep(0.01)
 
     async def start(self):
         if getattr(self, '_is_running', False): return

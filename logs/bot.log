@@ -549,3 +549,502 @@ Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b>
 2026-04-16 01:47:22 | INFO | bot | [QQQUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
 2026-04-16 03:21:32 | INFO | bot | ⏹ Остановка процессов...
 2026-04-16 03:21:33 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-24 01:19:03 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-24 01:19:18 | INFO | bot | ▶️ Инициализация систем...
+2026-04-24 01:19:18 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-24 01:19:20 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-24 01:19:20 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-24 01:19:21 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-24 01:21:25 | INFO | bot | ⏹ Остановка процессов...
+2026-04-24 01:21:26 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-24 01:22:01 | INFO | bot | ▶️ Инициализация систем...
+2026-04-24 01:22:01 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-24 01:22:02 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-24 01:22:02 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-24 01:22:03 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-24 01:30:19 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 01:30:19 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 01:42:43 | INFO | bot | [GENIUSUSDT_LONG] ✅ Вход выполнен. Объем: 675.0
+2026-04-24 01:43:12 | INFO | bot | [GENIUSUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 01:52:15 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 2760.34
+2026-04-24 01:52:50 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 02:21:59 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 4997.16
+2026-04-24 02:22:39 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 02:45:49 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 02:45:49 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 02:53:13 | ERROR | bot | [TOWNSUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 02:53:13 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 03:05:19 | INFO | bot | [GENIUSUSDT_LONG] ✅ Вход выполнен. Объем: 1239.0
+2026-04-24 03:06:31 | INFO | bot | [GENIUSUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 03:47:34 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 03:47:34 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 05:12:14 | INFO | bot | [BERAUSDT_SHORT] ✅ Вход выполнен. Объем: 1317.0
+2026-04-24 05:12:38 | DEBUG | bot | [BERAUSDT] Исключение отмены a74d7df7-129c-46ab-a626-cbb6c606e764: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-24 05:12:38 | INFO | bot | [BERAUSDT_SHORT] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 05:32:41 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 4905.56
+2026-04-24 05:33:09 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 05:35:26 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 526.39
+2026-04-24 05:35:39 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 05:50:47 | ERROR | bot | [AIAUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 05:50:47 | WARNING | bot | [AIAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 06:23:59 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 06:23:59 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 06:24:48 | INFO | bot | [KERNELUSDT_SHORT] ✅ Вход выполнен. Объем: 6343.0
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:28 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:29 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:30 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:31 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:32 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:33 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:34 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:35 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:36 | ERROR | bot | [KERNELUSDT_SHORT] Исключение execute_exit: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-24 06:25:37 | DEBUG | bot | [KERNELUSDT] Исключение отмены 99d0662f-a01c-468e-bfe6-e8f3ce09e104: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-24 06:25:37 | INFO | bot | [KERNELUSDT_SHORT] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 06:52:52 | ERROR | bot | [AIAUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 06:52:52 | WARNING | bot | [AIAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 07:25:17 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 07:25:17 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 08:59:45 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 08:59:45 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 09:36:39 | INFO | bot | [STABLEUSDT_SHORT] ✅ Вход выполнен. Объем: 22805.1
+2026-04-24 09:37:02 | INFO | bot | [STABLEUSDT_SHORT] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 10:11:09 | ERROR | bot | [HOMEUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 10:11:09 | WARNING | bot | [HOMEUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 10:19:38 | INFO | bot | [GENIUSUSDT_LONG] ✅ Вход выполнен. Объем: 1177.0
+2026-04-24 10:19:41 | INFO | bot | [GENIUSUSDT_LONG] 🛑 Позиция закрыта физически. Стейт очищен.
+2026-04-24 10:27:15 | INFO | bot | ⏹ Остановка процессов...
+2026-04-24 10:27:15 | INFO | bot | 💾 Финальное сохранение стейта на диск...
