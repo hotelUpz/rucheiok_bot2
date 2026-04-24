@@ -133,6 +133,12 @@ class OrderExecutor:
             side = "Buy" if signal.side == "LONG" else "Sell"
             phemex_pos_side = "Long" if signal.side == "LONG" else "Short"
 
+            # В методе execute_exit (перед отправкой ордера)
+            async with self.tb._get_lock(pos_key):
+                pos = self.tb.state.active_positions.get(pos_key)
+                if pos:
+                    pos.pending_price = price  # <--- Сохраняем "намерение"
+
             for attempt in range(max(1, self.max_entry_retries)):
                 try:
                     resp = await self.client.place_limit_order(symbol, side, qty, price, phemex_pos_side)
@@ -196,6 +202,12 @@ class OrderExecutor:
 
             side = "Sell" if pos_side_raw == "LONG" else "Buy"
             phemex_pos_side = "Long" if pos_side_raw == "LONG" else "Short"
+
+            # В методе execute_exit (перед отправкой ордера)
+            async with self.tb._get_lock(pos_key):
+                pos = self.tb.state.active_positions.get(pos_key)
+                if pos:
+                    pos.exit_price_hint = price  # <--- Сохраняем "намерение"
 
             for attempt in range(max(1, self.max_exit_retries)):
                 try:

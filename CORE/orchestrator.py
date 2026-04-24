@@ -30,9 +30,12 @@ from EXIT.scenarios.negative import NegativeScenario
 from EXIT.scenarios.breakeven import PositionTTLClose
 from EXIT.interference import Interference
 from EXIT.extrime_close import ExtrimeClose
+from ANALYTICS.tracker import PerformanceTracker, format_duration
 
 from c_log import UnifiedLogger
 from utils import get_config_summary
+
+REPORT_INTERVAL_HOURS = 6.0 # Интервал отчетов для разработчика (в часах)
 
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
@@ -59,6 +62,7 @@ class TradingBot:
         self.black_list = self.bl_manager.load_from_config(self.cfg.get("black_list", []))
         
         self.state = BotState(black_list=self.black_list)       
+        self.tracker = PerformanceTracker(self.state)
         self._is_running = False
 
         self.phemex_sym_api = PhemexSymbols()
@@ -73,10 +77,19 @@ class TradingBot:
 
         tg_cfg = self.cfg.get("tg", {})
         from TG.tg_sender import TelegramSender
+        
+        # Основной чат управления
         self.tg = TelegramSender(
             os.getenv("TELEGRAM_TOKEN") or tg_cfg.get("token", ""),
             os.getenv("TELEGRAM_CHAT_ID") or tg_cfg.get("chat_id", ""),
         ) if tg_cfg.get("enable") else None
+
+        # Чат отчетов разработчика
+        report_id = os.getenv("REPORT_CHAT_ID")
+        self.report_tg = TelegramSender(
+            os.getenv("TELEGRAM_TOKEN") or tg_cfg.get("token", ""),
+            report_id
+        ) if report_id else None
 
         self.signal_engine = SignalEngine(cfg["entry"], self.phemex_funding_api)
 
@@ -140,12 +153,14 @@ class TradingBot:
             logger.warning(f"[{symbol}] 🚫 Помещен в карантин на {q_hours}ч (вход не удался).")
         asyncio.create_task(self.state.save())
 
-    def apply_loss_quarantine(self, symbol: str):
+    def apply_loss_quarantine(self, symbol: str, trade_pnl: float = 0.0):
         q_cfg = self.cfg.get("risk", {}).get("quarantine", {})
         max_fails = q_cfg.get("max_consecutive_fails", 1)
         q_hours = q_cfg.get("quarantine_hours", "inf")
 
         self.state.consecutive_fails[symbol] = self.state.consecutive_fails.get(symbol, 0) + 1
+        
+        # Улучшенная логика карантина: если убыток большой, то сразу в карантин (опционально, пока оставим как было)
         if self.state.consecutive_fails[symbol] >= max_fails:
             if str(q_hours).lower() == "inf": self.state.quarantine_until[symbol] = "inf" 
             else: self.state.quarantine_until[symbol] = time.time() + (float(q_hours) * 3600)
@@ -301,6 +316,7 @@ class TradingBot:
                     from CORE.models_fsm import ActivePosition
                     self.state.active_positions[pos_key] = ActivePosition(
                         symbol=symbol, side=signal.side, pending_qty=0.0,
+                        pending_price=signal.price,
                         in_pending=True,   # ЯКОРЬ
                         in_position=False,
                         init_ask1=signal.init_ask1,
@@ -364,21 +380,40 @@ class TradingBot:
 
                     if getattr(pos, 'is_closed_by_exchange', False):
                         if pos.entry_price > 0.0:
-                            if pos.in_extrime_mode: 
+                            if getattr(pos, 'in_extrime_mode', False): 
                                 semantic = "⚠️ Аварийный выход (Extrime Mode)"
-                                self.apply_loss_quarantine(pos.symbol)
-                            elif pos.in_breakeven_mode: 
+                            elif getattr(pos, 'in_breakeven_mode', False): 
                                 semantic = "🛡 Выход по безубытку (TTL)"
-                                self.state.consecutive_fails[pos.symbol] = 0
                             else: 
                                 semantic = "🎯 Тейк-профит (Base Scenario)"
-                                self.state.consecutive_fails[pos.symbol] = 0
                             
-                            exit_pr = pos.realized_exit_price if pos.realized_exit_price > 0 else (pos.current_close_price or pos.avg_price)
+                            exit_pr = pos.exit_price_hint or pos.avg_price
+                            duration_sec = time.time() - pos.opened_at
+                            
+                            net_pnl, is_win = self.tracker.register_trade(
+                                symbol=pos.symbol,
+                                side=pos.side,
+                                entry_price=pos.pending_price,
+                                exit_price=exit_pr,
+                                qty=pos.current_qty,
+                                duration_sec=duration_sec
+                            )
+
+                            if is_win:
+                                self.state.consecutive_fails[pos.symbol] = 0
+                                self.state.quarantine_until.pop(pos.symbol, None)
+                                emoji = "💵"
+                            else:
+                                if net_pnl < -0.5:
+                                    self.apply_loss_quarantine(pos.symbol, net_pnl)
+                                emoji = "🩸"
+
                             if self.tg:
                                 msg = Reporters.exit_success(pos_key, semantic, exit_pr)
+                                msg += f"\n💰 PnL: <b>{net_pnl:.2f}$</b> {emoji}"
+                                msg += f"\n⏳ Длительность: {format_duration(duration_sec)}"
                                 asyncio.create_task(self.tg.send_message(msg))
-                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта физически. Стейт очищен.")
+                            logger.info(f"[{pos_key}] 🛑 Позиция закрыта. PnL: {net_pnl:.4f}$. Стейт очищен.")
 
                         self.state.active_positions.pop(pos_key, None)
                         asyncio.create_task(self.state.save())
@@ -415,7 +450,36 @@ class TradingBot:
         self._stream = PhemexStakanStream(symbols=symbols, depth=10, chunk_size=40)
         self._stream_task = asyncio.create_task(self._stream.run(self._stakan_data_sink))
 
+        # Инициализация баланса для трекера
+        try:
+            saved_start_balance = self.tracker.data.get("start_balance", 0.0)
+            if saved_start_balance > 0:
+                logger.info(f"💰 Стартовый баланс загружен: {saved_start_balance:.2f} {self.quota_asset}")
+                self.tracker._recalc_from_history()
+                await self.state.save()
+            else:
+                logger.info("📡 Запрашиваем баланс с биржи...")
+                from API.PHEMEX.order import PhemexPrivateClient
+                # Предполагаем, что в PhemexPrivateClient есть get_equity или аналогичный метод
+                # Если нет, мы его добавим или используем заглушку
+                if hasattr(self.private_client, 'get_equity'):
+                    balance = await self.private_client.get_equity(self.quota_asset)
+                else:
+                    # Фоллбэк: запрашиваем через wallets или что-то еще
+                    balance = 0.0 
+                self.tracker.set_initial_balance(balance)
+                logger.info(f"💰 Стартовый баланс установлен: {balance:.2f} {self.quota_asset}")
+                await self.state.save()
+        except Exception as e:
+            logger.error(f"❌ Ошибка инициализации баланса: {e}")
+
         self._game_loop_task = asyncio.create_task(self._main_trading_loop())
+        
+        # Периодические отчеты
+        if self.report_tg:
+            self._report_task = asyncio.create_task(self._periodic_report_loop())
+            # Сразу тестовый отчет
+            asyncio.create_task(self._send_developer_report(is_test=True))
 
     async def aclose(self):
         await self.stop()
@@ -442,7 +506,34 @@ class TradingBot:
         await self._await_task(getattr(self, '_private_ws_task', None))
         await self._await_task(getattr(self, '_stream_task', None))
         await self._await_task(getattr(self, '_game_loop_task', None))
+        await self._await_task(getattr(self, '_report_task', None))
         self._latest_market_data.clear()
         self._processing.clear()
         self._signal_timeouts.clear()
         await self.state.save()
+
+    async def _send_developer_report(self, is_test: bool = False):
+        if not self.report_tg: return
+        try:
+            summary = self.tracker.get_summary_text()
+            prefix = "🧪 <b>ТЕСТОВЫЙ ОТЧЕТ</b>\n" if is_test else "📅 <b>ПЕРИОДИЧЕСКИЙ ОТЧЕТ</b>\n"
+            await self.report_tg.send_message(prefix + summary)
+            
+            # Отправка файла стейта
+            if os.path.exists(self.state.filepath):
+                await self.report_tg.send_document(self.state.filepath, caption="📄 Текущий стейт бота (bot_state.json)")
+        except Exception as e:
+            logger.error(f"❌ Ошибка отправки отчета разработчику: {e}")
+
+    async def _periodic_report_loop(self):
+        logger.info(f"📊 Цикл отчетов запущен (каждые {REPORT_INTERVAL_HOURS}ч)")
+        while self._is_running:
+            try:
+                await asyncio.sleep(REPORT_INTERVAL_HOURS * 3600)
+                if self._is_running:
+                    await self._send_developer_report()
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in report loop: {e}")
+                await asyncio.sleep(60)

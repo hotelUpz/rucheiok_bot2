@@ -27,6 +27,7 @@ class BotState:
         self.leverage_configured: Set[str] = set()
         self._lock = asyncio.Lock()
         self.black_list = black_list
+        self.analytics: dict = {}
 
     def _sync_save(self, state_dict: dict):
         save_json_safe(self.filepath, state_dict)
@@ -41,7 +42,8 @@ class BotState:
                     if pos.symbol not in self.black_list
                 },
                 "fails": dict(self.consecutive_fails),
-                "quarantine": {x: str(y) for x, y in dict(self.quarantine_until).items() if x and y}
+                "quarantine": {x: str(y) for x, y in dict(self.quarantine_until).items() if x and y},
+                "analytics": getattr(self, 'analytics', {})
             }
             await asyncio.to_thread(self._sync_save, state_dict)
 
@@ -49,8 +51,17 @@ class BotState:
         data = load_json(self.filepath, default={})
         if not data: return
         
-        self.consecutive_fails = data.get("fails", {})
-        self.quarantine_until = data.get("quarantine", {})
+        # Мягкое обновление для фейлов и карантина
+        for k, v in data.get("fails", {}).items():
+            if k not in self.consecutive_fails:
+                self.consecutive_fails[k] = v
+                
+        for k, v in data.get("quarantine", {}).items():
+            if k not in self.quarantine_until:
+                self.quarantine_until[k] = v
+        
+        # Для аналитики используем update
+        self.analytics.update(data.get("analytics", {}))
         
         saved_positions = data.get("positions", {})
         self.active_positions.clear()
@@ -58,4 +69,4 @@ class BotState:
             pos = ActivePosition.from_dict(pos_data)
             if pos.symbol in self.black_list:
                 continue
-            self.active_positions[pos_key] = pos
+            self.active_positions[pos_key] = pos

@@ -33,7 +33,8 @@ class ActivePosition:
     pending_price: float = 0.0           
     avg_price: float = 0.0               
     current_close_price: float = 0.0     
-    realized_exit_price: float = 0.0     
+    realized_exit_price: float = 0.0    
+    exit_price_hint: float = 0.0  # Цена, по которой мы ПОСЛЕДНИЙ РАЗ отправили ордер на выход
     
     pending_qty: float = 0.0             
     current_qty: float = 0.0             
