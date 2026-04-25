@@ -12,24 +12,171 @@
         "HOMEUSDT": 0,
         "ACUUSDT": 0,
         "SPORTFUNUSDT": 0,
-        "PLTRUSDT": 0
+        "PLTRUSDT": 0,
+        "OPGUSDT": 0,
+        "KATUSDT": 0,
+        "MASKUSDT": 0,
+        "QUSDT": 1
     },
     "quarantine": {
-        "BOBUSDT": "1777043967.633417"
+        "QUSDT": "inf",
+        "TOWNSUSDT": "1777135822.1362038"
     },
     "analytics": {
         "start_balance": 10530.266714025258,
-        "current_balance": 10530.266714025258,
-        "max_balance": 10530.266714025258,
-        "min_balance": 10530.266714025258,
-        "mdd_usd": 0.0,
-        "mdd_pct": 0.0,
-        "max_profit_usd": 0.0,
-        "max_profit_pct": 0.0,
-        "total_wins": 0,
-        "total_losses": 0,
-        "total_pnl": 0.0,
-        "symbols": {},
-        "history": []
+        "current_balance": 10529.506552136578,
+        "max_balance": 10534.516728389739,
+        "min_balance": 10529.506552136578,
+        "mdd_usd": 5.010176253161262,
+        "mdd_pct": 0.04755962121792649,
+        "max_profit_usd": 4.25,
+        "max_profit_pct": 0.04036,
+        "total_wins": 6,
+        "total_losses": 5,
+        "total_pnl": -0.7601618886800088,
+        "symbols": {
+            "OPGUSDT": {
+                "wins": 3,
+                "losses": 0,
+                "pnl": 2.7747620400000184
+            },
+            "APRUSDT": {
+                "wins": 1,
+                "losses": 3,
+                "pnl": -0.016018011880036653
+            },
+            "STABLEUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 1.2172615631999955
+            },
+            "BOBUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 0.11670160000000211
+            },
+            "MASKUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.11188515999999699
+            },
+            "QUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -4.740983919999992
+            }
+        },
+        "history": [
+            {
+                "ts": 1777041582.8555286,
+                "symbol": "OPGUSDT",
+                "side": "LONG",
+                "entry_usd": 429.39,
+                "exit_usd": 431.23,
+                "pnl": 1.3232,
+                "is_win": true,
+                "duration": "3.5s"
+            },
+            {
+                "ts": 1777043669.2886584,
+                "symbol": "OPGUSDT",
+                "side": "LONG",
+                "entry_usd": 449.57,
+                "exit_usd": 451.47,
+                "pnl": 1.359,
+                "is_win": true,
+                "duration": "8.8s"
+            },
+            {
+                "ts": 1777049753.3333037,
+                "symbol": "OPGUSDT",
+                "side": "LONG",
+                "entry_usd": 99.76,
+                "exit_usd": 99.97,
+                "pnl": 0.0926,
+                "is_win": true,
+                "duration": "23.5s"
+            },
+            {
+                "ts": 1777073895.322031,
+                "symbol": "APRUSDT",
+                "side": "LONG",
+                "entry_usd": 390.3,
+                "exit_usd": 390.91,
+                "pnl": 0.1413,
+                "is_win": true,
+                "duration": "23.5s"
+            },
+            {
+                "ts": 1777073997.7734027,
+                "symbol": "STABLEUSDT",
+                "side": "LONG",
+                "entry_usd": 758.57,
+                "exit_usd": 760.7,
+                "pnl": 1.2173,
+                "is_win": true,
+                "duration": "35.5s"
+            },
+            {
+                "ts": 1777082929.853164,
+                "symbol": "BOBUSDT",
+                "side": "SHORT",
+                "entry_usd": 101.2,
+                "exit_usd": 100.96,
+                "pnl": 0.1167,
+                "is_win": true,
+                "duration": "1.1m"
+            },
+            {
+                "ts": 1777107321.881741,
+                "symbol": "MASKUSDT",
+                "side": "SHORT",
+                "entry_usd": 70.39,
+                "exit_usd": 70.42,
+                "pnl": -0.1119,
+                "is_win": false,
+                "duration": "5.1m"
+            },
+            {
+                "ts": 1777109871.2493072,
+                "symbol": "APRUSDT",
+                "side": "LONG",
+                "entry_usd": 600.57,
+                "exit_usd": 601.18,
+                "pnl": -0.1136,
+                "is_win": false,
+                "duration": "1.3m"
+            },
+            {
+                "ts": 1777120883.747862,
+                "symbol": "APRUSDT",
+                "side": "LONG",
+                "entry_usd": 302.01,
+                "exit_usd": 302.35,
+                "pnl": -0.0234,
+                "is_win": false,
+                "duration": "48.8s"
+            },
+            {
+                "ts": 1777122789.383702,
+                "symbol": "APRUSDT",
+                "side": "LONG",
+                "entry_usd": 150.32,
+                "exit_usd": 150.48,
+                "pnl": -0.0204,
+                "is_win": false,
+                "duration": "43.5s"
+            },
+            {
+                "ts": 1777126481.6719286,
+                "symbol": "QUSDT",
+                "side": "SHORT",
+                "entry_usd": 373.94,
+                "exit_usd": 378.23,
+                "pnl": -4.741,
+                "is_win": false,
+                "duration": "1.3m"
+            }
+        ]
     }
 }

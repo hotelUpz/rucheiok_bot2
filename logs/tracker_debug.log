@@ -1,0 +1,11 @@
+2026-04-24 17:39:42 | DEBUG | tracker_debug | DEBUG: register_trade called for OPGUSDT | side: LONG | entry: 0.2801 | exit: 0.2813 | qty: 1533.0
+2026-04-24 18:14:29 | DEBUG | tracker_debug | DEBUG: register_trade called for OPGUSDT | side: LONG | entry: 0.284 | exit: 0.2852 | qty: 1583.0
+2026-04-24 19:55:53 | DEBUG | tracker_debug | DEBUG: register_trade called for OPGUSDT | side: LONG | entry: 0.2818 | exit: 0.2824 | qty: 354.0
+2026-04-25 02:38:15 | DEBUG | tracker_debug | DEBUG: register_trade called for APRUSDT | side: LONG | entry: 0.17915 | exit: 0.17943 | qty: 2178.64
+2026-04-25 02:39:57 | DEBUG | tracker_debug | DEBUG: register_trade called for STABLEUSDT | side: LONG | entry: 0.03207 | exit: 0.03216 | qty: 23653.6
+2026-04-25 05:08:49 | DEBUG | tracker_debug | DEBUG: register_trade called for BOBUSDT | side: SHORT | entry: 0.005953 | exit: 0.005939 | qty: 17000.0
+2026-04-25 11:55:21 | DEBUG | tracker_debug | DEBUG: register_trade called for MASKUSDT | side: SHORT | entry: 0.5138 | exit: 0.514 | qty: 137.0
+2026-04-25 12:37:51 | DEBUG | tracker_debug | DEBUG: register_trade called for APRUSDT | side: LONG | entry: 0.17796 | exit: 0.17814 | qty: 3374.75
+2026-04-25 15:41:23 | DEBUG | tracker_debug | DEBUG: register_trade called for APRUSDT | side: LONG | entry: 0.17804 | exit: 0.17824 | qty: 1696.3
+2026-04-25 16:13:09 | DEBUG | tracker_debug | DEBUG: register_trade called for APRUSDT | side: LONG | entry: 0.17837 | exit: 0.17856 | qty: 842.72
+2026-04-25 17:14:41 | DEBUG | tracker_debug | DEBUG: register_trade called for QUSDT | side: SHORT | entry: 0.010112 | exit: 0.010228 | qty: 36980.0

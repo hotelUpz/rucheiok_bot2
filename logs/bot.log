@@ -165,3 +165,134 @@ Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b>
 2026-04-24 17:19:27 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
 2026-04-24 17:20:06 | INFO | bot | ⏹ Остановка процессов...
 2026-04-24 17:20:07 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-24 17:39:00 | INFO | bot | ▶️ Инициализация систем...
+2026-04-24 17:39:00 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-24 17:39:01 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-24 17:39:01 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-24 17:39:03 | INFO | bot | 💰 Стартовый баланс загружен: 10530.27 USDT
+2026-04-24 17:39:03 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-24 17:39:03 | INFO | bot | 📊 Цикл отчетов запущен (каждые 6.0ч)
+2026-04-24 17:39:12 | ERROR | bot | [TOWNSUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 17:39:12 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 17:39:39 | INFO | bot | [OPGUSDT_LONG] ✅ Вход выполнен. Объем: 1533.0
+2026-04-24 17:39:42 | INFO | bot | [OPGUSDT_LONG] 🛑 Позиция закрыта. PnL: 1.3232$. Стейт очищен.
+2026-04-24 18:14:21 | INFO | bot | [OPGUSDT_LONG] ✅ Вход выполнен. Объем: 1583.0
+2026-04-24 18:14:29 | INFO | bot | [OPGUSDT_LONG] 🛑 Позиция закрыта. PnL: 1.3590$. Стейт очищен.
+2026-04-24 19:17:34 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 19:17:34 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 19:55:30 | INFO | bot | [OPGUSDT_LONG] ✅ Вход выполнен. Объем: 354.0
+2026-04-24 19:55:53 | INFO | bot | [OPGUSDT_LONG] 🛑 Позиция закрыта. PnL: 0.0926$. Стейт очищен.
+2026-04-24 20:37:59 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 20:37:59 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 21:43:26 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 21:43:26 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-24 22:23:03 | INFO | bot | ⏹ Остановка процессов...
+2026-04-24 22:23:03 | INFO | bot | 💾 Финальное сохранение стейта на диск...
+2026-04-24 22:23:33 | INFO | bot | ▶️ Инициализация систем...
+2026-04-24 22:23:33 | INFO | bot | ⚙️ БОТ ЗАПУЩЕН С НАСТРОЙКАМИ
+🎛 <b>[APP & RISK]</b>
+Name: <b>Rucheiok Bot</b> | Quota: <b>USDT</b>
+Max Positions: <b>1</b>
+Leverage: <b>22x</b> | Margin Mode: <b>2</b>
+Margin Size: <b>row</b> | Notional Limit: <b>1000.0 USDT</b>
+Margin Over Size: <b>1%</b>
+Quarantine: <b>1</b> fails for <b>infh</b>
+
+📡 <b>[SYSTEM]</b>
+TG Enabled: <b>True</b>
+Logs: D:True I:True W:True E:True
+
+🎯 <b>[ENTRY PHEMEX]</b>
+Enable: <b>True</b> | Depth: <b>8</b> | TTL: <b>5s</b>
+ROC Window: <b>3</b> | Max 1 ROC: <b>0.5%</b>
+Sprd 3 row: &gt;= <b>0.3%</b>
+
+🔶 <b>[ENTRY BINANCE & FUNDING]</b>
+Binance: <b>True</b> | Sprd: &gt;= <b>0.8%</b>
+Funding: <b>True</b> | Thresh: &gt;= <b>1.0%</b>
+
+🚪 <b>[EXIT SCENARIOS]</b>
+<b>Base (Average):</b> True | Stab TTL: <b>3s</b>
+<b>Negative:</b> True | Neg Spread &lt;= <b>0%</b> for <b>30s</b>
+<b>Interference:</b> True | Usual Vol: <b>3%</b>
+<b>TTL Close:</b> None | TTL: <b>300s</b> | Wait: <b>2s</b>
+<b>Extrime:</b> True | Retries: <b>inf</b> per <b>3s</b>
+2026-04-24 22:23:34 | INFO | bot | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-04-24 22:23:34 | INFO | bot | 🔄 Прогрев кэша цен и фандинга...
+2026-04-24 22:23:34 | INFO | bot | 💰 Стартовый баланс загружен: 10530.27 USDT
+2026-04-24 22:23:34 | INFO | bot | 🎮 Главная торговая живолупа (Game Loop) запущена.
+2026-04-24 22:23:34 | INFO | bot | 📊 Цикл отчетов запущен (каждые 6.0ч)
+2026-04-24 22:57:27 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-24 22:57:27 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 00:15:36 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 00:15:36 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 00:23:44 | ERROR | bot | [TOWNSUSDT_SHORT] Исключение execute_entry: Private API request failed: Cannot connect to host api.phemex.com:443 ssl:default [getaddrinfo failed]
+2026-04-25 00:23:44 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 01:15:45 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 01:15:45 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 01:21:54 | ERROR | bot | [AIAUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 01:21:54 | WARNING | bot | [AIAUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 01:24:56 | ERROR | bot | [TOWNSUSDT_LONG] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 01:24:56 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 01:55:50 | ERROR | bot | [KATUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 01:55:50 | WARNING | bot | [KATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 02:37:52 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 2178.64
+2026-04-25 02:38:15 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта. PnL: 0.1413$. Стейт очищен.
+2026-04-25 02:39:22 | INFO | bot | [STABLEUSDT_LONG] ✅ Вход выполнен. Объем: 23653.6
+2026-04-25 02:39:57 | DEBUG | bot | [STABLEUSDT] Исключение отмены 45773e4b-2a90-40e9-989f-dd23f01ae302: Private API request failed: Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-04-25 02:39:57 | INFO | bot | [STABLEUSDT_LONG] 🛑 Позиция закрыта. PnL: 1.2173$. Стейт очищен.
+2026-04-25 05:07:42 | INFO | bot | [BOBUSDT_SHORT] ✅ Вход выполнен. Объем: 17000.0
+2026-04-25 05:08:49 | INFO | bot | [BOBUSDT_SHORT] 🛑 Позиция закрыта. PnL: 0.1167$. Стейт очищен.
+2026-04-25 06:01:24 | ERROR | bot | [KATUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 06:01:24 | WARNING | bot | [KATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 07:57:16 | ERROR | bot | [BOBUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 07:57:16 | WARNING | bot | [BOBUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 09:30:33 | ERROR | bot | [KATUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 09:30:33 | WARNING | bot | [KATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 11:16:21 | ERROR | bot | [KATUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 11:16:21 | WARNING | bot | [KATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 11:50:14 | INFO | bot | [MASKUSDT_SHORT] ✅ Вход выполнен. Объем: 137.0
+2026-04-25 11:55:21 | INFO | bot | [MASKUSDT_SHORT] 🛑 Позиция закрыта. PnL: -0.1119$. Стейт очищен.
+2026-04-25 12:16:42 | ERROR | bot | [KATUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 12:16:42 | WARNING | bot | [KATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 12:36:30 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 3374.75
+2026-04-25 12:37:51 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта. PnL: -0.1136$. Стейт очищен.
+2026-04-25 13:17:24 | ERROR | bot | [KATUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 13:17:24 | WARNING | bot | [KATUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 15:40:35 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 1696.3
+2026-04-25 15:41:23 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта. PnL: -0.0234$. Стейт очищен.
+2026-04-25 16:12:26 | INFO | bot | [APRUSDT_LONG] ✅ Вход выполнен. Объем: 842.72
+2026-04-25 16:13:09 | INFO | bot | [APRUSDT_LONG] 🛑 Позиция закрыта. PnL: -0.0204$. Стейт очищен.
+2026-04-25 16:15:58 | WARNING | bot | [APRUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
+2026-04-25 17:13:21 | INFO | bot | [QUSDT_SHORT] ✅ Вход выполнен. Объем: 36980.0
+2026-04-25 17:14:41 | WARNING | bot | [QUSDT] 💀 Карантин ПОТЕРЬ: 1 фейлов. Блокировка на infч.
+2026-04-25 17:14:41 | INFO | bot | [QUSDT_SHORT] 🛑 Позиция закрыта. PnL: -4.7410$. Стейт очищен.
+2026-04-25 18:50:22 | ERROR | bot | [TOWNSUSDT_SHORT] Исключение execute_entry: Private API request failed: Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-04-25 18:50:22 | WARNING | bot | [TOWNSUSDT] 🚫 Помещен в карантин на 1ч (вход не удался).
