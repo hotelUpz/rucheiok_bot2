@@ -1,7 +1,8 @@
 {
     "app": {
         "name": "Rucheiok3 Bot",
-        "max_active_positions": 2
+        "max_active_positions": 2,
+        "report_interval_hours": 12
     },
     "phemex": {
         "_fields": {

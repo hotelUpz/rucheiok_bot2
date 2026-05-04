@@ -48,8 +48,8 @@ async def polling_supervisor(tg_admin: AdminTgBot):
         await asyncio.sleep(retry_pause)
 
 async def _main():
-    cfg = load_json(filepath=CFG_PATH, default={})
-    tg_enabled = cfg.get("tg", {}).get("enable", False)
+    cfg = load_json(filepath=CFG_PATH)
+    tg_enabled = cfg["tg"]["enable"]
     
     bot = TradingBot(cfg)
     tasks = []
@@ -57,15 +57,15 @@ async def _main():
     try:
         # Извлекаем параметры для глобальной настройки плечей
         # Приоритет: секция "phemex" -> секция "credentials" / "risk"
-        phemex_cfg = cfg.get("phemex", {})
-        api_key = os.getenv("API_KEY") or phemex_cfg.get("api_key") or cfg.get("credentials", {}).get("api_key", "")
-        api_secret = os.getenv("API_SECRET") or phemex_cfg.get("api_secret") or cfg.get("credentials", {}).get("api_secret", "")
+        phemex_cfg = cfg["phemex"]
+        api_key = os.getenv("API_KEY") or phemex_cfg["api_key"]
+        api_secret = os.getenv("API_SECRET") or phemex_cfg["api_secret"]
         
-        risk_cfg = cfg.get("risk", {})
-        leverage_cfg = risk_cfg.get("leverage", {})
+        risk_cfg = cfg["risk"]
+        leverage_cfg = risk_cfg["leverage"]
         
-        leverage_val = phemex_cfg.get("leverage") or leverage_cfg.get("val")
-        raw_margin = phemex_cfg.get("margin_mode") or leverage_cfg.get("margin_mode", 2)
+        leverage_val = phemex_cfg["leverage"]
+        raw_margin = phemex_cfg["margin_mode"]
         
         # Маппинг для красивого лога и корректной передачи в setter
         # 1 / "cross" -> Cross, 2 / "isolated" -> Isolated
@@ -76,9 +76,9 @@ async def _main():
             margin_mode_str = "Isolated"
             raw_margin = 2
         
-        set_previous = leverage_cfg.get("set_previous", False)
-        use_cache = leverage_cfg.get("used_by_cache", False)
-        delay_sec = leverage_cfg.get("delay_sec", 0.3)
+        set_previous = leverage_cfg["set_previous"]
+        use_cache = leverage_cfg["used_by_cache"]
+        delay_sec = leverage_cfg["delay_sec"]
         
         if set_previous:
             # 1. Запуск глобальной конфигурации
@@ -101,8 +101,8 @@ async def _main():
 
         # 2. Инициализация TG и Торговли
         if tg_enabled:
-            token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"].get("token")
-            chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"].get("chat_id")
+            token = os.getenv("TELEGRAM_TOKEN") or cfg["tg"]["token"]
+            chat_id = os.getenv("TELEGRAM_CHAT_ID") or cfg["tg"]["chat_id"]
 
             if not token or not chat_id:
                 logger.error("Telegram включен, но token/chat_id не заданы.")

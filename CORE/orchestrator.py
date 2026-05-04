@@ -86,7 +86,7 @@ class TradingBot:
         self.phemex_funding_api = PhemexFunding(session=self.session)
         self.binance_funding_api = BinanceFunding(session=self.session)
         self.klines_api = PhemexKlinesAPI(session=self.session)
-        self.rsi_manager = RSIManager(self.klines_api, self.cfg["entry"]["rsi_filter"])
+        self.rsi_manager = RSIManager(self.klines_api, self.cfg["entry"]["pattern"]["rsi_filter"])
 
         self.private_client = PhemexPrivateClient(api_key, api_secret, self.session)
         self.private_ws = PhemexPrivateWS(api_key, api_secret)
@@ -504,7 +504,7 @@ class TradingBot:
         self.price_manager = PriceCacheManager(
             self.binance_ticker_api, self.phemex_ticker_api, 
             self.active_symbols, 
-            upd_sec=self.cfg.get("price_update_sec", 0.2),
+            upd_sec=self.cfg["entry"]["pattern"]["binance_trigger"]["update_prices_sec"],
             rsi_manager=self.rsi_manager
         )
         
