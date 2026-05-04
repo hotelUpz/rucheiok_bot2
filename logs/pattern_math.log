@@ -1,0 +1,808 @@
+2026-05-02 22:59:32 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: Vol 0.2 < 10
+2026-05-02 22:59:50 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Vol 5.5 < 10
+2026-05-02 22:59:53 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.17% > 0.75%
+2026-05-02 22:59:59 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.07% > 0.75%
+2026-05-02 23:00:02 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.30% > 0.75%
+2026-05-02 23:00:04 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.26% > 0.75%
+2026-05-02 23:00:04 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.20% > 0.75%
+2026-05-02 23:00:05 | DEBUG | pattern_math | [TAUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:00:06 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:00:06 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.11% > 0.75%
+2026-05-02 23:00:08 | DEBUG | pattern_math | [TAUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:00:08 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.35% > 0.75%
+2026-05-02 23:00:08 | DEBUG | pattern_math | [TAUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:00:08 | DEBUG | pattern_math | [TAUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:00:09 | DEBUG | pattern_math | [TAUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:00:09 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Vol 2.0 < 10
+2026-05-02 23:00:12 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:00:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:00:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:00:22 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:00:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:00:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:00:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:00:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.10% > 0.75%
+2026-05-02 23:00:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:00:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:00:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:00:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:00:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:00:35 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:00:35 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:00:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.0 < 1.25
+2026-05-02 23:00:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:01:14 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:01:14 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:01:17 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:01:20 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:01:21 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.19% > 0.75%
+2026-05-02 23:01:24 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:01:24 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:01:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:01:26 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.13% > 0.75%
+2026-05-02 23:01:26 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.11% > 0.75%
+2026-05-02 23:01:31 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:01:31 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:01:32 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:01:36 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:01:36 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:01:37 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:01:37 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:01:42 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:01:44 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Vol 6.2 < 10
+2026-05-02 23:01:46 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:01:49 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Vol 5.5 < 10
+2026-05-02 23:01:55 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:01:58 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:02:00 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:02:00 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:02:01 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:02:02 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:02:03 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:02:03 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:02:05 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:02:12 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:02:13 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:02:14 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:02:15 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:02:15 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:02:15 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:02:15 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:02:21 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:02:21 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:02:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:02:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:02:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.13% > 0.75%
+2026-05-02 23:02:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:02:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:02:23 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.31% > 0.75%
+2026-05-02 23:02:23 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.23% > 0.75%
+2026-05-02 23:02:23 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Vol 5.5 < 10
+2026-05-02 23:02:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:02:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:02:26 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:02:26 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:02:27 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:02:29 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:02:35 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:02:36 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:02:37 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:02:38 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:02:39 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:02:43 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:02:45 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:02:49 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:02:51 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:02:53 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:02:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:02:56 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:03:01 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:03:03 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.31% > 0.75%
+2026-05-02 23:03:04 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:03:24 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.35% > 0.75%
+2026-05-02 23:03:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:03:26 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.52% > 0.75%
+2026-05-02 23:03:27 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.56% > 0.75%
+2026-05-02 23:03:28 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.54% > 0.75%
+2026-05-02 23:03:29 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.36% > 0.75%
+2026-05-02 23:03:30 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.33% > 0.75%
+2026-05-02 23:03:32 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.29% > 0.75%
+2026-05-02 23:03:34 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.17% > 0.75%
+2026-05-02 23:03:35 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.18% > 0.75%
+2026-05-02 23:04:23 | DEBUG | pattern_math | [KNCUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:04:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.34% > 0.75%
+2026-05-02 23:04:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:04:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:04:38 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.25% > 0.75%
+2026-05-02 23:04:39 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:04:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.33% > 0.75%
+2026-05-02 23:04:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.32% > 0.75%
+2026-05-02 23:04:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.18% > 0.75%
+2026-05-02 23:04:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:04:44 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:04:45 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:04:46 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:04:49 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.0 < 1.25
+2026-05-02 23:04:49 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:04:49 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:04:51 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.10% > 0.75%
+2026-05-02 23:04:52 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:04:52 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:04:52 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.89% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.88% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.20% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.24% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.19% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:04:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:04:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:04:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:05:02 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.40% > 0.75%
+2026-05-02 23:05:02 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.18% > 0.75%
+2026-05-02 23:05:03 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:05:05 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:05:06 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:05:07 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:05:38 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:05:39 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:05:40 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:06:03 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.65% > 0.75%
+2026-05-02 23:06:04 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.30% > 0.75%
+2026-05-02 23:06:05 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.52% > 0.75%
+2026-05-02 23:06:05 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:06:06 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:06:07 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 2.07% > 0.75%
+2026-05-02 23:06:07 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 2.03% > 0.75%
+2026-05-02 23:06:08 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.07% > 0.75%
+2026-05-02 23:06:09 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.72% > 0.75%
+2026-05-02 23:06:12 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.64% > 0.75%
+2026-05-02 23:06:16 | DEBUG | pattern_math | [PUMPBTCUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:06:22 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.64% > 0.75%
+2026-05-02 23:06:24 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.57% > 0.75%
+2026-05-02 23:06:24 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:06:26 | DEBUG | pattern_math | [PUMPBTCUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:06:34 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:06:45 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:06:50 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:06:52 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:06:52 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Vol 5.5 < 10
+2026-05-02 23:06:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:06:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:06:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:07:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:07:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.0 < 1.25
+2026-05-02 23:07:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:07:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:07:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:07:03 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Vol 5.5 < 10
+2026-05-02 23:07:03 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:07:04 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:07:04 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.23% > 0.75%
+2026-05-02 23:07:04 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:07:04 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:07:04 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.41% > 0.75%
+2026-05-02 23:07:05 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.31% > 0.75%
+2026-05-02 23:07:05 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.30% > 0.75%
+2026-05-02 23:07:10 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:07:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:07:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:07:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:07:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:07:24 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.35% > 0.75%
+2026-05-02 23:07:28 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:07:30 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.06% > 0.75%
+2026-05-02 23:07:34 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.07% > 0.75%
+2026-05-02 23:07:34 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:07:35 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:07:36 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:07:41 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.98% > 0.75%
+2026-05-02 23:07:41 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:07:41 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:07:45 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.68% > 0.75%
+2026-05-02 23:07:45 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.67% > 0.75%
+2026-05-02 23:07:47 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:07:47 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:07:48 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:07:50 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:11:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.0 < 10
+2026-05-02 23:11:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.16% > 0.75%
+2026-05-02 23:11:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:11:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:11:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:11:23 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:11:24 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.05% > 0.75%
+2026-05-02 23:11:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:11:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:11:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:11:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.98% > 0.75%
+2026-05-02 23:11:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:11:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:11:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:11:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:11:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:11:31 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.35% > 0.75%
+2026-05-02 23:11:31 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.34% > 0.75%
+2026-05-02 23:11:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:11:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:11:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:11:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:11:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:11:35 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:11:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:11:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:11:37 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:11:37 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:11:41 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:11:41 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:11:41 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:11:50 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:11:50 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:12:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:12:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.55% > 0.75%
+2026-05-02 23:12:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:12:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.54% > 0.75%
+2026-05-02 23:12:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.53% > 0.75%
+2026-05-02 23:12:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.23% > 0.75%
+2026-05-02 23:12:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.22% > 0.75%
+2026-05-02 23:12:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.21% > 0.75%
+2026-05-02 23:12:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.17% > 0.75%
+2026-05-02 23:12:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.16% > 0.75%
+2026-05-02 23:12:15 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:12:15 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.10% > 0.75%
+2026-05-02 23:12:15 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:12:15 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.07% > 0.75%
+2026-05-02 23:12:16 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:12:16 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:12:16 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:12:24 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:12:24 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.89% > 0.75%
+2026-05-02 23:12:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:12:28 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:12:28 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:12:29 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:12:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:12:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:12:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:12:31 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:12:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 1.7 < 10
+2026-05-02 23:12:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:12:34 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:12:35 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:12:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:12:36 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:12:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:12:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:12:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:12:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:12:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:12:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:12:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:12:45 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:12:45 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:12:45 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.8 < 10
+2026-05-02 23:12:47 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:12:47 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:12:49 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:12:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:12:53 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:12:55 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:12:55 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:12:55 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:12:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:12:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:13:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:13:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:13:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:13:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:13:02 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:13:06 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:13:07 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:13:07 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:13:10 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:13:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:13:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:13:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:13:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:13:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 3.5 < 10
+2026-05-02 23:13:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:13:16 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: OB Spread 11.26% > 0.75%
+2026-05-02 23:13:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:13:18 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:13:18 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:13:18 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:13:18 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:13:19 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:13:19 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:13:19 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:13:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:13:20 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:13:20 | DEBUG | pattern_math | [MITOUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:13:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:13:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.2 < 10
+2026-05-02 23:13:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:13:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:13:58 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:14:01 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:14:02 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:14:02 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:14:08 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:14:08 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:14:10 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:14:13 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:14:13 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:14:13 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:14:14 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:14:16 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:14:20 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:14:21 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:14:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:14:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:14:24 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:14:24 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:14:24 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:14:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:14:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:14:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:14:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:14:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:14:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:14:26 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:14:27 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:14:27 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:14:28 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:14:28 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:14:31 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:14:32 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:14:33 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:14:33 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:14:33 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:14:34 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:14:34 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:14:34 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:14:34 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:14:37 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:14:40 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:14:41 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:14:42 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:14:46 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:14:47 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:14:47 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:14:47 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:14:50 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:14:50 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:14:51 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:14:52 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:14:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:14:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:14:54 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:14:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:14:55 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:14:56 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:14:56 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:14:56 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.26% > 0.75%
+2026-05-02 23:14:56 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.30% > 0.75%
+2026-05-02 23:14:58 | DEBUG | pattern_math | [ZEREBROUSDT] [LONG] Skip: OB Spread 1.18% > 0.75%
+2026-05-02 23:15:00 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:15:00 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:15:04 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:15:04 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:15:05 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:15:06 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:15:06 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:15:07 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:15:14 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:15:15 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:15:17 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:15:22 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:15:23 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:15:25 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:15:27 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:15:30 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:15:33 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:15:33 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:15:33 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:15:37 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:15:43 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:15:46 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:15:46 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:15:46 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:15:47 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:15:56 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:15:57 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:15:57 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:16:01 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:16:05 | DEBUG | pattern_math | [MAVIAUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:16:06 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:16:07 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:16:07 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:16:08 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:16:08 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:16:09 | DEBUG | pattern_math | [MAVIAUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:16:13 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:16:13 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:16:14 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:16:14 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:16:14 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:20:08 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.14% > 0.75%
+2026-05-02 23:20:09 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.13% > 0.75%
+2026-05-02 23:20:09 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:20:09 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.19% > 0.75%
+2026-05-02 23:20:10 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:20:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.06% > 0.75%
+2026-05-02 23:20:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:20:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:20:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:20:15 | DEBUG | pattern_math | [BTRUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:20:15 | DEBUG | pattern_math | [BTRUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:20:15 | DEBUG | pattern_math | [BTRUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:20:17 | DEBUG | pattern_math | [BTRUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:20:17 | DEBUG | pattern_math | [BTRUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:20:20 | DEBUG | pattern_math | [BTRUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:20:44 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:20:45 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: OB Spread 0.98% > 0.75%
+2026-05-02 23:20:45 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: Vol 0.2 < 10
+2026-05-02 23:20:45 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:20:45 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:20:48 | DEBUG | pattern_math | [NAORISUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:21:41 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.47% > 0.75%
+2026-05-02 23:21:42 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.56% > 0.75%
+2026-05-02 23:21:42 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.54% > 0.75%
+2026-05-02 23:21:43 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.60% > 0.75%
+2026-05-02 23:21:43 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.63% > 0.75%
+2026-05-02 23:21:43 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.65% > 0.75%
+2026-05-02 23:21:44 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.67% > 0.75%
+2026-05-02 23:21:44 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.69% > 0.75%
+2026-05-02 23:21:46 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.73% > 0.75%
+2026-05-02 23:21:46 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.78% > 0.75%
+2026-05-02 23:21:46 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.48% > 0.75%
+2026-05-02 23:21:46 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.55% > 0.75%
+2026-05-02 23:21:47 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.27% > 0.75%
+2026-05-02 23:21:47 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:21:47 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.14% > 0.75%
+2026-05-02 23:21:47 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.31% > 0.75%
+2026-05-02 23:21:48 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.72% > 0.75%
+2026-05-02 23:22:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:22:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:22:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:22:54 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:22:58 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.39% > 0.75%
+2026-05-02 23:22:58 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.37% > 0.75%
+2026-05-02 23:22:58 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:22:59 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.11% > 0.75%
+2026-05-02 23:22:59 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: OB Spread 1.10% > 0.75%
+2026-05-02 23:23:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.16% > 0.75%
+2026-05-02 23:23:26 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:23:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.14% > 0.75%
+2026-05-02 23:23:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.13% > 0.75%
+2026-05-02 23:23:31 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:23:31 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:24:03 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:24:06 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:24:07 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:25:50 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:25:52 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:25:55 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:25:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:25:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:25:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:26:05 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:26:05 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:26:06 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:26:09 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.0 < 10
+2026-05-02 23:26:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.32% > 0.75%
+2026-05-02 23:26:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.28% > 0.75%
+2026-05-02 23:26:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.25% > 0.75%
+2026-05-02 23:26:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.24% > 0.75%
+2026-05-02 23:26:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:26:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:26:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:26:13 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:26:14 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:26:14 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:26:14 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:26:15 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:26:15 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:26:15 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:26:16 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:26:17 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:26:17 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:26:17 | DEBUG | pattern_math | [BIOUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:26:22 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 4.1 < 10
+2026-05-02 23:26:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:26:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.89% > 0.75%
+2026-05-02 23:26:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:26:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:26:30 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:26:53 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:27:26 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:27:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:27:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:27:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:27:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:27:34 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:27:34 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:27:37 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:27:37 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:27:37 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:27:38 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:27:39 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:27:39 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:27:39 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.88% > 0.75%
+2026-05-02 23:27:42 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:27:42 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:27:42 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:27:43 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:27:44 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:27:44 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:27:44 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:27:44 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:27:45 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:27:45 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:27:46 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:27:47 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:27:48 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:27:50 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:27:50 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:27:52 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:27:52 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:27:54 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:27:57 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:27:57 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:28:01 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:28:01 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:28:01 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.21% > 0.75%
+2026-05-02 23:28:02 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.87% > 0.75%
+2026-05-02 23:28:02 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.84% > 0.75%
+2026-05-02 23:28:03 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:28:03 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:28:04 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:28:05 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:28:08 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:28:09 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:28:09 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:28:09 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.05% > 0.75%
+2026-05-02 23:28:10 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:28:11 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:28:13 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:28:13 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.11% > 0.75%
+2026-05-02 23:28:14 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.14% > 0.75%
+2026-05-02 23:32:15 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:32:29 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:32:30 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:32:33 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:32:50 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:32:52 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:32:52 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:33:02 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:33:05 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:33:07 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:33:12 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:33:13 | DEBUG | pattern_math | [ORDIUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:33:22 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:33:22 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:33:23 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:33:23 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:33:24 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:33:24 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:33:24 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:33:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.38% > 0.75%
+2026-05-02 23:33:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.14% > 0.75%
+2026-05-02 23:33:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.11% > 0.75%
+2026-05-02 23:33:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:33:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:33:32 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Vol 5.4 < 10
+2026-05-02 23:33:34 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:33:36 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:33:36 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:33:37 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.05% > 0.75%
+2026-05-02 23:33:37 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Vol 5.7 < 10
+2026-05-02 23:33:37 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:33:42 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:33:46 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:33:47 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:33:47 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:33:48 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.11% > 0.75%
+2026-05-02 23:33:48 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:33:48 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.05% > 0.75%
+2026-05-02 23:33:48 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.02% > 0.75%
+2026-05-02 23:34:08 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:34:10 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:34:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:34:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.0 < 1.25
+2026-05-02 23:34:12 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:34:20 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:34:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.0 < 1.25
+2026-05-02 23:34:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:34:24 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:34:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.88% > 0.75%
+2026-05-02 23:35:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:35:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:35:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:35:17 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.14% > 0.75%
+2026-05-02 23:35:18 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:35:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:35:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.89% > 0.75%
+2026-05-02 23:35:20 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:35:23 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:35:24 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.09% > 0.75%
+2026-05-02 23:35:24 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.06% > 0.75%
+2026-05-02 23:35:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.88% > 0.75%
+2026-05-02 23:35:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.08% > 0.75%
+2026-05-02 23:35:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.07% > 0.75%
+2026-05-02 23:35:25 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:35:25 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:35:25 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:35:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:35:28 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:35:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:35:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.88% > 0.75%
+2026-05-02 23:35:29 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.23% > 0.75%
+2026-05-02 23:35:29 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:35:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:35:29 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:35:30 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:35:31 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.06% > 0.75%
+2026-05-02 23:35:31 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:35:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.51% > 0.75%
+2026-05-02 23:35:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.34% > 0.75%
+2026-05-02 23:35:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.61% > 0.75%
+2026-05-02 23:35:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.60% > 0.75%
+2026-05-02 23:35:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.39% > 0.75%
+2026-05-02 23:35:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.16% > 0.75%
+2026-05-02 23:35:33 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.15% > 0.75%
+2026-05-02 23:35:34 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:35:34 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:35:34 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.89% > 0.75%
+2026-05-02 23:35:37 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:35:37 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:35:38 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:35:39 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.01% > 0.75%
+2026-05-02 23:35:39 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.98% > 0.75%
+2026-05-02 23:35:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:35:40 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:35:41 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:35:42 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:35:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:35:43 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:35:44 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:35:45 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:35:45 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:35:49 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:35:55 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:35:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.05% > 0.75%
+2026-05-02 23:35:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.00% > 0.75%
+2026-05-02 23:35:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.33% > 0.75%
+2026-05-02 23:35:56 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.13% > 0.75%
+2026-05-02 23:35:57 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:35:57 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:35:57 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:35:57 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.95% > 0.75%
+2026-05-02 23:35:57 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:35:57 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:35:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:35:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:35:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:35:59 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:36:00 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:36:08 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 4.1 < 10
+2026-05-02 23:36:09 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.80% > 0.75%
+2026-05-02 23:36:11 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:36:14 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:36:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:36:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:36:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:36:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.77% > 0.75%
+2026-05-02 23:36:19 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:36:20 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:36:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:36:21 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:36:22 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:36:23 | DEBUG | pattern_math | [GENIUSUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:36:24 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:36:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.26% > 0.75%
+2026-05-02 23:36:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.23% > 0.75%
+2026-05-02 23:36:27 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 1.12% > 0.75%
+2026-05-02 23:36:28 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:36:28 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.92% > 0.75%
+2026-05-02 23:36:29 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:36:29 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:36:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.88% > 0.75%
+2026-05-02 23:36:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:36:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.83% > 0.75%
+2026-05-02 23:36:30 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:36:31 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:36:31 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:36:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:36:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:36:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.7 < 10
+2026-05-02 23:36:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:36:32 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:36:35 | DEBUG | pattern_math | [UBUSDT] [LONG] Skip: Vol 5.1 < 10
+2026-05-02 23:37:25 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:37:26 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.87% > 0.75%
+2026-05-02 23:37:26 | DEBUG | pattern_math | [BASEDUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:37:26 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:37:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:37:28 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:37:30 | DEBUG | pattern_math | [BASEDUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:37:31 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:37:35 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:37:35 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: Imbalance 0.1 < 1.25
+2026-05-02 23:37:36 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.84% > 0.75%
+2026-05-02 23:37:41 | DEBUG | pattern_math | [BUSDT] [LONG] Skip: OB Spread 0.90% > 0.75%
+2026-05-02 23:40:36 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:40:36 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 0.96% > 0.75%
+2026-05-02 23:40:36 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 0.94% > 0.75%
+2026-05-02 23:40:36 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 0.93% > 0.75%
+2026-05-02 23:40:36 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 0.91% > 0.75%
+2026-05-02 23:40:37 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:40:38 | DEBUG | pattern_math | [B2USDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:40:58 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.99% > 0.75%
+2026-05-02 23:40:58 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.97% > 0.75%
+2026-05-02 23:41:00 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.03% > 0.75%
+2026-05-02 23:41:01 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.05% > 0.75%
+2026-05-02 23:41:35 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:41:36 | DEBUG | pattern_math | [BSBUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:42:06 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:42:08 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:42:08 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:42:09 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:42:09 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 1.06% > 0.75%
+2026-05-02 23:42:09 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:42:19 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:42:29 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:42:33 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.82% > 0.75%
+2026-05-02 23:42:36 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.86% > 0.75%
+2026-05-02 23:42:36 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.85% > 0.75%
+2026-05-02 23:42:39 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Vol 5.6 < 10
+2026-05-02 23:42:40 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.06% > 0.75%
+2026-05-02 23:42:40 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 1.04% > 0.75%
+2026-05-02 23:42:41 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:42:42 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:42:42 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.78% > 0.75%
+2026-05-02 23:42:42 | DEBUG | pattern_math | [XNYUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:42:47 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.76% > 0.75%
+2026-05-02 23:42:47 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:42:47 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:42:48 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:42:52 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:42:52 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:42:53 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:42:57 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:42:59 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:43:04 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:43:04 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:43:06 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:43:11 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:43:12 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:43:21 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:43:22 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:43:23 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.81% > 0.75%
+2026-05-02 23:43:28 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.75% > 0.75%
+2026-05-02 23:43:28 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:43:29 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:43:33 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:43:35 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:43:39 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:43:39 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:43:43 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:43:44 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.2 < 1.25
+2026-05-02 23:43:45 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:43:45 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:43:48 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:43:51 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:43:51 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.2 < 1.25
+2026-05-02 23:43:52 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.9 < 1.25
+2026-05-02 23:44:00 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: OB Spread 0.79% > 0.75%
+2026-05-02 23:44:01 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.1 < 1.25
+2026-05-02 23:44:04 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.4 < 1.25
+2026-05-02 23:44:04 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.3 < 1.25
+2026-05-02 23:44:04 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.6 < 1.25
+2026-05-02 23:44:05 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.5 < 1.25
+2026-05-02 23:44:05 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.0 < 1.25
+2026-05-02 23:44:07 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.8 < 1.25
+2026-05-02 23:44:10 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 0.7 < 1.25
+2026-05-02 23:44:12 | DEBUG | pattern_math | [SPACEUSDT] [LONG] Skip: Imbalance 1.2 < 1.25

@@ -1,0 +1,23 @@
+2026-05-02 22:56:21 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=1
+2026-05-02 22:56:30 | INFO | core | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-05-02 22:56:33 | INFO | core | 🚀 PriceCacheManager loop started with interval 0.25s
+2026-05-02 22:56:33 | INFO | core | 🚀 DexUpdater loop started (Interval: 0.5s)
+2026-05-02 23:01:38 | DEBUG | core | 📊 [EXIT SPREADS]: BIOUSDT: 1.85%(DEX)
+2026-05-02 23:01:48 | DEBUG | core | 📊 [EXIT SPREADS]: BIOUSDT: 1.44%(DEX)
+2026-05-02 23:01:58 | DEBUG | core | 📊 [EXIT SPREADS]: BIOUSDT: 0.28%(DEX)
+2026-05-02 23:01:59 | INFO | core | [BIOUSDT_LONG] 🛑 Позиция закрыта. 💵 PnL: 0.0004$ | Время: 20с
+2026-05-02 23:30:30 | DEBUG | core | 📊 [EXIT SPREADS]: BIOUSDT: 0.28%(DEX) | SIRENUSDT: 2.96%(DEX)
+2026-05-02 23:30:40 | DEBUG | core | 📊 [EXIT SPREADS]: SIRENUSDT: 0.35%(DEX)
+2026-05-02 23:30:50 | DEBUG | core | 📊 [EXIT SPREADS]: SIRENUSDT: 0.32%(DEX)
+2026-05-02 23:31:00 | DEBUG | core | 📊 [EXIT SPREADS]: SIRENUSDT: 0.35%(DEX)
+2026-05-02 23:31:10 | DEBUG | core | 📊 [EXIT SPREADS]: SIRENUSDT: 0.32%(DEX)
+2026-05-02 23:31:17 | WARNING | core | [SIRENUSDT] 💀 Карантин ПОТЕРЬ: 1 фейлов. Блокировка на infч.
+2026-05-02 23:31:17 | INFO | core | [SIRENUSDT_LONG] 🛑 Позиция закрыта. 🩸 PnL: -0.1279$ | Время: 47с
+2026-05-02 23:40:25 | INFO | core | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-05-03 00:21:50 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=1
+2026-05-03 00:21:57 | INFO | core | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-05-03 00:21:59 | INFO | core | 🚀 PriceCacheManager loop started with interval 0.2s
+2026-05-03 00:24:07 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=1
+2026-05-03 00:24:12 | INFO | core | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-05-03 00:24:12 | INFO | core | 🚀 PriceCacheManager loop started with interval 0.2s
+2026-05-03 00:24:12 | INFO | core | 🚀 DexUpdater loop started (Interval: 0.5s)

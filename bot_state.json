@@ -1,0 +1,20 @@
+{
+    "positions": {},
+    "fails": {},
+    "quarantine": {},
+    "analytics": {
+        "start_balance": 67.810726375742,
+        "current_balance": 6.810726375742,
+        "max_balance": 6.810726375742,
+        "min_balance": 6.810726375742,
+        "mdd_usd": 0.0,
+        "mdd_pct": 0.0,
+        "max_profit_usd": 0.0,
+        "max_profit_pct": 0.0,
+        "total_wins": 0,
+        "total_losses": 0,
+        "total_pnl": 0.0,
+        "symbols": {},
+        "history": []
+    }
+}
