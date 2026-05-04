@@ -9,10 +9,10 @@ import json
 import time
 from pathlib import Path
 from typing import Dict, List, Tuple, TYPE_CHECKING, Optional, Set, Any
-from ENTRY.signal_engine import SignalEngine
 from c_log import UnifiedLogger
 
 if TYPE_CHECKING:
+    from ENTRY.signal_engine import SignalEngine
     from CORE.orchestrator import TradingBot
     from API.PHEMEX.ticker import PhemexTickerAPI
     from API.BINANCE.ticker import BinanceTickerAPI
@@ -89,7 +89,7 @@ class PriceCacheManager:
         self.phemex_prices: Dict[str, float] = {}
         self.binance_fair_prices: Dict[str, float] = {}
         self.phemex_fair_prices: Dict[str, float] = {}
-        self.dex_prices: Dict[str, float] = {}
+        self.dex_prices: Dict[str, Tuple[float, float]] = {} # symbol -> (price, timestamp)
         self.binance_depth: Dict[str, 'BinanceDepthTop'] = {} # symbol -> DepthTop
         
         self._is_running = False
@@ -154,9 +154,9 @@ class PriceCacheManager:
         """Возвращает (BinanceFairPrice, PhemexFairPrice)"""
         return self.binance_fair_prices.get(symbol, 0.0), self.phemex_fair_prices.get(symbol, 0.0)
 
-    def get_dex_price(self, symbol: str) -> float:
-        """Возвращает последнюю закешированную цену с Dexscreener"""
-        return self.dex_prices.get(symbol, 0.0)
+    def get_dex_price(self, symbol: str) -> Tuple[float, float]:
+        """Возвращает (последняя цена, timestamp) с Dexscreener"""
+        return self.dex_prices.get(symbol, (0.0, 0.0))
 
     def get_all_phemex_prices(self) -> Dict[str, float]:
         return self.phemex_prices
@@ -236,7 +236,7 @@ class ConfigManager:
             )
             
             # Пересоздаем движок сигналов (математика стакана обновится здесь же)
-            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.funding_manager, self.tb.rsi_manager, self.tb.dex_api)
+            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.funding_manager, self.tb.price_manager, self.tb.rsi_manager)
 
             # Перезапускаем луп фандинга
             if getattr(self.tb, '_is_running', False):
@@ -510,13 +510,14 @@ class DexUpdater:
         logger.info(f"🚀 DexUpdater loop started (Interval: {self.interval}s)")
         while self._is_running:
             try:
-                active_symbols = {pos.symbol for pos in self.state.active_positions.values()}
-                if active_symbols:
+                # Обновляем цены для ВСЕХ рабочих символов
+                target_symbols = list(self.price_manager.target_symbols)
+                if target_symbols:
                     tasks = []
-                    for symbol in active_symbols:
-                        # Используем Phemex цену как референс
+                    for symbol in target_symbols:
                         _, p_price = self.price_manager.get_prices(symbol)
-                        tasks.append(self._update_single(symbol, p_price))
+                        if p_price > 0:
+                            tasks.append(self._update_single(symbol, p_price))
                     
                     if tasks:
                         await asyncio.gather(*tasks)
@@ -532,7 +533,7 @@ class DexUpdater:
             if pair_data:
                 price_str = pair_data.get("priceUsd")
                 if price_str:
-                    self.price_manager.dex_prices[symbol] = float(price_str)
+                    self.price_manager.dex_prices[symbol] = (float(price_str), time.time())
         except Exception as e:
             logger.debug(f"Failed to update DEX price for {symbol}: {e}")
 

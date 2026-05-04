@@ -329,7 +329,7 @@ class TradingBot:
         b_depth = self.price_manager.get_binance_depth(symbol)
         b_fair, p_fair = self.price_manager.get_fair_prices(symbol)
         
-        signal: "EntryPayload" = await self.signal_engine.analyze(snap, b_price, p_price, b_depth, b_fair, p_fair)
+        signal: "EntryPayload" = self.signal_engine.analyze(snap, b_price, p_price, b_depth, b_fair, p_fair)
         if not signal: return
 
         pos_key = f"{symbol}_{signal.side}"
@@ -414,10 +414,17 @@ class TradingBot:
                             if pos.in_position:
                                 pos.marked_for_death_ts = 0.0 
                             elif time.time() - pos.marked_for_death_ts > 5.0:
-                                logger.debug(f"[{pos_key}] 🗑 Удаление фантомной позиции (no WS fill).")
-                                self.state.active_positions.pop(pos_key, None)
-                                self.active_positions_locker.pop(pos_key, None)
-                                asyncio.create_task(self.state.save())
+                                # Верификация смерти ордера ПЕРЕД удалением
+                                logger.warning(f"[{pos_key}] 🗑 Верификация смерти фантома...")
+                                try:
+                                    # Отменяем всё по символу на всякий пожарный
+                                    await self.executor.cancel_all_orders(pos.symbol)
+                                    logger.debug(f"[{pos_key}] 🗑 Фантом зачищен на бирже, удаляем из JSON.")
+                                    self.state.active_positions.pop(pos_key, None)
+                                    self.active_positions_locker.pop(pos_key, None)
+                                    asyncio.create_task(self.state.save())
+                                except Exception as e:
+                                    logger.error(f"[{pos_key}] Ошибка при зачистке фантома: {e}")
                                 continue
 
                         if getattr(pos, 'is_closed_by_exchange', False):
@@ -429,6 +436,9 @@ class TradingBot:
                                 self.min_quarantine_threshold_usdt, 
                                 self.force_quarantine_threshold_usdt
                             )
+                            # Еще раз зачищаем ордера при выходе
+                            await self.executor.cancel_all_orders(pos.symbol)
+                            
                             self.state.active_positions.pop(pos_key, None)
                             self.active_positions_locker.pop(pos_key, None) 
                             asyncio.create_task(self.state.save())
@@ -503,7 +513,7 @@ class TradingBot:
         self._binance_stream_task: Optional[asyncio.Task] = None
         
         self.funding_manager = FundingManager(self.cfg["entry"]["pattern"], self.phemex_funding_api, self.binance_funding_api, self.symbol_manager)
-        self.signal_engine = SignalEngine(self.cfg["entry"], self.funding_manager, self.rsi_manager, self.dex_api)
+        self.signal_engine = SignalEngine(self.cfg["entry"], self.funding_manager, self.price_manager, self.rsi_manager)
 
         # Подключаем price_manager к dex_updater
         self.dex_updater.price_manager = self.price_manager
@@ -516,35 +526,17 @@ class TradingBot:
 
         await self.state.sync_with_exchange(self.private_client)
 
-        # ==========================================
-        # ИНИЦИАЛИЗАЦИЯ ФИНАНСОВОГО АУДИТА
-        # ==========================================
-        try:
-            if hasattr(self, 'tracker'):
-                saved_start_balance = self.tracker.data.get("start_balance", 0.0)
-                
-                if saved_start_balance > 0:
-                    logger.info(f"💰 Стартовый баланс успешно загружен из стейта: {saved_start_balance:.2f} {self.quota_asset}")
-                    # Всегда пересчитываем max_profit и mdd из истории при рестарте
-                    self.tracker._recalc_from_history()
-                    await self.state.save()
-                else:
-                    logger.info("📡 Запрашиваем Equity с биржи для инициализации аудита...")
-                    usd_balance = await self.private_client.get_equity(self.quota_asset)
-                    
-                    self.tracker.set_initial_balance(usd_balance)  # внутри тоже вызывает _recalc_from_history
-                    logger.info(f"💰 Стартовый баланс зафиксирован: {usd_balance:.2f} {self.quota_asset}")
-                    await self.state.save()
-                    
-        except Exception as e:
-            logger.error(f"❌ Не удалось получить/установить стартовый баланс: {e}")
-        # ==========================================
+        # Баланс уже синхронизирован в начале start()
 
         logger.info("🔄 Прогрев кэша цен и фандинга...")
         await self.price_manager.warmup()
         # 4. Фоновые циклы
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
         self._funding_task = asyncio.create_task(self.funding_manager.run())
+        
+        if self.cfg["entry"]["dex_filter"]["enable"]:
+            self._dex_updater_task = asyncio.create_task(self.dex_updater.run())
+            
         self._binance_stream_task = asyncio.create_task(self.binance_stream.run(self._on_binance_depth))
         self._game_loop_task = asyncio.create_task(self._main_trading_loop())
         

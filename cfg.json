@@ -46,7 +46,7 @@
             "margin_mode": 1
         },
         "margin_size": "row",
-        "notional_limit": 550,
+        "notional_limit": 150,
         "margin_over_size_pct": 1,
         "hedge_mode": false,
         "quarantine": {
@@ -114,8 +114,8 @@
                     "rate": "spr3_pct / roc_sma. Если < desired_rate, скип"
                 },
                 "depth_limit": 8,
-                "min_first_row_usdt_notional": 50,
-                "max_first_row_usdt_notional": 500,
+                "min_first_row_usdt_notional": 30,
+                "max_first_row_usdt_notional": 150,
                 "max_spread_pct": 0.75,
                 "min_spr2_pct": 0.3,
                 "min_spr3_pct": 0.35,

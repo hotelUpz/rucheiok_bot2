@@ -1,5 +1,5 @@
 # ============================================================
-# FILE: ENTRY/engine.py
+# FILE: ENTRY/signal_engine.py
 # ROLE: Оркестратор логики входа (Pattern math, Binance filter, TTLs, Funding)
 # ============================================================
 from __future__ import annotations
@@ -17,16 +17,17 @@ if TYPE_CHECKING:
     from ENTRY.funding_manager import FundingManager
     from CORE.rsi_manager import RSIManager
     from API.DEX.dexscreener import DexscreenerAPI
+    from CORE._utils import PriceCacheManager
 
 
 logger = UnifiedLogger("signal_engine")
 
 class SignalEngine:
-    def __init__(self, cfg: Dict[str, Any], funding_manager: 'FundingManager', rsi_manager: Optional['RSIManager'] = None, dex_api: Optional['DexscreenerAPI'] = None):
+    def __init__(self, cfg: Dict[str, Any], funding_manager: 'FundingManager', price_manager: 'PriceCacheManager', rsi_manager: Optional['RSIManager'] = None):
         self.cfg = cfg
         self.funding_manager = funding_manager  
+        self.price_manager = price_manager
         self.rsi_manager = rsi_manager
-        self.dex_api = dex_api
         
         self.binance_trigger_cfg = cfg["pattern"]["binance_trigger"]
         self.ob_cfg = cfg["pattern"]["orderbook_filter"]
@@ -88,7 +89,7 @@ class SignalEngine:
         else: # TICKER
             return (b_price - p_price) / p_price * 100 if p_price > 0 else 0
 
-    async def analyze(self, depth: DepthTop, b_price: float, p_price: float, b_depth: Optional[BinanceDepthTop], b_fair: float = 0.0, p_fair: float = 0.0) -> Optional[EntryPayload]:
+    def analyze(self, depth: DepthTop, b_price: float, p_price: float, b_depth: Optional[BinanceDepthTop], b_fair: float = 0.0, p_fair: float = 0.0) -> Optional[EntryPayload]:
         """
         Иерархия фильтров:
         1. Funding (Global)
@@ -181,19 +182,17 @@ class SignalEngine:
         # 6. Фильтр: DEX Price (Dexscreener)
         dex_price = 0.0
         dex_spread_pct = 0.0
-        if self.dex_enabled and self.dex_api:
-            # Используем кэшированное или быстрое получение цены
-            pair_data = await self.dex_api.get_price_by_symbol(symbol, ref_price=p_price)
-            if pair_data:
-                dex_price = float(pair_data.get("priceUsd", 0))
-                if dex_price > 0:
-                    dex_spread_pct = (dex_price - p_price) / p_price * 100
-                    passed_dex = (dex_spread_pct >= self.min_dex_spread_pct) if direction == "LONG" else (dex_spread_pct <= -self.min_dex_spread_pct)
-                    if not passed_dex:
-                        return None
+        if self.dex_enabled:
+            # Получаем из кеша
+            dex_price, dex_ts = self.price_manager.get_dex_price(symbol)
+            # Staleness check: если данным > 10 секунд — скипаем фильтр
+            if dex_price > 0 and (now - dex_ts <= 10):
+                dex_spread_pct = (dex_price - p_price) / p_price * 100
+                passed_dex = (dex_spread_pct >= self.min_dex_spread_pct) if direction == "LONG" else (dex_spread_pct <= -self.min_dex_spread_pct)
+                if not passed_dex:
+                    return None
             else:
-                # Если DEX обязателен (напр. min_dex_spread_pct > 0) и данных нет - можно скипать, 
-                # но здесь оставим опциональным пропуском
+                # Если данных нет или они протухли — работаем без DEX
                 pass
 
 

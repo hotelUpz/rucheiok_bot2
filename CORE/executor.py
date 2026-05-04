@@ -84,11 +84,13 @@ class OrderExecutor:
                     
             await asyncio.sleep(poll_step)
 
-    async def cancel_all_orders(self, symbol: str) -> bool:
+    async def cancel_all_orders(self, symbol: str) -> Dict[str, Any]:
+        """Отмена всех ордеров по символу (G-API)"""
         try:
-            resp = await self.client.cancel_all_orders(symbol)
-            return resp.get("code") == 0
-        except: return False
+            return await self.client.cancel_all_orders(symbol)
+        except Exception as e:
+            logger.debug(f"[{symbol}] Ошибка массовой отмены: {e}")
+            return {}
 
     async def execute_cancel(self, symbol: str, pos_side: str, order_id: str) -> bool:
         """
