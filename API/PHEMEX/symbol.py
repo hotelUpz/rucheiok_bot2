@@ -44,25 +44,33 @@ class PhemexSymbols:
             return default
 
     def _parse_perp(self, obj: Dict[str, Any], quote: str = "USDT") -> Optional[PhemexSymbolInfo]:
-        sym = obj.get("symbol", "")
+        sym = obj.get("symbol", "").upper()
         if not sym: return None
         
         # Фильтруем спот (начинается с 's')
-        if sym.startswith("s"): return None
+        if sym.startswith("S"): return None
+        
+        # Фильтруем "мусорные" множители, которые часто глючат в API клайнов
+        if sym.startswith("U1000") or sym.startswith("U100") or sym.startswith("U10000"):
+            return None
+
+        # Проверка Quota Asset (должен заканчиваться на USDT или другой заданный ассет)
+        quote_upper = quote.upper()
+        if not sym.endswith(quote_upper):
+            return None
 
         q = str(obj.get("quoteCurrency") or obj.get("settleCurrency") or "").upper()
-        if q != quote.upper(): return None
+        if q != quote_upper: return None
 
         status = str(obj.get("status") or obj.get("state") or "Listed")
         
-        # Извлекаем параметры из правильных полей согласно черновику
         tick_size = self._to_float(obj.get("tickSize"))
         lot_size = self._to_float(obj.get("qtyStepSize"))
         contract_size = self._to_float(obj.get("contractSize"), 1.0)
         max_lvg = self._to_float(obj.get("limitOrderMaxLeverage") or obj.get("maxLeverage"), 20.0)
 
         return PhemexSymbolInfo(
-            symbol=sym.upper(),
+            symbol=sym,
             status=status,
             quote_currency=q,
             tick_size=tick_size,
@@ -83,21 +91,20 @@ class PhemexSymbols:
             root = data.get("data", {})
             if not isinstance(root, dict): return []
 
-            # ВАЖНО: Ищем в perpProductsV2 или perpProducts (из черновика)
             items = root.get("perpProductsV2") or root.get("perpProducts") or []
             
-            result = []
-            seen = set()
+            unique_results: Dict[str, PhemexSymbolInfo] = {} # Deduplication set logic
             for item in items:
                 si = self._parse_perp(item, quote=quote)
                 if si:
                     if only_active and not self._is_active_status(si.status):
                         continue
-                    if si.symbol not in seen:
-                        seen.add(si.symbol)
-                        result.append(si)
+                    
+                    # Если символ уже есть, не перезаписываем (сохраняем первый найденный)
+                    if si.symbol not in unique_results:
+                        unique_results[si.symbol] = si
             
-            return result
+            return list(unique_results.values())
         except Exception as e:
             logger.error(f"Error fetching Phemex symbols: {e}")
             return []

@@ -26,3 +26,18 @@
 2026-05-03 00:24:14 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
 2026-05-03 00:24:14 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
 2026-05-03 00:24:15 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-05-04 22:48:47 | DEBUG | api | Klines fail for U1000FLOKIUSDT: HTTP 400
+2026-05-04 22:48:51 | DEBUG | api | Klines fail for U1000SATSUSDT: HTTP 400
+2026-05-04 22:48:52 | DEBUG | api | Klines fail for U1000CATUSDT: HTTP 400
+2026-05-04 22:49:09 | DEBUG | api | Klines fail for U1000SHIBUSDT: HTTP 400
+2026-05-04 22:49:16 | DEBUG | api | Klines fail for U1000BONKUSDT: HTTP 400
+2026-05-04 22:49:22 | DEBUG | api | Klines fail for U1000RATSUSDT: HTTP 400
+2026-05-04 22:49:27 | DEBUG | api | Klines fail for U1000XECUSDT: HTTP 400
+2026-05-04 22:49:29 | DEBUG | api | Klines fail for U1000CHEEMSUSDT: HTTP 400
+2026-05-04 22:49:36 | DEBUG | api | Klines fail for U1000PEPEUSDT: HTTP 400
+2026-05-04 22:49:40 | DEBUG | api | Klines fail for U1000000BABYDOGEUSDT: HTTP 400
+2026-05-04 22:49:42 | DEBUG | api | Klines fail for GOOGLUSDT: HTTP 0
+2026-05-04 22:49:42 | DEBUG | api | Klines fail for RECALLUSDT: HTTP 0
+2026-05-04 22:49:43 | DEBUG | api | Exception fetching klines for MOVRUSDT: Session is closed, cannot send request.
+2026-05-04 22:49:43 | DEBUG | api | Exception fetching klines for STOUSDT: Session is closed, cannot send request.
+2026-05-04 22:49:43 | DEBUG | api | Exception fetching klines for DRIFTUSDT: Session is closed, cannot send request.

@@ -58,37 +58,6 @@ class PhemexKlinesAPI:
         allowed_limits = [5, 10, 50, 100, 500, 1000]
         return next((l for l in allowed_limits if l >= limit), 1000)
 
-    async def get_price_scales(self) -> Dict[str, float]:
-        """Fetches all symbols to identify their price scales (1/tickSize)."""
-        url = f"{self.BASE_URL}/public/products"
-        try:
-            resp = await self.session.get(url, timeout=10.0)
-            if resp.status_code != 200:
-                logger.error(f"Failed to fetch products for scales: {resp.status_code}")
-                return {}
-            
-            data = ujson.loads(resp.content)
-            products = data.get("data", {}).get("perpProductsV2") or data.get("data", {}).get("perpProducts") or []
-            
-            scales = {}
-            for p in products:
-                sym = p.get("symbol", "").upper()
-                
-                # По опыту: надежнее всего брать масштаб из 1/tickSize
-                tick = float(p.get("tickSize", 0.0001))
-                scale = 1 / tick if tick > 0 else 10000.0
-                
-                # Если tickSize слишком мелкий или отсутствует, пробуем priceScale как экспоненту
-                if scale < 1:
-                    p_exp = int(p.get("priceScale", 4))
-                    scale = 10 ** p_exp
-                
-                scales[sym] = scale
-            return scales
-        except Exception as e:
-            logger.error(f"Error fetching price scales: {e}")
-            return {}
-
     async def get_klines(self, symbol: str, interval: Optional[str] = None, limit: Optional[int] = None) -> List[Kline]:
         """Fetches klines for a single symbol."""
         res = self.res_map.get(interval or self.interval, 60)
