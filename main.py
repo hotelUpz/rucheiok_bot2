@@ -112,7 +112,7 @@ async def _main():
             tg_task = asyncio.create_task(polling_supervisor(tg_admin))
             tasks.append(tg_task)
 
-            # await bot.start() # -- форсированный запуск в обход админа.
+            await bot.start() # -- форсированный запуск в обход админа.
         else:
             logger.warning("TG отключен. Автостарт торговли...")
             await bot.start()

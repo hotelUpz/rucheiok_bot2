@@ -263,12 +263,13 @@ from aiogram.fsm.state import State, StatesGroup
 from c_log import UnifiedLogger
 from utils import get_config_summary
 from typing import TYPE_CHECKING
+from consts import BASE_DIR
 
 if TYPE_CHECKING:
     from CORE.orchestrator import TradingBot
 
-CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.json"
-TEMP_CFG_PATH = Path(__file__).resolve().parent.parent / "cfg.tmp.json"
+CFG_PATH = BASE_DIR / "cfg.json"
+TEMP_CFG_PATH = BASE_DIR / "cfg.tmp.json"
 
 logger = UnifiedLogger("tg")
 

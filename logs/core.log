@@ -23,3 +23,8 @@
 2026-05-03 00:24:12 | INFO | core | 🚀 DexUpdater loop started (Interval: 0.5s)
 2026-05-04 22:45:12 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=1
 2026-05-04 22:48:26 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=1
+2026-05-05 15:28:50 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=23
+2026-05-05 15:29:34 | INFO | core | 📋 Lists loaded: WhiteList=0, BlackList=23
+2026-05-05 15:30:46 | WARNING | core | ⚠️ На бирже есть позиция STEEMUSDT_SHORT, которой нет в JSON!
+2026-05-05 15:30:46 | INFO | core | ✅ Стейт синхронизирован. В памяти 0 активных позиций.
+2026-05-05 15:30:48 | INFO | core | 🚀 PriceCacheManager loop started with interval 0.25s

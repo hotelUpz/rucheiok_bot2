@@ -6,16 +6,18 @@ from __future__ import annotations
 
 import asyncio
 from typing import Dict, Set, List, Any
+from pathlib import Path
 from utils import load_json, save_json_safe
 from CORE.models_fsm import ActivePosition
 from c_log import UnifiedLogger
+from consts import BASE_DIR
 
 logger = UnifiedLogger("core")
 
 
 class BotState:
     """Вызываем в ключевые моменты движения торговой итерации."""
-    def __init__(self, black_list: List, white_list: List = None, filepath: str = "bot_state.json"):
+    def __init__(self, black_list: List, white_list: List = None, filepath: str | Path = BASE_DIR / "bot_state.json"):
         self.filepath = filepath
         self.active_positions: Dict[str, ActivePosition] = {}
         self.consecutive_fails: Dict[str, int] = {}

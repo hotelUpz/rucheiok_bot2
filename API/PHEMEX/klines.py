@@ -8,7 +8,7 @@ import asyncio
 import time
 import ujson
 from dataclasses import dataclass, asdict
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional
 from curl_cffi.requests import AsyncSession
 from c_log import UnifiedLogger
 from utils import save_json_safe

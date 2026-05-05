@@ -61,9 +61,6 @@ class TradingBot:
         self.signal_timeout_sec = self.cfg["entry"]["signal_timeout_sec"]
         self.hedge_mode = self.cfg["risk"]["hedge_mode"]
         
-        # binance_trigger update interval
-        upd_sec = self.cfg["entry"]["pattern"]["binance_trigger"]["update_prices_sec"]
-        
         api_key = os.getenv("API_KEY") or self.cfg["credentials"]["api_key"]
         api_secret = os.getenv("API_SECRET") or self.cfg["credentials"]["api_secret"]
 
@@ -104,9 +101,8 @@ class TradingBot:
         self.risk_manager = RiskManager(self.state, self.cfg)
         self.analytics = AnalyticsManager()
         self.trade_manager = TradeManager(self.tracker, self.risk_manager, self.analytics, self.tg)
-        
-        self.dex_upd_sec = self.cfg["exit"]["scenarios"]["base"]["update_prices_sec"]
-        self.dex_updater = DexUpdater(self.dex_api, None, self.state, self.dex_upd_sec)
+
+        self.dex_updater = DexUpdater(self.dex_api, None, self.state, 1.0)
 
         # --- ОТЧЕТНОСТЬ (как в uranus) ---
         report_id = os.getenv("REPORT_CHAT_ID")
@@ -534,7 +530,7 @@ class TradingBot:
         self._price_updater_task = asyncio.create_task(self.price_manager.loop())
         self._funding_task = asyncio.create_task(self.funding_manager.run())
         
-        if self.cfg["entry"]["dex_filter"]["enable"]:
+        if self.cfg["entry"]["pattern"]["dex_filter"]["enable"]:
             self._dex_updater_task = asyncio.create_task(self.dex_updater.run())
             
         self._binance_stream_task = asyncio.create_task(self.binance_stream.run(self._on_binance_depth))

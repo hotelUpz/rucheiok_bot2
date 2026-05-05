@@ -17,7 +17,7 @@ from typing import Any, Optional, Dict
 
 import pytz
 
-from consts import LOG_DEBUG, LOG_ERROR, LOG_INFO, LOG_WARNING, MAX_LOG_LINES, TIME_ZONE
+from consts import LOG_DEBUG, LOG_ERROR, LOG_INFO, LOG_WARNING, MAX_LOG_LINES, TIME_ZONE, BASE_DIR
 
 TZ = pytz.timezone(TIME_ZONE)
 
@@ -31,7 +31,7 @@ class _TzFormatter(logging.Formatter):
 
 
 class UnifiedLogger:
-    def __init__(self, name: str, log_dir: str = "./logs", max_lines: int = MAX_LOG_LINES, context: Optional[str] = None):
+    def __init__(self, name: str, log_dir: str | Path = BASE_DIR / "logs", max_lines: int = MAX_LOG_LINES, context: Optional[str] = None):
         Path(log_dir).mkdir(parents=True, exist_ok=True)
         log_path = Path(log_dir) / f"{name}.log"
         approx_line_len = 350
