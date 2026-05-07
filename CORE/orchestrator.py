@@ -42,6 +42,7 @@ from utils import get_config_summary
 
 from API.PHEMEX.klines import PhemexKlinesAPI
 from CORE.rsi_manager import RSIManager
+from CORE.sma_manager import SMAManager
 
 if TYPE_CHECKING:
     from API.PHEMEX.stakan import DepthTop
@@ -84,6 +85,7 @@ class TradingBot:
         self.binance_funding_api = BinanceFunding(session=self.session)
         self.klines_api = PhemexKlinesAPI(session=self.session)
         self.rsi_manager = RSIManager(self.klines_api, self.cfg["entry"]["pattern"]["rsi_filter"])
+        self.sma_manager = SMAManager(self.klines_api, self.cfg["entry"]["pattern"]["sma_filter"])
 
         self.private_client = PhemexPrivateClient(api_key, api_secret, self.session)
         self.private_ws = PhemexPrivateWS(api_key, api_secret)
@@ -154,11 +156,6 @@ class TradingBot:
         try: await task
         except asyncio.CancelledError: pass
         except Exception as e: logger.debug(f"Task shutdown note: {e}")
-
-    async def _on_ws_subscribe(self):
-        """Срабатывает при первом подключении и каждом успешном реконнекте WS"""
-        logger.info("🔄 WS Подписан на приватный канал. Запуск синхронизации стейта (Recover)...")
-        await self.state.sync_with_exchange(self.private_client)
 
     def _get_lock(self, pos_key: str) -> asyncio.Lock:
         if pos_key not in self.active_positions_locker:
@@ -235,14 +232,8 @@ class TradingBot:
 
         actions_to_execute: List[Tuple] = []
 
-        b_price, p_price = self.price_manager.get_prices(symbol)
-        if p_price <= 0:
-            return
-
-        # Данные для расчета спреда
-        p_bid1, p_ask1 = snap.bids[0][0], snap.asks[0][0]
         b_depth = self.price_manager.get_binance_depth(symbol)
-        dex_price = self.price_manager.get_dex_price(symbol)
+        # dex_price убрали, так как он не используется здесь и возвращает кортеж (float, float)
 
         for pos_key in (long_key, short_key):
             async with self._get_lock(pos_key):
@@ -313,41 +304,62 @@ class TradingBot:
         if actions_to_execute:
             await self._payloader(actions_to_execute, symbol)
 
-    async def _evaluate_entry_signal(self, snap: DepthTop, symbol: str) -> None:
-        if not self.symbol_manager.is_allowed(symbol):
-            return
-            
-        if not self.risk_manager.check_risk_limits(symbol, self.hedge_mode, self.max_active_positions):
-            return
-
+    async def _analyze_entry(self, snap: DepthTop, symbol: str) -> Optional[EntryPayload]:
+        """
+        Чистый анализ без блокировок и сетевых операций.
+        Возвращает сигнал, если все фильтры пройдены.
+        """
         # 3. Сигнал на вход (только если нет позиции и нет лока)
         b_price, p_price = self.price_manager.get_prices(symbol)
         b_depth = self.price_manager.get_binance_depth(symbol)
         b_fair, p_fair = self.price_manager.get_fair_prices(symbol)
         
         signal: "EntryPayload" = self.signal_engine.analyze(snap, b_price, p_price, b_depth, b_fair, p_fair)
-        if not signal: return
+        if not signal: return None
 
         pos_key = f"{symbol}_{signal.side}"
         if pos_key in self.state.active_positions: 
-            return 
+            return None
 
-        if self._signal_timeouts.get(pos_key, 0) > time.time(): return
-        self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
+        # Проверка таймаута сигнала для конкретного направления
+        if self._signal_timeouts.get(pos_key, 0) > time.time(): return None
+        
+        return signal
 
-        try:            
+    async def _execute_entry_pipeline(self, symbol: str, signal: EntryPayload) -> None:
+        """
+        Логика резервирования и постановки входа.
+        Вызывается только если анализ выдал положительный результат.
+        """
+        pos_key = f"{symbol}_{signal.side}"
+        
+        # 1. Резервирование места (ПОД ГЛОБАЛЬНЫМ ЛОКОМ)
+        # Это гарантирует, что мы не превысим лимиты при параллельной обработке разных тикеров
+        async with self._entry_lock:
+            # Двойная проверка лимитов и существования позиции
+            if not self.risk_manager.check_risk_limits(symbol, self.hedge_mode, self.max_active_positions):
+                return
+            
+            if pos_key in self.state.active_positions:
+                return
+
+            # Выставляем таймаут (чтобы не спамить попытками входа в одну секунду)
+            self._signal_timeouts[pos_key] = time.time() + self.signal_timeout_sec
+
             async with self._get_lock(pos_key):
-                if pos_key not in self.state.active_positions:
-                    self.state.active_positions[pos_key] = ActivePosition(
-                        symbol=symbol, side=signal.side, pending_qty=0.0,
-                        in_pending=True,
-                        in_position=False,
-                        init_ask1=signal.init_ask1,
-                        init_bid1=signal.init_bid1,
-                        mid_price=signal.mid_price,
-                        base_target_price_100=signal.base_target_price_100
-                    )
+                self.state.active_positions[pos_key] = ActivePosition(
+                    symbol=symbol, side=signal.side, pending_qty=0.0,
+                    in_pending=True,
+                    in_position=False,
+                    init_ask1=signal.init_ask1,
+                    init_bid1=signal.init_bid1,
+                    mid_price=signal.mid_price,
+                    base_target_price_100=signal.base_target_price_100
+                )
 
+        # 2. Постановка ордера (ВНЕ ГЛОБАЛЬНОГО ЛОКА)
+        # Теперь другие тикеры могут анализироваться, пока мы ждем ответа от биржи
+        try:            
             success = await self.executor.execute_entry(symbol, pos_key, signal)
             
             if success:
@@ -376,16 +388,20 @@ class TradingBot:
         if symbol in self._processing: return
         self._processing.add(symbol)
         try:
-            if not await self.risk_manager.is_in_quarantine(symbol):
+            if not await self.risk_manager.check_trading_allowed(symbol):
                 return
                 
             pos_long_key, pos_short_key = f"{symbol}_LONG", f"{symbol}_SHORT"
             await self._evaluate_exit_scenarios(snap, symbol, pos_long_key, pos_short_key)
             
-            async with self._entry_lock:
-                if not self.risk_manager.check_risk_limits(symbol, self.hedge_mode, self.max_active_positions):
-                    return
-                await self._evaluate_entry_signal(snap, symbol)
+            # --- ЛОГИКА ВХОДА (ОПТИМИЗИРОВАННАЯ ПАРАЛЛЕЛЬНОСТЬ) ---
+            # 1. Анализ без блокировок
+            signal = await self._analyze_entry(snap, symbol)
+            
+            if signal:
+                # 2. Если есть сигнал — переходим к пайплайну исполнения (с внутренними локами)
+                await self._execute_entry_pipeline(symbol, signal)
+
         except Exception as e:
             err_tb = traceback.format_exc()
             logger.error(f"Pipeline error for {symbol}: {e}\n{err_tb}")
@@ -501,7 +517,8 @@ class TradingBot:
             self.binance_ticker_api, self.phemex_ticker_api, 
             self.active_symbols, 
             upd_sec=self.cfg["entry"]["pattern"]["binance_trigger"]["update_prices_sec"],
-            rsi_manager=self.rsi_manager
+            rsi_manager=self.rsi_manager,
+            sma_manager=self.sma_manager
         )
         
         # Поток стаканов Binance (USDT-M)
@@ -509,7 +526,7 @@ class TradingBot:
         self._binance_stream_task: Optional[asyncio.Task] = None
         
         self.funding_manager = FundingManager(self.cfg["entry"]["pattern"], self.phemex_funding_api, self.binance_funding_api, self.symbol_manager)
-        self.signal_engine = SignalEngine(self.cfg["entry"], self.funding_manager, self.price_manager, self.rsi_manager)
+        self.signal_engine = SignalEngine(self.cfg["entry"], self.funding_manager, self.price_manager, self.rsi_manager, self.sma_manager)
 
         # Подключаем price_manager к dex_updater
         self.dex_updater.price_manager = self.price_manager
@@ -519,6 +536,12 @@ class TradingBot:
             logger.info("⏳ Синхронизация RSI (Warmup)...")
             await self.rsi_manager.warmup(list(self.active_symbols))
             self._rsi_sync_task = asyncio.create_task(self.rsi_manager.background_loop(list(self.active_symbols)))
+
+        # Прогрев SMA (загрузка истории свечей)
+        if self.sma_manager:
+            logger.info("⏳ Синхронизация SMA (Warmup)...")
+            await self.sma_manager.warmup(list(self.active_symbols))
+            self._sma_sync_task = asyncio.create_task(self.sma_manager.background_loop(list(self.active_symbols)))
 
         await self.state.sync_with_exchange(self.private_client)
 
@@ -535,9 +558,6 @@ class TradingBot:
             
         self._binance_stream_task = asyncio.create_task(self.binance_stream.run(self._on_binance_depth))
         self._game_loop_task = asyncio.create_task(self._main_trading_loop())
-        
-        # Запускаем фоновое обновление DEX цен для открытых позиций
-        self._dex_updater_task = asyncio.create_task(self.dex_updater.run())
         
         await asyncio.sleep(1)
 
@@ -595,6 +615,7 @@ class TradingBot:
         self.price_manager.stop()
         self.funding_manager.stop()
         self.rsi_manager.stop()
+        self.sma_manager.stop()
         self.binance_stream.stop()
         if self._stream: self._stream.stop()
         await self.private_ws.aclose()
@@ -608,6 +629,7 @@ class TradingBot:
         await self._await_task(getattr(self, '_game_loop_task', None))
         await self._await_task(getattr(self, '_report_task', None))
         await self._await_task(getattr(self, '_rsi_sync_task', None))
+        await self._await_task(getattr(self, '_sma_sync_task', None))
         await self._await_task(getattr(self, '_dex_updater_task', None))
         self._latest_market_data.clear()
         self._processing.clear()

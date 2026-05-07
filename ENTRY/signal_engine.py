@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from API.BINANCE.stakan import DepthTop as BinanceDepthTop
     from ENTRY.funding_manager import FundingManager
     from CORE.rsi_manager import RSIManager
+    from CORE.sma_manager import SMAManager
     from API.DEX.dexscreener import DexscreenerAPI
     from CORE._utils import PriceCacheManager
 
@@ -23,17 +24,19 @@ if TYPE_CHECKING:
 logger = UnifiedLogger("signal_engine")
 
 class SignalEngine:
-    def __init__(self, cfg: Dict[str, Any], funding_manager: 'FundingManager', price_manager: 'PriceCacheManager', rsi_manager: Optional['RSIManager'] = None):
+    def __init__(self, cfg: Dict[str, Any], funding_manager: 'FundingManager', price_manager: 'PriceCacheManager', rsi_manager: Optional['RSIManager'] = None, sma_manager: Optional['SMAManager'] = None):
         self.cfg = cfg
         self.funding_manager = funding_manager  
         self.price_manager = price_manager
         self.rsi_manager = rsi_manager
+        self.sma_manager = sma_manager
         
         self.binance_trigger_cfg = cfg["pattern"]["binance_trigger"]
         self.ob_cfg = cfg["pattern"]["orderbook_filter"]
         self.fair_cfg = cfg["pattern"].get("fair_price_filter", {"enable": False})
         self.rsi_cfg = cfg["pattern"].get("rsi_filter", {"enable": False})
         self.dex_cfg = cfg["pattern"].get("dex_filter", {"enable": False})
+        self.sma_cfg = cfg["pattern"].get("sma_filter", {"enable": False})
         
         self.pattern_math = StakanEntryPattern(self.ob_cfg)
         
@@ -62,6 +65,9 @@ class SignalEngine:
         # dex_filter
         self.dex_enabled = self.dex_cfg["enable"]
         self.min_dex_spread_pct = abs(self.dex_cfg["min_dex_spread_pct"])
+
+        # sma_filter
+        self.sma_enabled = self.sma_cfg["enable"]
 
         self.price_mode = cfg["price_mode"].upper()
 
@@ -97,8 +103,9 @@ class SignalEngine:
         3. Binance Trigger (Spread)
         4. Fair Price Filter
         5. RSI Filter
-        6. DEX Filter (Dexscreener)
-        7. TTL Checks (Parallel maturity)
+        6. SMA Filter
+        7. DEX Filter (Dexscreener)
+        8. TTL Checks (Parallel maturity)
         """
         symbol: str = depth.symbol
         now: float = time.time()
@@ -179,7 +186,17 @@ class SignalEngine:
                 if direction == "SHORT" and rsi <= self.rsi_oversold:
                     return None
 
-        # 6. Фильтр: DEX Price (Dexscreener)
+        # 6. Фильтр: SMA
+        if self.sma_enabled and self.sma_manager:
+            sma = self.sma_manager.get_sma(symbol)
+            if sma is not None:
+                # LONG: price > SMA, SHORT: price < SMA
+                if direction == "LONG" and p_price <= sma:
+                    return None
+                if direction == "SHORT" and p_price >= sma:
+                    return None
+
+        # 7. Фильтр: DEX Price (Dexscreener)
         dex_price = 0.0
         dex_spread_pct = 0.0
         if self.dex_enabled:
@@ -196,7 +213,7 @@ class SignalEngine:
                 pass
 
 
-        # 7. ПРОВЕРКА ВЫДЕРЖКИ (TTLs) - ПАРАЛЛЕЛЬНО В КОНЦЕ
+        # 8. ПРОВЕРКА ВЫДЕРЖКИ (TTLs) - ПАРАЛЛЕЛЬНО В КОНЦЕ
         # Если мы дошли сюда, значит все фильтры прошли. Теперь проверяем время удержания.
         
         # TTL для спреда
@@ -228,6 +245,10 @@ class SignalEngine:
         # Логирование
         rsi_val = self.rsi_manager.get_rsi(symbol) if self.rsi_manager else None
         rsi_str = f"{rsi_val:.1f}" if rsi_val is not None else "N/A"
+        
+        sma_val = self.sma_manager.get_sma(symbol) if self.sma_manager else None
+        sma_str = f"{sma_val:.4f}" if sma_val is not None else "N/A"
+        
         fair_spread = (p_fair - p_price) / p_price * 100 if p_fair > 0 else 0
         
         logger.info(
@@ -236,7 +257,7 @@ class SignalEngine:
             f"BIN-PHM: {spread_pct:.2f}% | "
             f"DEX-PHM: {dex_spread_pct:.2f}% | "
             f"FAIR-PHM: {fair_spread:.2f}% | "
-            f"RSI: {rsi_str} | "
+            f"RSI: {rsi_str} | SMA: {sma_str} | "
             f"DEX: {dex_price}$ | BIN: {b_price}$ | PHM: {p_price}$"
         )
         if self.price_mode == "MID":

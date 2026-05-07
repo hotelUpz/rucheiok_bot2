@@ -83,7 +83,8 @@ class DexscreenerAPI:
                     return valid_pairs[0]
                     
             else:
-                logger.debug(f"Dexscreener error: HTTP {resp.status_code} for {symbol}")
+                # logger.debug(f"Dexscreener error: HTTP {resp.status_code} for {symbol}")
+                pass
         except Exception as e:
             logger.debug(f"Error fetching Dexscreener for {symbol}: {e}")
         return None

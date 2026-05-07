@@ -1,6 +1,6 @@
 # ============================================================
-# FILE: CORE/rsi_manager.py
-# ROLE: Менеджер свечей и расчет RSI в реальном времени
+# FILE: CORE/sma_manager.py
+# ROLE: Менеджер свечей и расчет SMA в реальном времени
 # ============================================================
 from __future__ import annotations
 import asyncio
@@ -12,23 +12,24 @@ from c_log import UnifiedLogger
 if TYPE_CHECKING:
     from API.PHEMEX.klines import PhemexKlinesAPI
 
-logger = UnifiedLogger("rsi")
+logger = UnifiedLogger("sma")
 
 import pickle
 import os
 
-class RSIManager:
-    """Управление свечами и расчет RSI без лишних запросов к API."""
+class SMAManager:
+    """Управление свечами и расчет SMA без лишних запросов к API."""
     def __init__(self, kline_api: 'PhemexKlinesAPI', cfg: Dict[str, Any], cache_dir: str = ".gemini/cache"):
         self.api = kline_api
         self.cfg = cfg
         self.enabled = cfg.get("enable", False)
-        self.interval_str = cfg.get("interval", "1m")
-        self.limit = cfg.get("limit", 100)
+        self.interval_str = cfg.get("timeframe", "1m")
+        self.limit = cfg.get("candles_to_fetch", 50)
         self.window = cfg.get("window", 14)
-        self.full_update_sec = cfg.get("full_update_min", 10) * 60
+        # Интервал полного обновления (синхронизации) - по аналогии с RSI
+        self.full_update_sec = 10 * 60 # 10 минут
         
-        self.cache_path = os.path.join(cache_dir, "rsi_candles.pkl")
+        self.cache_path = os.path.join(cache_dir, "sma_candles.pkl")
         if not os.path.exists(cache_dir): os.makedirs(cache_dir, exist_ok=True)
         
         # Перевод интервала в секунды
@@ -48,24 +49,25 @@ class RSIManager:
         
         # 1. Пробуем загрузить из кэша (если не принудительно)
         if not force and self._load_from_cache():
-            logger.info("📦 RSI данные успешно загружены из кэша (pickle).")
+            logger.info("📦 SMA данные успешно загружены из кэша (pickle).")
             # Проверяем, не слишком ли старый кэш
             max_ts = max(self.last_ts.values()) if self.last_ts else 0
             if time.time() - max_ts < self.interval_sec * 2:
-                logger.info("✅ Кэш актуален. Полная загрузка пропущена.")
+                logger.info("✅ Кэш SMA актуален. Полная загрузка пропущена.")
                 return
 
-        logger.info(f"🕯️ RSI Sync: Загрузка {self.interval_str} свечей для {len(symbols)} монет...")
+        logger.info(f"🕯️ SMA Sync: Загрузка {self.interval_str} свечей для {len(symbols)} монет (limit={self.limit})...")
         all_data = await self.api.get_all_klines(symbols, self.interval_str, self.limit)
         
         for sym, klines in all_data.items():
             if klines:
                 closes = [k.close for k in klines]
+                # Сохраняем limit свечей
                 self.data[sym] = deque(closes, maxlen=self.limit + 1)
                 self.last_ts[sym] = klines[-1].timestamp
         
         self._save_to_cache()
-        logger.info(f"✅ RSI Sync завершен. Обновлено {len(self.data)} инструментов.")
+        logger.info(f"✅ SMA Sync завершен. Обновлено {len(self.data)} инструментов.")
 
     def update_price(self, symbol: str, price: float):
         """Обновление цены 'внутри' последней свечи или сдвиг при наступлении нового периода."""
@@ -91,7 +93,7 @@ class RSIManager:
                 pickle.dump({"data": self.data, "last_ts": self.last_ts}, f)
             self._last_save_ts = time.time()
         except Exception as e:
-            logger.debug(f"RSI Cache Save Error: {e}")
+            logger.debug(f"SMA Cache Save Error: {e}")
 
     def _load_from_cache(self) -> bool:
         if not os.path.exists(self.cache_path): return False
@@ -102,42 +104,19 @@ class RSIManager:
                 self.last_ts = cache.get("last_ts", {})
             return True
         except Exception as e:
-            logger.debug(f"RSI Cache Load Error: {e}")
+            logger.debug(f"SMA Cache Load Error: {e}")
             return False
 
-    def get_rsi(self, symbol: str) -> Optional[float]:
-        """Расчет RSI (Wilder's Smoothing)."""
+    def get_sma(self, symbol: str) -> Optional[float]:
+        """Расчет SMA (Simple Moving Average)."""
         if not self.enabled or symbol not in self.data: return None
         
         closes = list(self.data[symbol])
-        if len(closes) <= self.window: return None
+        if len(closes) < self.window: return None
         
-        # Берем последние N+1 значений для расчета изменений
-        data = closes[-(self.window + 1):]
-        
-        gains = []
-        losses = []
-        for i in range(1, len(data)):
-            diff = data[i] - data[i-1]
-            if diff > 0:
-                gains.append(diff)
-                losses.append(0)
-            else:
-                gains.append(0)
-                losses.append(abs(diff))
-        
-        # Первоначальное среднее (SMA)
-        avg_gain = sum(gains[:self.window]) / self.window
-        avg_loss = sum(losses[:self.window]) / self.window
-        
-        # Сглаживание по методу Уайлдера (если данных больше чем window)
-        # В данном упрощенном расчете мы берем именно последние window изменений.
-        # Для более точного RSI нужно хранить состояния avg_gain/avg_loss, 
-        # но для фильтра входа "здесь и сейчас" достаточно и такого расчета.
-        
-        if avg_loss == 0: return 100.0
-        rs = avg_gain / avg_loss
-        return 100 - (100 / (1 + rs))
+        # Берем последние window значений
+        subset = closes[-self.window:]
+        return sum(subset) / self.window
 
     async def background_loop(self, symbols: List[str]):
         """Фоновое обновление всех свечей раз в N минут для синхронизации с биржей."""
@@ -145,10 +124,10 @@ class RSIManager:
         while self._is_running:
             await asyncio.sleep(self.full_update_sec)
             try:
-                logger.info("🔄 RSI Background Sync: Полное обновление свечей с биржи...")
+                logger.info("🔄 SMA Background Sync: Полное обновление свечей с биржи...")
                 await self.warmup(symbols, force=True)
             except Exception as e:
-                logger.error(f"RSI Sync Error: {e}")
+                logger.error(f"SMA Sync Error: {e}")
 
     def stop(self):
         self._is_running = False

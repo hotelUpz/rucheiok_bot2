@@ -1,3 +1,46 @@
-2026-05-02 23:27:38 | DEBUG | dex_api | Dexscreener error: HTTP 400 for BUSDT
-2026-05-02 23:32:17 | DEBUG | dex_api | Dexscreener error: HTTP 400 for BUSDT
-2026-05-02 23:37:34 | DEBUG | dex_api | Dexscreener error: HTTP 400 for BUSDT
+2026-05-05 15:58:09 | DEBUG | dex_api | Dexscreener error: HTTP 400 for DUSDT
+2026-05-05 15:58:22 | DEBUG | dex_api | Dexscreener error: HTTP 400 for TUSDT
+2026-05-05 15:58:28 | DEBUG | dex_api | Dexscreener error: HTTP 400 for AUSDT
+2026-05-05 15:58:32 | DEBUG | dex_api | Dexscreener error: HTTP 400 for HUSDT
+2026-05-05 15:58:41 | DEBUG | dex_api | Dexscreener error: HTTP 400 for 4USDT
+2026-05-05 15:59:13 | DEBUG | dex_api | Dexscreener error: HTTP 400 for FUSDT
+2026-05-05 15:59:15 | DEBUG | dex_api | Dexscreener error: HTTP 400 for QUSDT
+2026-05-05 15:59:21 | DEBUG | dex_api | Dexscreener error: HTTP 400 for BUSDT
+2026-05-05 15:59:38 | DEBUG | dex_api | Dexscreener error: HTTP 400 for WUSDT
+2026-05-05 15:59:41 | DEBUG | dex_api | Dexscreener error: HTTP 400 for DUSDT
+2026-05-05 15:59:55 | DEBUG | dex_api | Dexscreener error: HTTP 400 for TUSDT
+2026-05-05 16:00:01 | DEBUG | dex_api | Dexscreener error: HTTP 400 for AUSDT
+2026-05-05 16:00:04 | DEBUG | dex_api | Dexscreener error: HTTP 400 for HUSDT
+2026-05-05 16:00:14 | DEBUG | dex_api | Dexscreener error: HTTP 400 for 4USDT
+2026-05-05 16:00:45 | DEBUG | dex_api | Dexscreener error: HTTP 400 for FUSDT
+2026-05-05 16:00:48 | DEBUG | dex_api | Dexscreener error: HTTP 400 for QUSDT
+2026-05-05 16:00:54 | DEBUG | dex_api | Dexscreener error: HTTP 400 for BUSDT
+2026-05-05 16:01:11 | DEBUG | dex_api | Dexscreener error: HTTP 400 for WUSDT
+2026-05-05 16:01:14 | DEBUG | dex_api | Dexscreener error: HTTP 400 for DUSDT
+2026-05-05 16:01:27 | DEBUG | dex_api | Dexscreener error: HTTP 400 for TUSDT
+2026-05-05 16:01:34 | DEBUG | dex_api | Dexscreener error: HTTP 400 for AUSDT
+2026-05-05 16:01:37 | DEBUG | dex_api | Dexscreener error: HTTP 400 for HUSDT
+2026-05-05 16:01:47 | DEBUG | dex_api | Dexscreener error: HTTP 400 for 4USDT
+2026-05-05 16:02:18 | DEBUG | dex_api | Dexscreener error: HTTP 400 for FUSDT
+2026-05-05 16:02:21 | DEBUG | dex_api | Dexscreener error: HTTP 400 for QUSDT
+2026-05-05 16:02:27 | DEBUG | dex_api | Dexscreener error: HTTP 400 for BUSDT
+2026-05-05 16:02:44 | DEBUG | dex_api | Dexscreener error: HTTP 400 for WUSDT
+2026-05-05 16:02:47 | DEBUG | dex_api | Dexscreener error: HTTP 400 for DUSDT
+2026-05-05 16:02:54 | DEBUG | dex_api | Error fetching Dexscreener for ATUSDT: Session is closed, cannot send request.
+2026-05-05 16:02:54 | DEBUG | dex_api | Error fetching Dexscreener for RVNUSDT: Session is closed, cannot send request.
+2026-05-05 16:02:55 | DEBUG | dex_api | Error fetching Dexscreener for CFGUSDT: Session is closed, cannot send request.
+2026-05-05 16:25:54 | DEBUG | dex_api | Error fetching Dexscreener for FRAXUSDT: Failed to perform, curl: (28) Operation timed out after 10002 milliseconds with 4119 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:25:55 | DEBUG | dex_api | Error fetching Dexscreener for COLLECTUSDT: Failed to perform, curl: (28) Operation timed out after 10031 milliseconds with 0 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:40 | DEBUG | dex_api | Error fetching Dexscreener for ARBUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:44 | DEBUG | dex_api | Error fetching Dexscreener for ZRXUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:44 | DEBUG | dex_api | Error fetching Dexscreener for BASUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:44 | DEBUG | dex_api | Error fetching Dexscreener for CHRUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:45 | DEBUG | dex_api | Error fetching Dexscreener for HEIUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:46 | DEBUG | dex_api | Error fetching Dexscreener for HSCHKDUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:47 | DEBUG | dex_api | Error fetching Dexscreener for PYTHUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 16:46:47 | DEBUG | dex_api | Error fetching Dexscreener for ONGUSDT: Failed to perform, curl: (6) Could not resolve host: api.dexscreener.com. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 18:10:28 | DEBUG | dex_api | Error fetching Dexscreener for TRIAUSDT: Session is closed, cannot send request.
+2026-05-05 18:10:28 | DEBUG | dex_api | Error fetching Dexscreener for TROLLUSDT: Session is closed, cannot send request.
+2026-05-05 18:10:28 | DEBUG | dex_api | Error fetching Dexscreener for DIAUSDT: Session is closed, cannot send request.
+2026-05-05 18:22:11 | DEBUG | dex_api | Error fetching Dexscreener for CGPTUSDT: Failed to perform, curl: (28) Connection timed out after 10021 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+2026-05-05 18:54:06 | DEBUG | dex_api | Error fetching Dexscreener for PAYPUSDT: Failed to perform, curl: (28) Operation timed out after 10004 milliseconds with 0 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.

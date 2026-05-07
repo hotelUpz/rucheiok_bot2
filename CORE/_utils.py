@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from API.BINANCE.ticker import BinanceTickerAPI
     from CORE.models_fsm import EntryPayload, ActivePosition
     from CORE.rsi_manager import RSIManager
+    from CORE.sma_manager import SMAManager
     from API.DEX.dexscreener import DexscreenerAPI
     from CORE.restorator import BotState
     from API.BINANCE.stakan import DepthTop as BinanceDepthTop
@@ -79,12 +80,13 @@ class SymbolListManager:
 
 class PriceCacheManager:
     """Асинхронный кэш цен тикеров Binance/Phemex, обновляемый в фоне."""
-    def __init__(self, binance_api: 'BinanceTickerAPI', phemex_api: 'PhemexTickerAPI', target_symbols: Set[str], upd_sec: float = 0.2, rsi_manager: Optional['RSIManager'] = None):
+    def __init__(self, binance_api: 'BinanceTickerAPI', phemex_api: 'PhemexTickerAPI', target_symbols: Set[str], upd_sec: float = 0.2, rsi_manager: Optional['RSIManager'] = None, sma_manager: Optional['SMAManager'] = None):
         self.binance_api = binance_api
         self.phemex_api = phemex_api
         self.target_symbols = target_symbols
         self.upd_sec = upd_sec
         self.rsi_manager = rsi_manager
+        self.sma_manager = sma_manager
         self.binance_prices: Dict[str, float] = {}
         self.phemex_prices: Dict[str, float] = {}
         self.binance_fair_prices: Dict[str, float] = {}
@@ -122,6 +124,8 @@ class PriceCacheManager:
                         self.phemex_fair_prices[sym] = t.fair_price
                         if self.rsi_manager:
                             self.rsi_manager.update_price(sym, t.price)
+                        if self.sma_manager:
+                            self.sma_manager.update_price(sym, t.price)
                 
             self._last_fetch_ts = time.time()
         except Exception as e:
@@ -236,7 +240,7 @@ class ConfigManager:
             )
             
             # Пересоздаем движок сигналов (математика стакана обновится здесь же)
-            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.funding_manager, self.tb.price_manager, self.tb.rsi_manager)
+            self.tb.signal_engine = SignalEngine(self.tb.cfg["entry"], self.tb.funding_manager, self.tb.price_manager, self.tb.rsi_manager, self.tb.sma_manager)
 
             # Перезапускаем луп фандинга
             if getattr(self.tb, '_is_running', False):
@@ -278,6 +282,22 @@ class ConfigManager:
             self.tb.breakeven_order_timeout_sec = scen_cfg["breakeven_ttl_close"]["order_timeout_sec"]     
             self.tb.interference_order_timeout_sec = exit_cfg["interference"]["order_timeout_sec"]        
             self.tb.extrime_order_timeout_sec = exit_cfg["extrime_close"]["order_timeout_sec"]
+
+            # --- DEX UPDATER ---
+            if hasattr(self.tb, 'dex_updater'):
+                dex_enabled = self.tb.cfg["entry"]["pattern"]["dex_filter"]["enable"]
+                old_dex_task = getattr(self.tb, '_dex_updater_task', None)
+                
+                if not dex_enabled:
+                    if old_dex_task and not old_dex_task.done():
+                        self.tb.dex_updater.stop()
+                        old_dex_task.cancel()
+                        logger.info("🛑 DexUpdater loop stopped (disabled in config)")
+                        self.tb._dex_updater_task = None
+                else:
+                    if not old_dex_task or old_dex_task.done():
+                        self.tb._dex_updater_task = asyncio.create_task(self.tb.dex_updater.run())
+                        logger.info("🚀 DexUpdater loop started (enabled in config)")
 
             return True, "Конфигурация успешно обновлена в памяти!"
         except Exception as e:
@@ -341,18 +361,27 @@ class RiskManager:
             
         return True
 
-    async def is_in_quarantine(self, symbol: str) -> bool:        
+    async def check_trading_allowed(self, symbol: str) -> bool:        
+        """
+        Проверяет, разрешена ли обработка символа (не в карантине или имеет активную позицию).
+        Возвращает True если МОЖНО работать, False если нужно СКИПНУТЬ.
+        """
         if symbol in self.state.quarantine_until:
             q_val = self.state.quarantine_until[symbol]
             try: limit_time = float(q_val)
             except (ValueError, TypeError): limit_time = 0.0
 
             if time.time() > limit_time:
+                # Карантин истек
                 del self.state.quarantine_until[symbol]
                 self.state.consecutive_fails[symbol] = 0
                 asyncio.create_task(self.state.save()) 
                 return True            
-            elif not any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
+            elif any(k.startswith(f"{symbol}_") for k in self.state.active_positions): 
+                # В карантине, но есть активная позиция (нужно обрабатывать выход)
+                return True
+            else:
+                # В карантине и позиций нет - скипаем
                 return False
         return True
         
@@ -512,20 +541,23 @@ class DexUpdater:
             try:
                 # Обновляем цены для ВСЕХ рабочих символов
                 target_symbols = list(self.price_manager.target_symbols)
-                if target_symbols:
+                if target_symbols and self._is_running:
                     tasks = []
                     for symbol in target_symbols:
+                        if not self._is_running: break
                         _, p_price = self.price_manager.get_prices(symbol)
                         if p_price > 0:
                             tasks.append(self._update_single(symbol, p_price))
                     
-                    if tasks:
+                    if tasks and self._is_running:
                         await asyncio.gather(*tasks)
                 
-                await asyncio.sleep(self.interval)
+                if self._is_running:
+                    await asyncio.sleep(self.interval)
             except Exception as e:
                 logger.error(f"Error in DexUpdater loop: {e}")
-                await asyncio.sleep(1)
+                if self._is_running:
+                    await asyncio.sleep(1)
 
     async def _update_single(self, symbol: str, ref_price: float):
         try:

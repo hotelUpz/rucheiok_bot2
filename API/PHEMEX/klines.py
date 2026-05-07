@@ -47,7 +47,7 @@ class PhemexKlinesAPI:
         # Rate limiting (shared across requests in this instance)
         self._lock = asyncio.Lock()
         self._last_request_time = 0.0
-        self.min_interval = 0.15  # 150ms between requests
+        self.min_interval = 0.25  # 150ms between requests
 
     async def aclose(self):
         if not self._external_session and self.session:

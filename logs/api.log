@@ -1,43 +1,235 @@
-2026-05-02 22:56:35 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 22:56:35 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
-2026-05-02 22:56:35 | INFO | api | 🌐 Stakan WS подключен: на 37 монет.
-2026-05-02 22:56:35 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
-2026-05-02 22:56:36 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
-2026-05-02 23:08:47 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:09:02 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:10:20 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:10:36 | INFO | api | 🌐 Stakan WS подключен: на 37 монет.
-2026-05-02 23:24:26 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:24:28 | INFO | api | 🌐 Stakan WS подключен: на 37 монет.
-2026-05-02 23:25:41 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:26:26 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:39:13 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:39:31 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:39:54 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:40:16 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-02 23:40:23 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
-2026-05-02 23:40:23 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
-2026-05-02 23:40:23 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
-2026-05-02 23:40:31 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-03 00:24:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
-2026-05-03 00:24:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 17 монет.
-2026-05-03 00:24:14 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
-2026-05-03 00:24:14 | INFO | api | 🌐 Stakan WS подключен: на 37 монет.
-2026-05-03 00:24:14 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
-2026-05-03 00:24:14 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
-2026-05-03 00:24:15 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
-2026-05-04 22:48:47 | DEBUG | api | Klines fail for U1000FLOKIUSDT: HTTP 400
-2026-05-04 22:48:51 | DEBUG | api | Klines fail for U1000SATSUSDT: HTTP 400
-2026-05-04 22:48:52 | DEBUG | api | Klines fail for U1000CATUSDT: HTTP 400
-2026-05-04 22:49:09 | DEBUG | api | Klines fail for U1000SHIBUSDT: HTTP 400
-2026-05-04 22:49:16 | DEBUG | api | Klines fail for U1000BONKUSDT: HTTP 400
-2026-05-04 22:49:22 | DEBUG | api | Klines fail for U1000RATSUSDT: HTTP 400
-2026-05-04 22:49:27 | DEBUG | api | Klines fail for U1000XECUSDT: HTTP 400
-2026-05-04 22:49:29 | DEBUG | api | Klines fail for U1000CHEEMSUSDT: HTTP 400
-2026-05-04 22:49:36 | DEBUG | api | Klines fail for U1000PEPEUSDT: HTTP 400
-2026-05-04 22:49:40 | DEBUG | api | Klines fail for U1000000BABYDOGEUSDT: HTTP 400
-2026-05-04 22:49:42 | DEBUG | api | Klines fail for GOOGLUSDT: HTTP 0
-2026-05-04 22:49:42 | DEBUG | api | Klines fail for RECALLUSDT: HTTP 0
-2026-05-04 22:49:43 | DEBUG | api | Exception fetching klines for MOVRUSDT: Session is closed, cannot send request.
-2026-05-04 22:49:43 | DEBUG | api | Exception fetching klines for STOUSDT: Session is closed, cannot send request.
-2026-05-04 22:49:43 | DEBUG | api | Exception fetching klines for DRIFTUSDT: Session is closed, cannot send request.
+2026-05-05 15:58:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 15:58:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 15:58:07 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-05-05 15:58:07 | INFO | api | 🌐 Stakan WS подключен: на 3 монет.
+2026-05-05 15:58:07 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-05-05 15:58:07 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-05-05 15:58:08 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-05-05 16:03:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:03:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 16:03:07 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-05-05 16:03:07 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-05-05 16:03:07 | INFO | api | 🌐 Stakan WS подключен: на 3 монет.
+2026-05-05 16:03:07 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-05-05 16:03:07 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-05-05 16:06:19 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:06:30 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:13:29 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:13:45 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:14:49 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 16:15:49 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:18:04 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:18:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:18:44 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:19:18 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:24:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:25:09 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:27:27 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 16:28:01 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:28:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:28:18 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 16:28:30 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:28:55 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:29:58 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:31:21 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:34:00 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:36:47 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:37:19 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:38:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:38:16 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:38:29 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:38:35 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 16:40:08 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:43:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:44:17 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:47:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:47:50 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:48:36 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:49:00 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 16:50:29 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:50:41 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:51:02 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:54:21 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:54:39 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:54:53 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:56:11 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:57:02 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 16:59:53 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 17:01:33 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:03:27 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:05:29 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:06:03 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:06:59 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:09:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:11:12 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 17:13:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:15:46 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:15:57 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:16:22 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:17:12 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:17:23 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:18:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:20:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:22:41 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 17:25:31 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:27:47 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:28:21 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:30:04 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:31:23 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:32:17 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:35:28 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 17:37:09 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:38:52 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:39:14 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:40:40 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:40:50 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:42:44 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:44:08 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:45:14 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:46:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 17:49:33 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:50:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:51:12 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:51:36 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:53:52 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:54:56 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:55:45 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:57:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 17:57:59 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 17:59:39 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:01:40 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:01:55 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:05:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:06:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:08:53 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 18:10:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:11:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:11:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 18:11:27 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-05-05 18:11:27 | INFO | api | 🌐 Stakan WS подключен: на 3 монет.
+2026-05-05 18:11:27 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-05-05 18:11:27 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-05-05 18:11:27 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-05-05 18:21:37 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:21:48 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:22:12 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:22:27 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:23:47 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 18:24:03 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:32:46 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:33:01 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:33:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:33:49 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:34:18 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:35:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:35:54 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:36:47 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 18:44:36 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:44:48 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:45:15 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:45:27 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:45:59 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:47:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:47:46 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 18:48:11 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:01:52 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:01:52 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:01:53 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-05-05 19:01:53 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-05-05 19:01:53 | INFO | api | 🌐 Stakan WS подключен: на 3 монет.
+2026-05-05 19:01:53 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-05-05 19:01:54 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-05-05 19:12:02 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:12:14 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:12:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:13:11 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:13:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:14:17 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:14:28 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:16:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:16:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:16:08 | INFO | api | 🌐 Stakan WS подключен: на 40 монет.
+2026-05-05 19:16:08 | INFO | api | 🔐 Private WS Подключен. Отправляем авторизацию...
+2026-05-05 19:16:08 | INFO | api | 🌐 Stakan WS подключен: на 3 монет.
+2026-05-05 19:16:08 | INFO | api | ✅ Авторизация успешна! Подписываемся на канал (aop_p.subscribe)...
+2026-05-05 19:16:08 | INFO | api | 🎯 Подписка ПРИНЯТА БИРЖЕЙ! Канал USDT-фьючерсов открыт.
+2026-05-05 19:26:31 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:26:47 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:27:04 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:27:15 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:28:05 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:28:22 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:28:45 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:29:08 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:38:03 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:38:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:38:51 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:39:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:39:35 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:39:36 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:40:16 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:41:03 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:48:36 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:49:54 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 19:50:06 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:50:40 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:50:52 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:51:09 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:51:44 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:52:08 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:52:55 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 19:59:20 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:00:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:01:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 20:02:40 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:02:52 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:03:03 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:04:21 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:05:00 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:12:04 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:12:31 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 20:13:19 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:13:33 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:14:18 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:14:29 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:14:46 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:14:59 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:16:23 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:24:03 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:24:36 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:24:46 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 20:24:49 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:25:09 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:25:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:28:11 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:35:04 | ERROR | api | Private API Failed (DELETE /g-orders/cancel): Phemex Error [10002]: OM_ORDER_NOT_FOUND
+2026-05-05 20:35:07 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:35:43 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:36:04 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:36:13 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 20:36:38 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:36:50 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:37:51 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:38:51 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:47:01 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:48:05 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 20:48:10 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:49:00 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:49:11 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:49:48 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:50:42 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:51:16 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:57:14 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:58:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 20:59:40 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:00:01 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:00:04 | INFO | api | 🌐 Binance Stakan WS подключен: на 43 монет.
+2026-05-05 21:00:34 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:01:55 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:03:27 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:07:26 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:09:32 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:10:03 | ERROR | api | Private API Failed (POST /g-orders): Phemex Error [11150]: TE_OI_LIMIT_REDUCE_ONLY
+2026-05-05 21:12:09 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:12:25 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.
+2026-05-05 21:12:48 | INFO | api | 🌐 Binance Stakan WS подключен: на 50 монет.

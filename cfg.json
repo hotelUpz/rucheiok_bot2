@@ -1,7 +1,7 @@
 {
     "app": {
         "name": "Rucheiok3 Bot",
-        "max_active_positions": 2,
+        "max_active_positions": 1,
         "report_interval_hours": 12
     },
     "phemex": {
@@ -94,7 +94,8 @@
             "quarantine_hours": 1
         },
         "allowed_directions": [
-            "LONG", "SHORT"
+            "LONG",
+            "SHORT"
         ],
         "pattern": {
             "funding_pattern1": {
@@ -114,8 +115,8 @@
                     "spread_mode": "BOOK (Asks vs Asks if LONG, Bids vs Bids if SHORT) | MID (Mid vs Mid) | TICKER (Last vs Last)"
                 },
                 "enable": true,
-                "spread_mode": "BOOK",
-                "spread_to_entry_pct": 0.5,
+                "spread_mode": "TICKER",
+                "spread_to_entry_pct": 0.15,
                 "min_price_spread_rate": 0.8,
                 "update_prices_sec": 0.25,
                 "ttl_sec": 0.25
@@ -125,7 +126,7 @@
                 "min_fair_spread_pct": 0.0
             },
             "rsi_filter": {
-                "enable": true,
+                "enable": false,
                 "interval": "1m",
                 "limit": 50,
                 "window": 14,
@@ -142,19 +143,25 @@
                 "depth_limit": 8,
                 "min_first_row_usdt_notional": 30,
                 "max_first_row_usdt_notional": 490,
-                "max_spread_pct": 0.75,
+                "max_spread_pct": 1.0,
                 "min_spr2_pct": 0.3,
-                "min_spr3_pct": 0.35,
+                "min_spr3_pct": 0.33,
                 "max_dist_rate": 0.75,
                 "sma_window": 3,
                 "roc_window": 5,
-                "max_one_roc": 0.25,
+                "max_one_roc": 0.35,
                 "desired_rate": 6,
                 "pattern_ttl_sec": 0.25
             },
             "dex_filter": {
-                "enable": true,
+                "enable": false,
                 "min_dex_spread_pct": 0.0
+            },
+            "sma_filter": {
+                "enable": false,
+                "timeframe": "1m",
+                "candles_to_fetch": 50,
+                "window": 14
             }
         }
     },
@@ -166,7 +173,7 @@
                 "enable": true,
                 "target_rate": 0.7,
                 "shift_demotion": 0.2,
-                "min_target_rate": 0.3,                
+                "min_target_rate": 0.3,
                 "shift_ttl": 20,
                 "stabilization_ttl": 0,
                 "order_timeout_sec": 0.5

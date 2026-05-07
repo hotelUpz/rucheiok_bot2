@@ -1,0 +1,92 @@
+{
+    "positions": {},
+    "fails": {
+        "MASKUSDT": 1,
+        "HEMIUSDT": 1,
+        "PIEVERSEUSDT": 0,
+        "BTRUSDT": 1,
+        "EIGENUSDT": 0
+    },
+    "quarantine": {
+        "BTRUSDT": "inf",
+        "ZECUSDT": "1778018611.9050524",
+        "CLOUSDT": "1778019003.1565504"
+    },
+    "analytics": {
+        "start_balance": 11560.465301641021,
+        "current_balance": 11554.181512260622,
+        "max_balance": 11560.465301641021,
+        "min_balance": 11553.483596860622,
+        "mdd_usd": 6.9817047803990135,
+        "mdd_pct": 0.060392939196036964,
+        "max_profit_usd": 0.0,
+        "max_profit_pct": 0.0,
+        "total_wins": 1,
+        "total_losses": 3,
+        "total_pnl": -6.283789380400003,
+        "symbols": {
+            "MASKUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.20723300000000008
+            },
+            "HEMIUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -0.6647860990000064
+            },
+            "BTRUSDT": {
+                "wins": 0,
+                "losses": 1,
+                "pnl": -6.1096856813999905
+            },
+            "EIGENUSDT": {
+                "wins": 1,
+                "losses": 0,
+                "pnl": 0.6979153999999941
+            }
+        },
+        "history": [
+            {
+                "ts": 1778013352.1880965,
+                "symbol": "MASKUSDT",
+                "side": "LONG",
+                "entry_usd": 93.58,
+                "exit_usd": 93.48,
+                "pnl": -0.2072,
+                "is_win": false,
+                "duration": "3.0m"
+            },
+            {
+                "ts": 1778013362.7641618,
+                "symbol": "HEMIUSDT",
+                "side": "SHORT",
+                "entry_usd": 98.52,
+                "exit_usd": 99.07,
+                "pnl": -0.6648,
+                "is_win": false,
+                "duration": "59.6s"
+            },
+            {
+                "ts": 1778015005.0617518,
+                "symbol": "BTRUSDT",
+                "side": "SHORT",
+                "entry_usd": 327.69,
+                "exit_usd": 333.4,
+                "pnl": -6.1097,
+                "is_win": false,
+                "duration": "40.0s"
+            },
+            {
+                "ts": 1778015201.2717907,
+                "symbol": "EIGENUSDT",
+                "side": "LONG",
+                "entry_usd": 242.58,
+                "exit_usd": 243.57,
+                "pnl": 0.6979,
+                "is_win": true,
+                "duration": "7.0s"
+            }
+        ]
+    }
+}

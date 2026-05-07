@@ -54,7 +54,7 @@ class StakanEntryPattern:
         ob_spread_pct = ob_spread_val / bid1 * 100
         
         if self.max_spread_pct is not None and ob_spread_pct > self.max_spread_pct:
-            logger.debug(f"[{symbol}] [{direction}] Skip: OB Spread {ob_spread_pct:.2f}% > {self.max_spread_pct}%")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: OB Spread {ob_spread_pct:.2f}% > {self.max_spread_pct}%")
             return None
 
         # 2. Параметры в зависимости от направления
@@ -78,25 +78,25 @@ class StakanEntryPattern:
         # 3. Проверка объема первой строки
         vol_usdt = row_vol_asset * entry_price
         if self.min_vol is not None and vol_usdt < self.min_vol:
-            logger.debug(f"[{symbol}] [{direction}] Skip: Vol {vol_usdt:.1f} < {self.min_vol}")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: Vol {vol_usdt:.1f} < {self.min_vol}")
             return None
         if self.max_vol is not None and vol_usdt > self.max_vol:
-            logger.debug(f"[{symbol}] [{direction}] Skip: Vol {vol_usdt:.1f} > {self.max_vol}")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: Vol {vol_usdt:.1f} > {self.max_vol}")
             return None
 
         # 4. Проверка спредов уровней (spr2, spr3)
         if spr2_pct < self.min_spr2:
-            logger.debug(f"[{symbol}] [{direction}] Skip: spr2 {spr2_pct:.4f}% < {self.min_spr2}%")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: spr2 {spr2_pct:.4f}% < {self.min_spr2}%")
             return None
         if spr3_pct < self.min_spr3:
-            logger.debug(f"[{symbol}] [{direction}] Skip: spr3 {spr3_pct:.4f}% < {self.min_spr3}%")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: spr3 {spr3_pct:.4f}% < {self.min_spr3}%")
             return None
 
         # 5. Дистанция bid/ask относительно шага цены (max_dist_rate)
         if dist_denom <= 0: return None
         dist_rate = ob_spread_val / dist_denom
         if dist_rate > self.max_dist_rate:
-            logger.debug(f"[{symbol}] [{direction}] Skip: dist_rate {dist_rate:.2f} > {self.max_dist_rate}")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: dist_rate {dist_rate:.2f} > {self.max_dist_rate}")
             return None
 
         # 6. Лесенка ROC (Rate of Change) - считаем С КОНЦА глубины
@@ -110,7 +110,7 @@ class StakanEntryPattern:
 
         # Проверка одиночных скачков в начале окна роков (roc_window)
         if any(r > self.max_one_roc for r in rocs[:self.roc_window]):
-            logger.debug(f"[{symbol}] [{direction}] Skip: High ROC in window: {rocs[:self.roc_window]}")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: High ROC in window: {rocs[:self.roc_window]}")
             return None
 
         # ROC SMA (среднее по всему окну roc_sma_window)
@@ -120,7 +120,7 @@ class StakanEntryPattern:
         # 7. Итоговый коэффициент (rate)
         rate = spr3_pct / roc_sma
         if rate < self.desired_rate:
-            logger.debug(f"[{symbol}] [{direction}] Skip: Rate {rate:.2f} < {self.desired_rate}")
+            # logger.debug(f"[{symbol}] [{direction}] Skip: Rate {rate:.2f} < {self.desired_rate}")
             return None
 
         return EntryPayload(
